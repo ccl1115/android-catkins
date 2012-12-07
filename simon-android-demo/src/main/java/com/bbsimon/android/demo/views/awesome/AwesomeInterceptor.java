@@ -3,6 +3,7 @@ package com.bbsimon.android.demo.views.awesome;
 import android.graphics.Canvas;
 import android.view.MotionEvent;
 
+@SuppressWarnings("unused")
 abstract class AwesomeInterceptor {
     abstract void postInterceptMeasure(int widthMeasureSpec, int heightMeasureSpec);
 

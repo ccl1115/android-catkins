@@ -2,6 +2,7 @@ package com.bbsimon.android.demo.views.awesome;
 
 import android.util.AttributeSet;
 
+@SuppressWarnings("unused")
 public interface IAwesome {
     public static final int STATE_COLLAPSE_LEFT = 10000;
     public static final int STATE_COLLAPSE_RIGHT = 10001;

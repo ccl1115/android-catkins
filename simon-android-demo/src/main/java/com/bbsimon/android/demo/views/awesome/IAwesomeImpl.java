@@ -16,6 +16,7 @@ import com.bbsimon.android.demo.R;
 /**
  * The implementation of Awesome interface and the interceptions for host view methods.
  */
+@SuppressWarnings("unused")
 class IAwesomeImpl extends AwesomeInterceptor implements IAwesome {
     /**
      * TAG for logcat

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
+@SuppressWarnings("unused")
 public class AwesomeLinearLayout extends LinearLayout implements IAwesome {
     private Context mContext;
 

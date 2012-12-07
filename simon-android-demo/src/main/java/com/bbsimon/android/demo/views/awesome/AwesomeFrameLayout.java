@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+@SuppressWarnings("unused")
 public class AwesomeFrameLayout extends FrameLayout implements IAwesome {
     private static final String TAG = "AwesomeFrameLayout";
 

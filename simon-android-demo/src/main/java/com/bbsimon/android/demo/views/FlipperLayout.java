@@ -32,8 +32,9 @@ import java.util.List;
 /**
  * 滑动控件
  *
- * @author ccl
+ * @author simon
  */
+@SuppressWarnings("unused")
 public class FlipperLayout extends ViewGroup {
 
     private static final String TAG = "FlipperLayout";

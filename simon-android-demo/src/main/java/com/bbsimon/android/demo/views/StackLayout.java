@@ -23,8 +23,9 @@ import java.util.Stack;
 
 /**
  * 实现层叠显示内容的控件
- * @author ccl
+ * @author simon
  */
+@SuppressWarnings("unused")
 public class StackLayout extends ViewGroup {
 
 
