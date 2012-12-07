@@ -1,0 +1,16 @@
+<resources>
+    <declare-styleable name="Flipper">
+        <attr name="content" format="integer" />
+        <attr name="head" format="integer" />
+        <attr name="handle" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="Awesome">
+        <attr name="left_offset" format="dimension" />
+        <attr name="right_offset" format="dimension" />
+        <attr name="top_offset" format="dimension" />
+        <attr name="bottom_offset" format="dimension" />
+        <attr name="trackable_area" format="string" />
+        <attr name="tap_back_area" format="string" />
+    </declare-styleable>
+</resources>
