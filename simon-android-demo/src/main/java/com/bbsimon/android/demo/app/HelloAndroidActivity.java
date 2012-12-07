@@ -1,7 +1,8 @@
-package com.bbsimon.android.demo;
+package com.bbsimon.android.demo.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import com.bbsimon.android.demo.R;
 import de.akquinet.android.androlog.Log;
 
 public class HelloAndroidActivity extends Activity {
