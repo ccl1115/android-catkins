@@ -34,6 +34,11 @@
                 <version>${platform.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>com.google.android</groupId>
+                <artifactId>support-v4</artifactId>
+                <version>r7</version>
+            </dependency>
 
             <!-- Androlog is a logging and reporting library for Android -->
             <dependency>
@@ -82,8 +87,8 @@
                     <version>2.3.2</version>
                     <inherited>true</inherited>
                     <configuration>
-                        <source>1.5</source>
-                        <target>1.5</target>
+                        <source>1.6</source>
+                        <target>1.6</target>
                     </configuration>
                 </plugin>
                 <plugin>
