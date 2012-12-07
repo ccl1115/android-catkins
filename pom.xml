@@ -77,6 +77,7 @@
                             ${project.basedir}/src/main/native
                         </nativeLibrariesDirectory>
                         <sdk>
+                            <path>/home/ccl/android-sdk-linux_x86</path>
                             <platform>17</platform>
                         </sdk>
                         <undeployBeforeDeploy>true</undeployBeforeDeploy>

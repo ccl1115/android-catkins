@@ -1,16 +1,41 @@
 <resources>
     <declare-styleable name="Flipper">
-        <attr name="content" format="integer" />
-        <attr name="head" format="integer" />
-        <attr name="handle" format="integer" />
+        <attr name="content"
+              format="integer"/>
+        <attr name="head"
+              format="integer"/>
+        <attr name="handle"
+              format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="Awesome">
-        <attr name="left_offset" format="dimension" />
-        <attr name="right_offset" format="dimension" />
-        <attr name="top_offset" format="dimension" />
-        <attr name="bottom_offset" format="dimension" />
-        <attr name="trackable_area" format="string" />
-        <attr name="tap_back_area" format="string" />
+        <attr name="left_offset"
+              format="dimension"/>
+        <attr name="right_offset"
+              format="dimension"/>
+        <attr name="top_offset"
+              format="dimension"/>
+        <attr name="bottom_offset"
+              format="dimension"/>
+        <attr name="track"
+              format="string"/>
+        <attr name="tap_back_area"
+              format="string"/>
+    </declare-styleable>
+
+    <declare-styleable name="Flip3DLayout">
+        <attr name="from"
+              format="integer"/>
+        <attr name="to"
+              format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="FakeChromeIndicator">
+        <attr name="space"
+              format="dimension"/>
+        <attr name="drawable"
+              format="reference"/>
+        <attr name="selector"
+              format="reference"/>
     </declare-styleable>
 </resources>
