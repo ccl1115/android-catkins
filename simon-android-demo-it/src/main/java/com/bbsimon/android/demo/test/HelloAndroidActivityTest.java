@@ -1,16 +1,16 @@
 package com.bbsimon.android.demo.test;
 
 import android.test.ActivityInstrumentationTestCase2;
-import com.bbsimon.android.demo.app.HelloAndroidActivity;
+import com.bbsimon.android.demo.app.HomeActivity;
 
-public class HelloAndroidActivityTest extends ActivityInstrumentationTestCase2<HelloAndroidActivity> {
+public class HelloAndroidActivityTest extends ActivityInstrumentationTestCase2<HomeActivity> {
 
     public HelloAndroidActivityTest() {
-        super(HelloAndroidActivity.class);
+        super(HomeActivity.class);
     }
 
     public void testActivity() {
-        HelloAndroidActivity activity = getActivity();
+        HomeActivity activity = getActivity();
         assertNotNull(activity);
     }
 }

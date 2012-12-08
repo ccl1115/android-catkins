@@ -132,19 +132,19 @@ public class FlipperLayout extends ViewGroup {
 
     public FlipperLayout(Context context, AttributeSet attrs, int style) {
         super(context, attrs, style);
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Flipper, style, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FlipperLayout, style, 0);
 
-        int contentId = a.getResourceId(R.styleable.Flipper_content, 0);
+        int contentId = a.getResourceId(R.styleable.FlipperLayout_content, 0);
         if (contentId == 0) {
             throw new IllegalArgumentException("The content must be set. It's required.");
         }
 
-        int headId = a.getResourceId(R.styleable.Flipper_head, 0);
+        int headId = a.getResourceId(R.styleable.FlipperLayout_head, 0);
         if (headId == 0) {
             throw new IllegalArgumentException("The head must be set. It's required.");
         }
 
-        int handleId = a.getResourceId(R.styleable.Flipper_handle, 0);
+        int handleId = a.getResourceId(R.styleable.FlipperLayout_handle, 0);
         if (handleId == 0) {
             throw new IllegalArgumentException("The handle must be set. It's required.");
         }

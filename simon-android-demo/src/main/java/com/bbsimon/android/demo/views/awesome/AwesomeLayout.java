@@ -112,12 +112,12 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    */
   @Override
   public void loadAttrs(AttributeSet attrs) {
-    TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.Awesome);
+    TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.AwesomeLayout);
 
-    mLeftOffset = a.getDimension(R.styleable.Awesome_left_offset, -1f);
-    mRightOffset = a.getDimension(R.styleable.Awesome_right_offset, -1f);
-    mTopOffset = a.getDimension(R.styleable.Awesome_top_offset, -1f);
-    mBottomOffset = a.getDimension(R.styleable.Awesome_bottom_offset, -1f);
+    mLeftOffset = a.getDimension(R.styleable.AwesomeLayout_left_offset, -1f);
+    mRightOffset = a.getDimension(R.styleable.AwesomeLayout_right_offset, -1f);
+    mTopOffset = a.getDimension(R.styleable.AwesomeLayout_top_offset, -1f);
+    mBottomOffset = a.getDimension(R.styleable.AwesomeLayout_bottom_offset, -1f);
 
     parseTrack(a);
     parseTapBackArea(a);
@@ -128,7 +128,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   }
 
   private void parseTrack(TypedArray a) {
-    final String track = a.getString(R.styleable.Awesome_track);
+    final String track = a.getString(R.styleable.AwesomeLayout_track);
     if (track != null && track.length() > 0) {
       final String[] tracks = track.split("\\|");
       for (String s : tracks) {
@@ -157,7 +157,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   }
 
   private void parseTapBackArea(TypedArray a) {
-    final String tapBackArea = a.getString(R.styleable.Awesome_tap_back_area);
+    final String tapBackArea = a.getString(R.styleable.AwesomeLayout_tap_back_area);
     if (tapBackArea != null && tapBackArea.length() > 0) {
       final String[] taps = tapBackArea.split("\\|");
       for (String s : taps) {

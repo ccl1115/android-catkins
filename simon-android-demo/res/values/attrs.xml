@@ -1,5 +1,5 @@
 <resources>
-    <declare-styleable name="Flipper">
+    <declare-styleable name="FlipperLayout">
         <attr name="content"
               format="integer"/>
         <attr name="head"
@@ -8,7 +8,7 @@
               format="integer"/>
     </declare-styleable>
 
-    <declare-styleable name="Awesome">
+    <declare-styleable name="AwesomeLayout">
         <attr name="left_offset"
               format="dimension"/>
         <attr name="right_offset"

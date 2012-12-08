@@ -1,0 +1,12 @@
+[
+    {
+        "name" : "FlipperLayout",
+        "description" : "",
+        "activity" : "FlipperLayoutDemoActivity",
+    },
+    {
+        "name" : "Flip3DLayout",
+        "description" : "",
+        "activity" : "Flip3DLayoutDemoActivity",
+    }
+]

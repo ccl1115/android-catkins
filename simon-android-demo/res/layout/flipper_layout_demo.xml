@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FF332233"/>
+
+    <com.bbsimon.android.demo.views.FlipperLayout
+            simon:content="@+id/content"
+            simon:head="@+id/head"
+            simon:handle="@+id/handle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:id="@+id/head"
+                android:background="#FF888800"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <Button
+                    android:id="@+id/handle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="handle"/>
+        </LinearLayout>
+
+        <FrameLayout
+                android:id="@+id/content"
+                android:background="#FF883933"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+    </com.bbsimon.android.demo.views.FlipperLayout>
+
+</FrameLayout>
