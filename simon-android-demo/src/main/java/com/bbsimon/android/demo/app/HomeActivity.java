@@ -37,7 +37,9 @@ public class HomeActivity extends Activity {
 
     ObjectMapper mapper = new ObjectMapper();
     try {
-      mDemos = mapper.readValue(getAssets().open("demos.json"), new TypeReference<List<Demo>>() {});
+      mDemos = mapper.readValue(getAssets().open("demos.json"),
+          new TypeReference<List<Demo>>() {
+          });
     } catch (IOException e) {
       Log.e(TAG, "@onCreate - Fail to load demos list.");
       e.printStackTrace();
@@ -48,7 +50,8 @@ public class HomeActivity extends Activity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        startActivity(new Intent(HomeActivity.this, mDemos.get(position).activityClass));
+        startActivity(new Intent(HomeActivity.this,
+            mDemos.get(position).activityClass));
       }
     });
   }
@@ -79,9 +82,11 @@ public class HomeActivity extends Activity {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
       if (convertView == null) {
-        convertView = View.inflate(HomeActivity.this, R.layout.demo_list_item, null);
+        convertView = View.inflate(HomeActivity.this,
+            R.layout.demo_list_item, null);
         mHolder.mName = (TextView) convertView.findViewById(R.id.name);
-        mHolder.mDescription = (TextView) convertView.findViewById(R.id.description);
+        mHolder.mDescription =
+            (TextView) convertView.findViewById(R.id.description);
       }
       final Demo demo = mDemos.get(position);
       mHolder.mName.setText(demo.name);

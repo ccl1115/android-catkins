@@ -3,5 +3,10 @@
         "name" : "FlipperLayout",
         "description" : "",
         "activity" : "com.bbsimon.android.demo.app.demo.FlipperLayoutDemoActivity"
+    },
+    {
+        "name" : "Flip3DLayout",
+        "description" : "",
+        "activity" : "com.bbsimon.android.demo.app.demo.Flip3DLayoutDemoActivity"
     }
 ]

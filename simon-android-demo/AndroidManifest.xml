@@ -20,6 +20,8 @@
         </activity>
 
         <activity android:name=".app.demo.FlipperLayoutDemoActivity"/>
+
+        <activity android:name=".app.demo.Flip3DLayoutDemoActivity"/>
     </application>
 
 </manifest>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <com.bbsimon.android.demo.views.Flip3DLayout
+            android:id="@+id/flip_3d_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp"
+            simon:from="@+id/from"
+            simon:to="@+id/to">
+
+        <View
+                android:id="@+id/from"
+                android:background="@android:color/holo_blue_dark"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        <View
+                android:id="@+id/to"
+                android:background="@android:color/holo_red_light"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+    </com.bbsimon.android.demo.views.Flip3DLayout>
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        <Button
+                android:id="@+id/flip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Flip"/>
+
+        <Button
+                android:id="@+id/flip_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Flip back"/>
+    </LinearLayout>
+
+</LinearLayout>
