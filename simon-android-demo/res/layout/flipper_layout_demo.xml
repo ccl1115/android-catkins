@@ -19,6 +19,7 @@
 
         <LinearLayout
                 android:id="@+id/head"
+                android:clickable="true"
                 android:background="#FF888800"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -32,6 +33,7 @@
 
         <FrameLayout
                 android:id="@+id/content"
+                android:clickable="true"
                 android:background="#FF883933"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
