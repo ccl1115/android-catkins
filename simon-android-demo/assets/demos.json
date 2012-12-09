@@ -1,12 +1,22 @@
 [
     {
         "name" : "FlipperLayout",
-        "description" : "",
+        "description" : "A layout acting like a drawer. It can be flinged to the right side out of the screen.",
         "activity" : "com.bbsimon.android.demo.app.demo.FlipperLayoutDemoActivity"
     },
     {
         "name" : "Flip3DLayout",
-        "description" : "",
+        "description" : "Flip or reverse flip between two children layouts",
         "activity" : "com.bbsimon.android.demo.app.demo.Flip3DLayoutDemoActivity"
+    },
+    {
+        "name" : "StackLayout",
+        "description" : "Acting like FrameLayout, but has an optional translate animation when adding or removing to it.",
+        "activity" : "com.bbsimon.android.demo.app.demo.StackLayoutDemoActivity"
+    },
+    {
+        "name" : "StackLayout /w Fragment",
+        "description" : "The same as StackLayout, but manages the children with FragmentManager using the android support package.",
+        "activity" : "com.bbsimon.android.demo.app.demo.StackLayoutWithFragmentDemoActivity"
     }
 ]

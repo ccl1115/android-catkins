@@ -22,6 +22,10 @@
         <activity android:name=".app.demo.FlipperLayoutDemoActivity"/>
 
         <activity android:name=".app.demo.Flip3DLayoutDemoActivity"/>
+
+        <activity android:name=".app.demo.StackLayoutDemoActivity"/>
+
+        <activity android:name=".app.demo.StackLayoutWithFragmentDemoActivity"/>
     </application>
 
 </manifest>

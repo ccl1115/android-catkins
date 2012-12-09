@@ -1,6 +1,9 @@
+/*
+ * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
+ */
+
 package com.bbsimon.android.demo.app;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,7 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends Activity {
+public class HomeActivity extends BaseActivity {
 
   private static final String TAG = "HomeActivity";
 
@@ -31,9 +34,12 @@ public class HomeActivity extends Activity {
     super.onCreate(savedInstanceState);
     Log.init(this);
     Log.v(TAG, "@onCreate");
-    setContentView(R.layout.main);
 
-    ListView listView = (ListView) findViewById(R.id.list);
+    getTitleBar().setTitle(TAG);
+
+    setContentView(R.layout.home);
+
+    ListView listView = (ListView) findViewById(R.id.content);
 
     ObjectMapper mapper = new ObjectMapper();
     try {

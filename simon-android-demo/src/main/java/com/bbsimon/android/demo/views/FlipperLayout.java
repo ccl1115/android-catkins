@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2011. Renren inc.
- */
-
 package com.bbsimon.android.demo.views;
 
 import android.content.Context;
