@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
+ */
+
 package com.bbsimon.android.demo.views.fakechrome;
 
 import android.content.Context;
@@ -13,8 +17,8 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
-import com.bbsimon.android.demo.views.fakechrome.scalable.IScalable;
 import com.bbsimon.android.demo.R;
+import com.bbsimon.android.demo.views.fakechrome.scalable.IScalable;
 
 import java.util.ArrayList;
 import java.util.List;
