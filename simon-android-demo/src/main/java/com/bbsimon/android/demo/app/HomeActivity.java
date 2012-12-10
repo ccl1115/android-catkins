@@ -32,7 +32,6 @@ public class HomeActivity extends BaseActivity {
   @SuppressWarnings("unchecked")
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    Log.init(this);
     Log.v(TAG, "@onCreate");
 
     getTitleBar().setTitle(TAG);

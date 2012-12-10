@@ -59,11 +59,11 @@ class PagerIndicator extends View {
     mFrame = new Rect();
 
     TypedArray ta =
-        context.obtainStyledAttributes(attrs, R.styleable.FakeChromeIndicator);
+        context.obtainStyledAttributes(attrs, R.styleable.PagerIndicator);
 
-    mDrawable = ta.getDrawable(R.styleable.FakeChromeIndicator_drawable);
-    mSelector = ta.getDrawable(R.styleable.FakeChromeIndicator_selector);
-    mSpace = ta.getDimension(R.styleable.FakeChromeIndicator_space, 0);
+    mDrawable = ta.getDrawable(R.styleable.PagerIndicator_drawable);
+    mSelector = ta.getDrawable(R.styleable.PagerIndicator_selector);
+    mSpace = ta.getDimension(R.styleable.PagerIndicator_space, 0);
 
     ta.recycle();
 

@@ -28,6 +28,7 @@ public abstract class BaseActivity extends FragmentActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     super.setContentView(buildContentView());
+    Log.init(this);
   }
 
   public interface ITitleBar {

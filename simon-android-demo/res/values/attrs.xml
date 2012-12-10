@@ -30,7 +30,7 @@
               format="integer"/>
     </declare-styleable>
 
-    <declare-styleable name="FakeChromeIndicator">
+    <declare-styleable name="PagerIndicator">
         <attr name="space"
               format="dimension"/>
         <attr name="drawable"

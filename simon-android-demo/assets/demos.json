@@ -18,5 +18,10 @@
         "name" : "StackLayout /w Fragment",
         "description" : "The same as StackLayout, but manages the children with FragmentManager using the android support package.",
         "activity" : "com.bbsimon.android.demo.app.demo.StackLayoutWithFragmentDemoActivity"
+    },
+    {
+        "name" : "AwesomeLayout",
+        "description" : "A highly configurable layout that can be translate to any direction.",
+        "activity" : "com.bbsimon.android.demo.app.demo.AwesomeLayoutDemoActivity"
     }
 ]

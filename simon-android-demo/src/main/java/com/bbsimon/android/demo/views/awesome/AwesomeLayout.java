@@ -15,10 +15,22 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.widget.FrameLayout;
 import com.bbsimon.android.demo.R;
+import de.akquinet.android.androlog.Log;
 
 @SuppressWarnings("unused")
-public class AwesomeLayout extends FrameLayout implements IAwesome {
+public class AwesomeLayout extends FrameLayout {
 
+  public static final int STATE_COLLAPSE_LEFT = 10000;
+  public static final int STATE_COLLAPSE_RIGHT = 10001;
+  public static final int STATE_COLLAPSE_TOP = 10002;
+  public static final int STATE_COLLAPSE_BOTTOM = 10003;
+  public static final int STATE_EXPAND = 10004;
+  public static final String LEFT = "left";
+  public static final String RIGHT = "right";
+  public static final String TOP = "top";
+  public static final String BOTTOM = "bottom";
+  public static final String HORIZONTAL = "horizontal";
+  public static final String VERTICAL = "vertical";
   private static final String TAG = "AwesomeLayout";
 
   private final static int MSG_ANIMATE_LEFT = -100;
@@ -46,7 +58,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   private float mTopOffset;
   private float mBottomOffset;
 
-  private final int mInterceptTouchEventThreshold;
+  private final int mTouchEventThreshold;
 
   private boolean mLeftTapBack;
   private boolean mRightTapBack;
@@ -55,21 +67,12 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
 
   private int mTrackDirection = 0x00;
 
-  private int mPositionState;
+  private int mState;
 
   private Rect mLeftFrameForTap = new Rect();
   private Rect mTopFrameForTap = new Rect();
   private Rect mRightFrameForTap = new Rect();
   private Rect mBottomFrameForTap = new Rect();
-
-  /* We store the host's properties to avoid too many get...() methods calling. */
-  private int mHostWidth;
-  private int mHostHeight;
-
-  /* When layout we store the initial values of mHost.getLeft() and mHost.getTop() because
-* after offset vertically or horizontally, these value will be updated. */
-  private int mHostLayoutLeft;
-  private int mHostLayoutTop;
 
   private int mLastDownX;
   private int mLastDownY;
@@ -87,6 +90,8 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   private OnTopAnimationListener mOnTopAnimationListener;
   private OnBottomAnimationListener mOnBottomAnimationListener;
   private OnOpenAnimationListener mOnOpenAnimationListener;
+  private int mMeasuredWidth;
+  private int mMeasuredHeight;
 
   public AwesomeLayout(Context context) {
     this(context, null, 0);
@@ -98,15 +103,17 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
 
   public AwesomeLayout(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
+    Log.init(context);
     mContext = getContext();
     mHandler = new AnimationHandler();
     mAnimator = new Animator();
     mTracker = new Tracker();
-    mPositionState = STATE_EXPAND;
+    mState = STATE_EXPAND;
 
     float density = mContext.getResources().getDisplayMetrics().density;
-    mInterceptTouchEventThreshold = (int) (TAP_THRESHOLD * density + 0.5);
+    mTouchEventThreshold = (int) (TAP_THRESHOLD * density + 0.5);
 
+    loadAttrs(attrs);
   }
 
   /**
@@ -114,7 +121,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @param attrs the attributes set from xml
    */
-  @Override
   public void loadAttrs(AttributeSet attrs) {
     TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.AwesomeLayout);
 
@@ -127,11 +133,10 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
     parseTapBackArea(a);
 
     a.recycle();
-
-    setClickable(true);
   }
 
   private void parseTrack(TypedArray a) {
+    Log.d(TAG, "@parseTrack");
     final String track = a.getString(R.styleable.AwesomeLayout_track);
     if (track != null && track.length() > 0) {
       final String[] tracks = track.split("\\|");
@@ -139,21 +144,27 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
         if (mLeftOffset != -1 && mRightOffset != -1 &&
             HORIZONTAL.equals(s) && (mTrackDirection & 0xF0) == 0) {
           mTrackDirection |= TRACK_DIRECTION_HORIZONTAL_MASK;
+          Log.v(TAG, "@parseTrack horizontal track");
         } else if ((mRightOffset != -1) && RIGHT.equals(s) &&
             (mTrackDirection & 0xF0) == 0) {
           mTrackDirection |= TRACK_DIRECTION_RIGHT_MASK;
+          Log.v(TAG, "@parseTrack right track");
         } else if ((mLeftOffset != -1) && LEFT.equals(s) &&
             (mTrackDirection & 0xF0) == 0) {
           mTrackDirection |= TRACK_DIRECTION_LEFT_MASK;
+          Log.v(TAG, "@parseTrack left track");
         } else if (mTopOffset != -1 && mBottomOffset != -1 &&
             VERTICAL.equals(s) && (mTrackDirection & 0x0F) == 0) {
           mTrackDirection |= TRACK_DIRECTION_VERTICAL_MASK;
+          Log.v(TAG, "@parseTrack vertical track");
         } else if (mTopOffset != -1 && TOP.equals(s) &&
             (mTrackDirection & 0x0F) == 0) {
           mTrackDirection |= TRACK_DIRECTION_TOP_MASK;
+          Log.v(TAG, "@parseTrack top track");
         } else if (mBottomOffset != -1 && BOTTOM.equals(s) &&
             (mTrackDirection & 0x0F) == 0) {
           mTrackDirection |= TRACK_DIRECTION_BOTTOM_MASK;
+          Log.v(TAG, "@parseTrack bottom track");
         }
       }
 
@@ -161,19 +172,23 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   }
 
   private void parseTapBackArea(TypedArray a) {
+    Log.d(TAG, "@parseTapBackArea");
     final String tapBackArea = a.getString(R.styleable.AwesomeLayout_tap_back_area);
     if (tapBackArea != null && tapBackArea.length() > 0) {
       final String[] taps = tapBackArea.split("\\|");
       for (String s : taps) {
         if (LEFT.equals(s) && mLeftOffset != -1) {
           mLeftTapBack = true;
+          Log.v(TAG, "@parseTapBackArea left tap back");
         } else if (RIGHT.equals(s) && mRightOffset != -1) {
           mRightTapBack = true;
+          Log.v(TAG, "@parseTapBackArea right tap back");
         } else if (TOP.equals(s) && mTopOffset != -1) {
           mTopTapBack = true;
+          Log.v(TAG, "@parseTapBackArea top tap back");
         } else if (BOTTOM.equals(s) && mBottomOffset != -1) {
           mBottomTapBack = true;
-        } else {
+          Log.v(TAG, "@parseTapBackArea bottom tap back");
         }
       }
     }
@@ -184,7 +199,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return the mLeft offset
    */
-  @Override
   public int getLeftOffset() {
     return (int) mLeftOffset;
   }
@@ -194,7 +208,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return the mTop offset
    */
-  @Override
   public int getRightOffset() {
     return (int) mRightOffset;
   }
@@ -204,7 +217,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return the mTop offset
    */
-  @Override
   public int getTopOffset() {
     return (int) mTopOffset;
   }
@@ -214,7 +226,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return the bottom offset
    */
-  @Override
   public int getBottomOffset() {
     return (int) mBottomOffset;
   }
@@ -224,7 +235,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return true if allow tap back
    */
-  @Override
   public boolean getLeftTapBack() {
     return mLeftTapBack;
   }
@@ -234,7 +244,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return true if allow tap back
    */
-  @Override
   public boolean getRightTapBack() {
     return mRightTapBack;
   }
@@ -244,7 +253,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return true if allow tap back
    */
-  @Override
   public boolean getTopTapBack() {
     return mTopTapBack;
   }
@@ -254,7 +262,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return true if allow tap back
    */
-  @Override
   public boolean getBottomTapBack() {
     return mBottomTapBack;
   }
@@ -264,7 +271,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @param tapBack tap back
    */
-  @Override
   public void setLeftTapBack(boolean tapBack) {
     mLeftTapBack = tapBack;
   }
@@ -274,7 +280,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @param tapBack tap back
    */
-  @Override
   public void setRightTapBack(boolean tapBack) {
     mRightTapBack = tapBack;
   }
@@ -284,7 +289,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @param tapBack tap back
    */
-  @Override
   public void setTopTapBack(boolean tapBack) {
     mTopTapBack = tapBack;
   }
@@ -294,7 +298,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @param tapBack tap back
    */
-  @Override
   public void setBottomTapBack(boolean tapBack) {
     mBottomTapBack = tapBack;
   }
@@ -302,10 +305,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Flip left immediately, without animation.
    */
-  @Override
   public void left() {
     if (canLeft()) {
-      offsetLeftAndRight((int) (mLeftOffset - mHostWidth - getLeft()));
+      offsetLeftAndRight((int) (mLeftOffset - mMeasuredWidth - getLeft()));
       invalidate();
     }
   }
@@ -313,10 +315,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Flip right immediately, without animation.
    */
-  @Override
   public void right() {
     if (canRight()) {
-      offsetLeftAndRight((int) (mHostWidth - mRightOffset - getLeft()));
+      offsetLeftAndRight((int) (mMeasuredWidth - mRightOffset - getLeft()));
       invalidate();
     }
   }
@@ -324,10 +325,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Flip top immediately, without animation.
    */
-  @Override
   public void top() {
     if (canTop()) {
-      offsetTopAndBottom((int) (mTopOffset - mHostHeight - getTop()));
+      offsetTopAndBottom((int) (mTopOffset - mMeasuredHeight - getTop()));
       invalidate();
     }
   }
@@ -335,10 +335,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Flip bottom immediately, without animation.
    */
-  @Override
   public void bottom() {
     if (canBottom()) {
-      offsetTopAndBottom((int) (mHostHeight - mBottomOffset - getTop()));
+      offsetTopAndBottom((int) (mMeasuredHeight - mBottomOffset - getTop()));
       invalidate();
     }
   }
@@ -346,7 +345,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Open host view when flipped.
    */
-  @Override
   public void open() {
     offsetLeftAndRight(getLeft());
     offsetTopAndBottom(getTop());
@@ -356,7 +354,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Animation version of flipping
    */
-  @Override
   public void animateLeft() {
     if (canLeft()) mAnimator.animateLeft(-mAnimator.velocity);
   }
@@ -364,7 +361,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Animation version of flipping
    */
-  @Override
   public void animateRight() {
     if (canRight()) mAnimator.animateRight(mAnimator.velocity);
   }
@@ -372,7 +368,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Animation version of flipping
    */
-  @Override
   public void animateTop() {
     if (canTop()) mAnimator.animateTop(-mAnimator.velocity);
   }
@@ -380,7 +375,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Animation version of flipping
    */
-  @Override
   public void animateBottom() {
     if (canBottom()) mAnimator.animateBottom(mAnimator.velocity);
   }
@@ -388,9 +382,8 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   /**
    * Animation version of flipping
    */
-  @Override
   public void animateOpen() {
-    switch (mPositionState) {
+    switch (mState) {
       case STATE_COLLAPSE_LEFT:
         mAnimator.animateLeftOpen(mAnimator.velocity);
         break;
@@ -413,34 +406,88 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    *
    * @return the state
    */
-  @Override
   public int getState() {
-    return mPositionState;
+    return mState;
   }
 
-  @Override
   public void setLeftAnimationListener(OnLeftAnimationListener listener) {
     mOnLeftAnimationListener = listener;
   }
 
-  @Override
   public void setRightAnimationListener(OnRightAnimationListener listener) {
     mOnRightAnimationListener = listener;
   }
 
-  @Override
   public void setTopAnimationListener(OnTopAnimationListener listener) {
     mOnTopAnimationListener = listener;
   }
 
-  @Override
   public void setBottomAnimationListener(OnBottomAnimationListener listener) {
     mOnBottomAnimationListener = listener;
   }
 
-  @Override
   public void setOpenAnimationListener(OnOpenAnimationListener listener) {
     mOnOpenAnimationListener = listener;
+  }
+
+  interface OnOpenAnimationListener {
+    /**
+     * fire when open animation starts.
+     */
+    void onOpenAnimationStart();
+
+    /**
+     * fire when open animation ends;
+     */
+    void onOpenAnimationEnd();
+  }
+
+  interface OnLeftAnimationListener {
+    /**
+     * fire when left animation starts.
+     */
+    void onLeftAnimationStart();
+
+    /**
+     * fire when left animation ends.
+     */
+    void onLeftAnimationEnd();
+  }
+
+  interface OnRightAnimationListener {
+    /**
+     * fire when right animation starts.
+     */
+    void onRightAnimationStart();
+
+    /**
+     * fire when right animation ends.
+     */
+    void onRightAnimationEnd();
+  }
+
+  interface OnTopAnimationListener {
+    /**
+     * fire when top animation starts.
+     */
+    void onTopAnimationStart();
+
+    /**
+     * fire when top animation ends.
+     */
+    void onTopAnimationEnd();
+  }
+
+  interface OnBottomAnimationListener {
+    /**
+     * fire when bottom animation starts.
+     */
+    void onBottomAnimationStart();
+
+    /**
+     * fire when bottom animation ends.
+     */
+    void onBottomAnimationEnd();
   }
 
 
@@ -487,26 +534,26 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
    * the position state.
    */
   private void offset() {
-    switch (mPositionState) {
+    switch (mState) {
       case STATE_EXPAND:
         offsetLeftAndRight(-getLeft());
         offsetTopAndBottom(-getTop());
         invalidate();
         break;
       case STATE_COLLAPSE_LEFT:
-        offsetLeftAndRight((int) (mLeftOffset - mHostWidth - getLeft()));
+        offsetLeftAndRight((int) (mLeftOffset - mMeasuredWidth - getLeft()));
         invalidate();
         break;
       case STATE_COLLAPSE_TOP:
-        offsetTopAndBottom((int) (mTopOffset - mHostHeight - getTop()));
+        offsetTopAndBottom((int) (mTopOffset - mMeasuredHeight - getTop()));
         invalidate();
         break;
       case STATE_COLLAPSE_RIGHT:
-        offsetLeftAndRight((int) (mHostWidth - mRightOffset - getLeft()));
+        offsetLeftAndRight((int) (mMeasuredWidth - mRightOffset - getLeft()));
         invalidate();
         break;
       case STATE_COLLAPSE_BOTTOM:
-        offsetTopAndBottom((int) (mHostHeight - mBottomOffset - getTop()));
+        offsetTopAndBottom((int) (mMeasuredHeight - mBottomOffset - getTop()));
         invalidate();
         break;
     }
@@ -514,19 +561,19 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   }
 
   private boolean canLeft() {
-    return mLeftOffset != -1 && mPositionState == STATE_EXPAND;
+    return mLeftOffset != -1 && mState == STATE_EXPAND;
   }
 
   private boolean canTop() {
-    return mTopOffset != -1 && mPositionState == STATE_EXPAND;
+    return mTopOffset != -1 && mState == STATE_EXPAND;
   }
 
   private boolean canBottom() {
-    return mBottomOffset != -1 && mPositionState == STATE_EXPAND;
+    return mBottomOffset != -1 && mState == STATE_EXPAND;
   }
 
   private boolean canRight() {
-    return mRightOffset != -1 && mPositionState == STATE_EXPAND;
+    return mRightOffset != -1 && mState == STATE_EXPAND;
   }
 
   /**
@@ -564,32 +611,32 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
     }
 
     boolean prepareLeftTrack() {
-      if (mPositionState != STATE_EXPAND &&
-          mPositionState != STATE_COLLAPSE_LEFT) return false;
+      if (mState != STATE_EXPAND &&
+          mState != STATE_COLLAPSE_LEFT) return false;
       prepareTracking();
       direction = TRACK_DIRECTION_LEFT_MASK;
       return true;
     }
 
     boolean prepareTopTrack() {
-      if (mPositionState != STATE_EXPAND &&
-          mPositionState != STATE_COLLAPSE_TOP) return false;
+      if (mState != STATE_EXPAND &&
+          mState != STATE_COLLAPSE_TOP) return false;
       prepareTracking();
       direction = TRACK_DIRECTION_TOP_MASK;
       return true;
     }
 
     boolean prepareRightTrack() {
-      if (mPositionState != STATE_EXPAND &&
-          mPositionState != STATE_COLLAPSE_RIGHT) return false;
+      if (mState != STATE_EXPAND &&
+          mState != STATE_COLLAPSE_RIGHT) return false;
       prepareTracking();
       direction = TRACK_DIRECTION_RIGHT_MASK;
       return true;
     }
 
     boolean prepareBottomTrack() {
-      if (mPositionState != STATE_EXPAND &&
-          mPositionState != STATE_COLLAPSE_BOTTOM) return false;
+      if (mState != STATE_EXPAND &&
+          mState != STATE_COLLAPSE_BOTTOM) return false;
       prepareTracking();
       direction = TRACK_DIRECTION_BOTTOM_MASK;
       return true;
@@ -613,39 +660,39 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       final int top = getTop() - yOffset;
       switch (direction) {
         case TRACK_DIRECTION_LEFT_MASK:
-          if (left > mLeftOffset - mHostWidth && left < 0) {
+          if (left > mLeftOffset - mMeasuredWidth && left < 0) {
             offsetLeftAndRight(-xOffset);
             invalidate();
           }
           break;
         case TRACK_DIRECTION_RIGHT_MASK:
-          if (left < mHostWidth - mRightOffset && left > 0) {
+          if (left < mMeasuredWidth - mRightOffset && left > 0) {
             offsetLeftAndRight(-xOffset);
             invalidate();
           }
           break;
         case TRACK_DIRECTION_TOP_MASK:
-          if (top > mTopOffset - mHostHeight && top < 0) {
+          if (top > mTopOffset - mMeasuredHeight && top < 0) {
             offsetTopAndBottom(-yOffset);
             invalidate();
           }
           break;
         case TRACK_DIRECTION_BOTTOM_MASK:
-          if (top < mHostHeight - mBottomOffset && top > 0) {
+          if (top < mMeasuredHeight - mBottomOffset && top > 0) {
             offsetTopAndBottom(-yOffset);
             invalidate();
           }
           break;
         case TRACK_DIRECTION_HORIZONTAL_MASK:
-          if (left > mLeftOffset - mHostWidth &&
-              left < mHostWidth - mRightOffset) {
+          if (left > mLeftOffset - mMeasuredWidth &&
+              left < mMeasuredWidth - mRightOffset) {
             offsetLeftAndRight(-xOffset);
             invalidate();
           }
           break;
         case TRACK_DIRECTION_VERTICAL_MASK:
-          if (top > mTopOffset - mHostHeight &&
-              top < mHostHeight - mBottomOffset) {
+          if (top > mTopOffset - mMeasuredHeight &&
+              top < mMeasuredHeight - mBottomOffset) {
             offsetTopAndBottom(-yOffset);
             invalidate();
           }
@@ -701,13 +748,13 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
 
     private void verticalFling(float velocity) {
       final int top = getTop();
-      if (top <= 0 && top >= mTopOffset - mHostHeight) {
+      if (top <= 0 && top >= mTopOffset - mMeasuredHeight) {
         if (velocity < 0) {
           mAnimator.animateTop(velocity);
         } else {
           mAnimator.animateTopOpen(velocity);
         }
-      } else if (top >= 0 && top <= mHostHeight - mBottomOffset) {
+      } else if (top >= 0 && top <= mMeasuredHeight - mBottomOffset) {
         if (velocity < 0) {
           mAnimator.animateBottomOpen(velocity);
         } else {
@@ -725,15 +772,15 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
     }
 
     private void horizontalFling(float velocity) {
-//            Log.d(TAG, "@horizontalFling");
+      Log.d(TAG, "@horizontalFling");
       final int left = getLeft();
-      if (left <= 0 && left >= mLeftOffset - mHostWidth) {
+      if (left <= 0 && left >= mLeftOffset - mMeasuredWidth) {
         if (velocity < 0) {
           mAnimator.animateLeft(velocity);
         } else {
           mAnimator.animateLeftOpen(velocity);
         }
-      } else if (left >= 0 && left <= mHostWidth - mRightOffset) {
+      } else if (left >= 0 && left <= mMeasuredWidth - mRightOffset) {
         if (velocity < 0) {
           mAnimator.animateRightOpen(velocity);
         } else {
@@ -751,7 +798,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
     }
 
     private void rightFling(float velocity) {
-//            Log.d(TAG, "@rightFling");
+      Log.d(TAG, "@rightFling");
       if (velocity < 0) {
         mAnimator.animateRightOpen(velocity);
       } else {
@@ -760,7 +807,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
     }
 
     private void topFling(float velocity) {
-//            Log.d(TAG, "@topFling");
+      Log.d(TAG, "@topFling");
       if (velocity < 0) {
         mAnimator.animateTop(velocity);
       } else {
@@ -782,11 +829,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
     final float velocity;
     final float minVelocity;
     final float endVelocity;
-    final float acceleration;
 
     float animatingDelta;
     float animatingVelocity;
-    float animatingAcceleration;
     long lastAnimationTime;
     long currentAnimationTime;
     boolean animating;
@@ -795,7 +840,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       final float density = mContext.getResources().getDisplayMetrics().density;
       velocity = VELOCITY * density;
       minVelocity = MIN_VELOCITY * density;
-      acceleration = ACCELERATION * density;
       endVelocity = END_VELOCITY * density;
     }
 
@@ -803,77 +847,70 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       final float v = animatingVelocity;
       final long now = SystemClock.uptimeMillis();
       final float t = (now - lastAnimationTime) / 1000f;
-      animatingDelta = v * t + animatingAcceleration * t * t * 0.5f;
-      animatingVelocity = v + animatingAcceleration * t;
+      animatingDelta = v * t;
       lastAnimationTime = now;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
-
-      //Log.d(TAG, "@compute position " + animatingDelta + " velocity " + animatingVelocity);
-    }
-
-    float computeAcceleration(float d, float velocity) {
-      if (Math.abs(d) < 100) return 0;
-      float endV = velocity < 0 ? -endVelocity : endVelocity;
-      return (endV - velocity) * ((velocity + 0.5f * (endV - velocity)) / d);
     }
 
     void computeLeftAnimation() {
       compute();
-      if (getLeft() + animatingDelta <= mLeftOffset - mHostWidth) {
+      if (getLeft() + animatingDelta <= mLeftOffset - mMeasuredWidth) {
         final OnLeftAnimationListener listener = mOnLeftAnimationListener;
         if (listener != null) listener.onLeftAnimationEnd();
         animating = false;
-        mPositionState = STATE_COLLAPSE_LEFT;
+        mState = STATE_COLLAPSE_LEFT;
         offset();
       } else {
         offsetLeftAndRight((int) animatingDelta);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_LEFT), currentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT, currentAnimationTime);
       }
     }
 
     void computeRightAnimation() {
       compute();
-      if (getLeft() + animatingDelta >= mHostWidth - mRightOffset) {
+      if (getLeft() + animatingDelta >= mMeasuredWidth - mRightOffset) {
         final OnRightAnimationListener listener = mOnRightAnimationListener;
         if (listener != null) listener.onRightAnimationEnd();
         animating = false;
-        mPositionState = STATE_COLLAPSE_RIGHT;
+        mState = STATE_COLLAPSE_RIGHT;
         offset();
       } else {
         offsetLeftAndRight((int) animatingDelta);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT), currentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT,
+            currentAnimationTime);
       }
     }
 
     void computeTopAnimation() {
       compute();
-      if (getTop() + animatingDelta <= mTopOffset - mHostHeight) {
+      if (getTop() + animatingDelta <= mTopOffset - mMeasuredHeight) {
         final OnTopAnimationListener listener = mOnTopAnimationListener;
         if (listener != null) listener.onTopAnimationEnd();
         animating = false;
-        mPositionState = STATE_COLLAPSE_TOP;
+        mState = STATE_COLLAPSE_TOP;
         offset();
       } else {
         offsetTopAndBottom((int) animatingDelta);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_TOP), currentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP, currentAnimationTime);
       }
     }
 
     void computeBottomAnimation() {
       compute();
-      if (getTop() + animatingDelta >= mHostHeight - mBottomOffset) {
+      if (getTop() + animatingDelta >= mMeasuredHeight - mBottomOffset) {
         final OnBottomAnimationListener listener = mOnBottomAnimationListener;
         if (listener != null) listener.onBottomAnimationEnd();
         animating = false;
-        mPositionState = STATE_COLLAPSE_BOTTOM;
+        mState = STATE_COLLAPSE_BOTTOM;
         offset();
       } else {
         offsetTopAndBottom((int) animatingDelta);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_BOTTOM), currentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM,
+            currentAnimationTime);
       }
     }
 
@@ -885,12 +922,13 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
           listener.onOpenAnimationEnd();
         }
         animating = false;
-        mPositionState = STATE_EXPAND;
+        mState = STATE_EXPAND;
         offset();
       } else {
         offsetLeftAndRight((int) animatingDelta);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_LEFT_OPEN), currentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT_OPEN,
+            currentAnimationTime);
       }
     }
 
@@ -900,12 +938,13 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
         final OnOpenAnimationListener listener = mOnOpenAnimationListener;
         if (listener != null) listener.onOpenAnimationEnd();
         animating = false;
-        mPositionState = STATE_EXPAND;
+        mState = STATE_EXPAND;
         offset();
       } else {
         offsetLeftAndRight((int) animatingDelta);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT_OPEN), currentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT_OPEN,
+            currentAnimationTime);
       }
     }
 
@@ -915,12 +954,13 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
         final OnOpenAnimationListener listener = mOnOpenAnimationListener;
         if (listener != null) listener.onOpenAnimationEnd();
         animating = false;
-        mPositionState = STATE_EXPAND;
+        mState = STATE_EXPAND;
         offset();
       } else {
         offsetTopAndBottom((int) animatingDelta);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_TOP_OPEN), currentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP_OPEN,
+            currentAnimationTime);
       }
     }
 
@@ -930,12 +970,13 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
         final OnOpenAnimationListener listener = mOnOpenAnimationListener;
         if (listener != null) listener.onOpenAnimationEnd();
         animating = false;
-        mPositionState = STATE_EXPAND;
+        mState = STATE_EXPAND;
         offset();
       } else {
         offsetTopAndBottom((int) animatingDelta);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_BOTTOM_OPEN), currentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM_OPEN,
+            currentAnimationTime);
       }
     }
 
@@ -949,9 +990,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       lastAnimationTime = currentAnimationTime;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
       animatingVelocity = velocity;
-      animatingAcceleration = computeAcceleration(-getLeft(), velocity);
       mHandler.removeMessages(MSG_ANIMATE_LEFT_OPEN);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_LEFT_OPEN), currentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT_OPEN,
+          currentAnimationTime);
     }
 
     void animateRightOpen(float velocity) {
@@ -964,9 +1005,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       lastAnimationTime = currentAnimationTime;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
       animatingVelocity = velocity;
-      animatingAcceleration = computeAcceleration(-getLeft(), velocity);
       mHandler.removeMessages(MSG_ANIMATE_RIGHT_OPEN);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT_OPEN), currentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT_OPEN,
+          currentAnimationTime);
     }
 
     void animateTopOpen(float velocity) {
@@ -975,9 +1016,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       lastAnimationTime = currentAnimationTime;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
       animatingVelocity = velocity;
-      animatingAcceleration = computeAcceleration(-getTop(), velocity);
       mHandler.removeMessages(MSG_ANIMATE_TOP_OPEN);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_TOP_OPEN), currentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP_OPEN,
+          currentAnimationTime);
     }
 
     void animateBottomOpen(float velocity) {
@@ -986,9 +1027,9 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       lastAnimationTime = currentAnimationTime;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
       animatingVelocity = velocity;
-      animatingAcceleration = computeAcceleration(-getTop(), velocity);
       mHandler.removeMessages(MSG_ANIMATE_BOTTOM_OPEN);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_BOTTOM_OPEN), currentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM_OPEN,
+          currentAnimationTime);
     }
 
     void animateLeft(float velocity) {
@@ -1001,9 +1042,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       lastAnimationTime = currentAnimationTime;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
       animatingVelocity = velocity;
-      animatingAcceleration =
-          computeAcceleration(mLeftOffset - mHostWidth - getLeft(), velocity);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_LEFT), currentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT, currentAnimationTime);
     }
 
     void animateRight(float velocity) {
@@ -1016,9 +1055,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       lastAnimationTime = currentAnimationTime;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
       animatingVelocity = velocity;
-      animatingAcceleration =
-          computeAcceleration(mHostWidth - mRightOffset - getLeft(), velocity);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT), currentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT, currentAnimationTime);
     }
 
     void animateTop(float velocity) {
@@ -1031,9 +1068,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       lastAnimationTime = currentAnimationTime;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
       animatingVelocity = velocity;
-      animatingAcceleration =
-          computeAcceleration(mTopOffset - mHostHeight - getLeft(), velocity);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_TOP), currentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP, currentAnimationTime);
     }
 
     void animateBottom(float velocity) {
@@ -1046,24 +1081,22 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       lastAnimationTime = currentAnimationTime;
       currentAnimationTime += FRAME_ANIMATION_DURATION;
       animatingVelocity = velocity;
-      animatingAcceleration =
-          computeAcceleration(-mBottomOffset + mHostHeight, velocity);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_BOTTOM), currentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM, currentAnimationTime);
     }
   }
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    final int width = getMeasuredWidth();
-    final int height = getMeasuredHeight();
-    assert width >= mLeftOffset :
+    mMeasuredWidth = getMeasuredWidth();
+    mMeasuredHeight = getMeasuredHeight();
+    assert mMeasuredWidth >= mLeftOffset :
         "mLeft offset should not be larger than the view's width";
-    assert width >= mRightOffset :
+    assert mMeasuredWidth >= mRightOffset :
         "right offset should not be larger than the view's width";
-    assert height >= mTopOffset :
+    assert mMeasuredHeight >= mTopOffset :
         "mTop offset should not be larger than the view's height";
-    assert height >= mBottomOffset :
+    assert mMeasuredHeight >= mBottomOffset :
         "bottom offset should not be larger than the view's height";
   }
 
@@ -1079,10 +1112,6 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
   @Override
   public void onLayout(boolean changed, int l, int t, int r, int b) {
     super.onLayout(changed, l, t, r, b);
-    mHostWidth = getWidth();
-    mHostHeight = getHeight();
-    mHostLayoutLeft = getLeft();
-    mHostLayoutTop = getTop();
 
     if (changed) {
       if (mLeftOffset != -1) {
@@ -1102,7 +1131,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
       }
     }
 
-    switch (mPositionState) {
+    switch (mState) {
       case STATE_COLLAPSE_BOTTOM:
         bottom();
         break;
@@ -1125,7 +1154,7 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    ev.offsetLocation(-mHostLayoutLeft, -mHostLayoutTop);
+    ev.offsetLocation(-getLeft(), -getTop());
     final int action = ev.getAction() & MotionEvent.ACTION_MASK;
     final int x = (int) ev.getX();
     final int y = (int) ev.getY();
@@ -1137,8 +1166,8 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
         break;
       case MotionEvent.ACTION_MOVE:
         if ((mTrackDirection & 0xF0) > 0 &&
-            (x < mLastDownX - mInterceptTouchEventThreshold || x > mLastDownX +
-                mInterceptTouchEventThreshold)) {
+            (x < mLastDownX - mTouchEventThreshold || x > mLastDownX +
+                mTouchEventThreshold)) {
           switch (mTrackDirection & 0xF0) {
             case TRACK_DIRECTION_LEFT_MASK:
               return mTracker.prepareLeftTrack();
@@ -1150,8 +1179,8 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
               break;
           }
         } else if ((mTrackDirection & 0x0F) > 0 &&
-            (y < mLastDownY - mInterceptTouchEventThreshold || y > mLastDownY +
-                mInterceptTouchEventThreshold)) {
+            (y < mLastDownY - mTouchEventThreshold || y > mLastDownY +
+                mTouchEventThreshold)) {
           switch (mTrackDirection & 0x0F) {
             case TRACK_DIRECTION_TOP_MASK:
               return mTracker.prepareTopTrack();
@@ -1167,21 +1196,21 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
         return false;
       case MotionEvent.ACTION_CANCEL:
       case MotionEvent.ACTION_UP:
-        if (mLastDownX - mInterceptTouchEventThreshold < x &&
-            x < mLastDownX + mInterceptTouchEventThreshold &&
-            mLastDownY - mInterceptTouchEventThreshold < y &&
-            y < mLastDownY + mInterceptTouchEventThreshold) {
+        if (mLastDownX - mTouchEventThreshold < x &&
+            x < mLastDownX + mTouchEventThreshold &&
+            mLastDownY - mTouchEventThreshold < y &&
+            y < mLastDownY + mTouchEventThreshold) {
           if (mLeftTapBack && mLeftFrameForTap.contains(x, y) &&
-              mPositionState == STATE_COLLAPSE_LEFT) {
+              mState == STATE_COLLAPSE_LEFT) {
             mAnimator.animateLeftOpen(mAnimator.velocity);
           } else if (mTopTapBack && mTopFrameForTap.contains(x, y) &&
-              mPositionState == STATE_COLLAPSE_TOP) {
+              mState == STATE_COLLAPSE_TOP) {
             mAnimator.animateTopOpen(mAnimator.velocity);
           } else if (mRightTapBack && mRightFrameForTap.contains(x, y) &&
-              mPositionState == STATE_COLLAPSE_RIGHT) {
+              mState == STATE_COLLAPSE_RIGHT) {
             mAnimator.animateRightOpen(-mAnimator.velocity);
           } else if (mBottomTapBack && mBottomFrameForTap.contains(x, y) &&
-              mPositionState == STATE_COLLAPSE_BOTTOM) {
+              mState == STATE_COLLAPSE_BOTTOM) {
             mAnimator.animateBottomOpen(-mAnimator.velocity);
           } else {
             return false;
@@ -1205,20 +1234,20 @@ public class AwesomeLayout extends FrameLayout implements IAwesome {
         if (mTracker.tracking) {
           if (!mLastMoveXBeenSet) {
             if (x > mLastDownX) {
-              mLastMoveX = mLastDownX + mInterceptTouchEventThreshold;
+              mLastMoveX = mLastDownX + mTouchEventThreshold;
               mLastMoveXBeenSet = true;
             } else {
-              mLastMoveX = mLastDownX - mInterceptTouchEventThreshold;
+              mLastMoveX = mLastDownX - mTouchEventThreshold;
               mLastMoveXBeenSet = true;
             }
           }
 
           if (!mLastMoveYBeenSet) {
             if (y > mLastDownY) {
-              mLastMoveY = mLastDownY + mInterceptTouchEventThreshold;
+              mLastMoveY = mLastDownY + mTouchEventThreshold;
               mLastMoveYBeenSet = true;
             } else {
-              mLastMoveY = mLastDownY - mInterceptTouchEventThreshold;
+              mLastMoveY = mLastDownY - mTouchEventThreshold;
               mLastMoveYBeenSet = true;
             }
           }

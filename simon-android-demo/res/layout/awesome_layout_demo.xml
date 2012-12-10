@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
+  -->
+
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FF938212"/>
+
+    <com.bbsimon.android.demo.views.awesome.AwesomeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/awesome"
+            android:background="#FF39481F"
+            simon:left_offset="64dp"
+            simon:right_offset="48dp"
+            simon:tap_back_area="left|right"
+            simon:track="horizontal">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:clickable="true"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+                android:text="Awesome"/>
+    </com.bbsimon.android.demo.views.awesome.AwesomeLayout>
+</FrameLayout>

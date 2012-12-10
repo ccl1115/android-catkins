@@ -26,6 +26,8 @@
         <activity android:name=".app.demo.StackLayoutDemoActivity"/>
 
         <activity android:name=".app.demo.StackLayoutWithFragmentDemoActivity"/>
+
+        <activity android:name=".app.demo.AwesomeLayoutDemoActivity"/>
     </application>
 
 </manifest>
