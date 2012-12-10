@@ -1,4 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project [
+        <!ELEMENT project (modelVersion|parent|groupId|artifactId|version|packaging|name|dependencies|build|profiles)*>
+        <!ATTLIST project
+                xmlns CDATA #REQUIRED
+                xmlns:xsi CDATA #REQUIRED
+                xsi:schemaLocation CDATA #REQUIRED>
+        <!ELEMENT modelVersion (#PCDATA)>
+        <!ELEMENT parent (groupId|artifactId|version)*>
+        <!ELEMENT groupId (#PCDATA)>
+        <!ELEMENT artifactId (#PCDATA)>
+        <!ELEMENT version (#PCDATA)>
+        <!ELEMENT packaging (#PCDATA)>
+        <!ELEMENT name (#PCDATA)>
+        <!ELEMENT dependencies (dependency)*>
+        <!ELEMENT dependency (groupId|artifactId|version|scope)*>
+        <!ELEMENT build (plugins)*>
+        <!ELEMENT plugins (plugin)*>
+        <!ELEMENT plugin (groupId|artifactId|extensions|executions|dependencies|configuration)*>
+        <!ELEMENT extensions (#PCDATA)>
+        <!ELEMENT profiles (profile)*>
+        <!ELEMENT profile (id|build)*>
+        <!ELEMENT id (#PCDATA)>
+        <!ELEMENT executions (execution)*>
+        <!ELEMENT execution (id|phase|goals|configuration)*>
+        <!ELEMENT phase (#PCDATA)>
+        <!ELEMENT goals (goal)*>
+        <!ELEMENT goal (#PCDATA)>
+        <!ELEMENT configuration (proguardVersion|maxMemory|injar|libs|obfuscate|addMavenDescriptor|proguardInclude|zipalign|sign|artifacts)*>
+        <!ELEMENT proguardVersion (#PCDATA)>
+        <!ELEMENT maxMemory (#PCDATA)>
+        <!ELEMENT injar (#PCDATA)>
+        <!ELEMENT libs (lib)*>
+        <!ELEMENT lib (#PCDATA)>
+        <!ELEMENT obfuscate (#PCDATA)>
+        <!ELEMENT addMavenDescriptor (#PCDATA)>
+        <!ELEMENT proguardInclude (#PCDATA)>
+        <!ELEMENT scope (#PCDATA)>
+        <!ELEMENT zipalign (verbose|inputApk|outputApk)*>
+        <!ELEMENT verbose (#PCDATA)>
+        <!ELEMENT inputApk (#PCDATA)>
+        <!ELEMENT outputApk (#PCDATA)>
+        <!ELEMENT sign (debug)*>
+        <!ELEMENT debug (#PCDATA)>
+        <!ELEMENT artifacts (artifact)*>
+        <!ELEMENT artifact (file|type|classifier)*>
+        <!ELEMENT file (#PCDATA)>
+        <!ELEMENT type (#PCDATA)>
+        <!ELEMENT classifier (#PCDATA)>
+        ]>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -90,7 +139,7 @@
                             <dependency>
                                 <groupId>net.sf.proguard</groupId>
                                 <artifactId>proguard</artifactId>
-                                <version>4.4</version>
+                                <version>4.7</version>
                                 <scope>runtime</scope>
                             </dependency>
                         </dependencies>
@@ -159,6 +208,36 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>emma</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.jayway.maven.plugins.android.generation2
+                        </groupId>
+                        <artifactId>android-maven-plugin</artifactId>
+                        <configuration>
+                            <!-- emma start -->
+                            <emma>
+                                <enable>true</enable>
+                                <classFolders>
+                                    ${project.basedir}/target/classes/
+                                </classFolders>
+                                <outputMetaFile>
+                                    ${project.basedir}/target/emma/coverage.em
+                                </outputMetaFile>
+                            </emma>
+                            <!-- emma stop -->
+                            <dex>
+                                <noLocals>true</noLocals>
+                                <!--  must be set for emma -->
+                            </dex>
+                        </configuration>
+                        <extensions>true</extensions>
                     </plugin>
                 </plugins>
             </build>

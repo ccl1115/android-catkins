@@ -99,6 +99,76 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>emma</id>
+            <dependencies>
+
+                <dependency>
+                    <groupId>emma</groupId>
+                    <artifactId>emma</artifactId>
+                    <type>jar</type>
+                    <scope>compile</scope>
+                    <version>2.0.5312</version>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>properties-maven-plugin</artifactId>
+                        <version>1.0-alpha-1</version>
+                        <executions>
+                            <execution>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>read-project-properties</goal>
+                                </goals>
+                                <configuration>
+                                    <files>
+                                        <file>default.properties</file>
+                                    </files>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>com.jayway.maven.plugins.android.generation2
+                        </groupId>
+                        <artifactId>android-maven-plugin</artifactId>
+                        <configuration>
+                            <test>
+                                <coverage>true</coverage>
+                                <createReport>true</createReport>
+                            </test>
+                            <dex>
+                                <noLocals>true</noLocals>
+                            </dex>
+                        </configuration>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>pull-coverage</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>pull</goal>
+                                </goals>
+                                <configuration>
+                                    <pullSource>
+                                        /data/data/com.bbsimon.android.demo/files/coverage.ec
+                                    </pullSource>
+                                    <pullDestination>
+                                        ${tested.project.dir}/target/emma/coverage.ec
+                                    </pullDestination>
+                                </configuration>
+                            </execution>
+                        </executions>
+
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 </project>
