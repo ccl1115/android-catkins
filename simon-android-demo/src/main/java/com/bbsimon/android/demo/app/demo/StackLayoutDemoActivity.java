@@ -29,7 +29,7 @@ public class StackLayoutDemoActivity extends BaseActivity
     super.onCreate(savedInstanceState);
 
     getTitleBar().setTitle(TAG);
-    setContentView(R.layout.stack_layout_demo);
+    setContentView(R.layout.stack_layout);
 
     View view = findViewById(R.id.push);
     view.setOnClickListener(this);

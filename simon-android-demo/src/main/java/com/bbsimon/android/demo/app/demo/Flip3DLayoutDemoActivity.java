@@ -25,7 +25,7 @@ public class Flip3DLayoutDemoActivity extends BaseActivity
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     getTitleBar().setTitle(TAG);
-    setContentView(R.layout.flip_3d_layout_demo);
+    setContentView(R.layout.flip_3d_layout);
 
     Button button = (Button) findViewById(R.id.flip);
     button.setOnClickListener(this);

@@ -21,6 +21,6 @@ public class FlipperLayoutDemoActivity extends BaseActivity {
     Log.init(this);
     Log.v(TAG, "@onCreate");
     getTitleBar().setTitle(TAG);
-    setContentView(R.layout.flipper_layout_demo);
+    setContentView(R.layout.flipper_layout);
   }
 }
