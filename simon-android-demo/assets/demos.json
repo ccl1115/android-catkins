@@ -20,8 +20,8 @@
         "activity" : "com.bbsimon.android.demo.app.demo.StackLayoutWithFragmentDemoActivity"
     },
     {
-        "name" : "AwesomeLayout",
-        "description" : "A highly configurable layout that can be translate to any direction.",
-        "activity" : "com.bbsimon.android.demo.app.demo.AwesomeLayoutDemoActivity"
+        "name" : "FakeChromeLayout"
+        "description" : "Act like the android Chrome app."
+        "activity" : "com.bbsimon.android.demo.app.demo.FakeChromeActivity"
     }
 ]
