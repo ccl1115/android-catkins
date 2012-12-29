@@ -56,15 +56,7 @@ public abstract class BaseActivity extends FragmentActivity {
       Log.e(TAG, "@setContentView content view layout id doesn't exist.");
       return;
     }
-    View added = mRoot.findViewById(R.id.content);
-    if (added != null) {
-      mRoot.removeView(added);
-    }
-    content.setId(R.id.content);
-    mRoot.addView(content,
-        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        ));
+    setContentView(content);
   }
 
   @Override
@@ -77,7 +69,10 @@ public abstract class BaseActivity extends FragmentActivity {
     if (view == null) {
       return;
     }
-    mRoot.removeView(view);
+    View added = mRoot.findViewById(R.id.content);
+    if (added != null) {
+      mRoot.removeView(added);
+    }
     view.setId(R.id.content);
     mRoot.addView(view,
         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
