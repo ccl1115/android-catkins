@@ -36,18 +36,12 @@ public class StackLayout extends ViewGroup {
 
   private static final String TAG = "StackLayout";
 
-  // for debug
-  private static final boolean DEBUG = true;
-  private long mSingleAnimationTime = 0;
-  private long mSingleAnimationCount = 0;
-
   private static final int MSG_ENTER_ANIMATION = -1000;
   private static final int MSG_EXIT_ANIMATION = -1001;
 
   private static final int TRANSLATE_VELOCITY = 1000;
   private static final int ALPHA_VELOCITY = 200;
   private static final int DECELERATION_THRESHOLD = 50;
-  private static final int ANIMATION_FRAME_DURATION = 1000 / 60;
 
   private List<View> mViewStack;
   private View mTop;
@@ -67,7 +61,6 @@ public class StackLayout extends ViewGroup {
 
   private OnStackAnimationListener mOnStackAnimationListener;
 
-  private int mDecelerationThreshold;
   private int mTranslateVelocity;
   private int mAlphaVelocity;
   private float mAnimatingTranslateVelocity;
@@ -98,8 +91,6 @@ public class StackLayout extends ViewGroup {
     final float density = getResources().getDisplayMetrics().density;
     mTranslateVelocity = (int) (density * TRANSLATE_VELOCITY + 0.5);
     mAlphaVelocity = (int) (density * ALPHA_VELOCITY + 0.5);
-    mDecelerationThreshold = (int) (density * DECELERATION_THRESHOLD + 0.5);
-
 
     setClickable(true);
   }
@@ -142,11 +133,6 @@ public class StackLayout extends ViewGroup {
       return;
     }
 
-    if (DEBUG) {
-      mSingleAnimationTime = SystemClock.uptimeMillis();
-      mSingleAnimationCount = 0;
-    }
-
     // Skip the animation when added
     assert child != null;
     Boolean b = (Boolean) child.getTag(R.id.use_animation);
@@ -167,7 +153,7 @@ public class StackLayout extends ViewGroup {
     mAnimationHandler.removeMessages(MSG_EXIT_ANIMATION);
     long now = SystemClock.uptimeMillis();
     mAnimationLastTime = now;
-    mCurrentAnimationTime = now + ANIMATION_FRAME_DURATION;
+    mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
     mAnimating = true;
     mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(MSG_ENTER_ANIMATION),
         mCurrentAnimationTime);
@@ -228,7 +214,7 @@ public class StackLayout extends ViewGroup {
     mAnimationHandler.removeMessages(MSG_ENTER_ANIMATION);
     long now = SystemClock.uptimeMillis();
     mAnimationLastTime = now;
-    mCurrentAnimationTime = now + ANIMATION_FRAME_DURATION;
+    mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
     mAnimating = true;
     mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(MSG_EXIT_ANIMATION),
         mCurrentAnimationTime);
@@ -326,9 +312,6 @@ public class StackLayout extends ViewGroup {
   protected void dispatchDraw(Canvas canvas) {
 
     final long drawingTime = getDrawingTime();
-    if (DEBUG) {
-      mSingleAnimationCount += 1;
-    }
     if (mTop != null) {
       if (mAnimating) {
         if (mPreviousTop != null) {
@@ -351,7 +334,6 @@ public class StackLayout extends ViewGroup {
         drawChild(canvas, mTop, drawingTime);
       }
     }
-    //Log.d(TAG, "@dispatchDraw drawingTime " + (SystemClock.uptimeMillis() - now));
   }
 
   @Override
@@ -453,7 +435,7 @@ public class StackLayout extends ViewGroup {
         mStopAnimatingAlpha = false;
         postRemoveView();
       } else {
-        mCurrentAnimationTime += ANIMATION_FRAME_DURATION;
+        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
         mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(
             MSG_EXIT_ANIMATION), mCurrentAnimationTime);
       }
@@ -474,11 +456,6 @@ public class StackLayout extends ViewGroup {
       }
       if (mLeft <= 0) {
         //Log.d(TAG, "@doEntering\n==> entering finished");
-        if (DEBUG) {
-          Log.d(TAG,
-              "@doEntering animation fps " + (1000f * mSingleAnimationCount /
-                  (SystemClock.uptimeMillis() - mSingleAnimationTime)));
-        }
         mAnimating = false;
         mLeft = 0;
         mStopAnimatingAlpha = false;
@@ -487,10 +464,7 @@ public class StackLayout extends ViewGroup {
           mOnStackAnimationListener.onStackPushAnimationEnd();
         }
       } else {
-        if (mLeft < mDecelerationThreshold) {
-          mAnimatingTranslateVelocity = mAnimatingTranslateVelocity * 0.9f;
-        }
-        mCurrentAnimationTime += ANIMATION_FRAME_DURATION;
+        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
         mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(
             MSG_ENTER_ANIMATION), mCurrentAnimationTime);
       }

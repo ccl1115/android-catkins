@@ -18,6 +18,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import com.bbsimon.android.demo.R;
+import com.bbsimon.android.demo.views.Facade;
 import com.bbsimon.android.demo.views.fakechrome.scalable.IScalable;
 
 import java.util.ArrayList;
@@ -38,8 +39,6 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
   public static final int MODE_PAGER = 1000;
   public static final int MODE_OVERVIEW = 1001;
   public static final int MODE_SWITCHING = 1002;
-
-  private static final int FRAME_ANIMATION_DURATION = 1000 / 60; // ms
 
   // Consider as a tap if movement within this value
   private static final int TAP_THRESHOLD = 15; // dips
@@ -274,7 +273,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
         }
 
         lastAnimationTime = now;
-        currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
         mAdditionDeletionHandler.removeMessages(MSG_ANIMATE_OVERVIEW_DELETION);
         mAdditionDeletionHandler.sendMessageAtTime(
             mOverviewHandler.obtainMessage(MSG_ANIMATE_OVERVIEW_DELETION),
@@ -295,7 +294,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
 
       final long now = SystemClock.uptimeMillis();
       lastAnimationTime = now;
-      currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
       mAdditionDeletionHandler.removeMessages(MSG_ANIMATE_OVERVIEW_DELETION);
       mAdditionDeletionHandler.sendMessageAtTime(mOverviewHandler.obtainMessage(MSG_ANIMATE_OVERVIEW_DELETION),
           currentAnimatingTime);
@@ -327,7 +326,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
         }
 
         lastAnimationTime = now;
-        currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
         mAdditionDeletionHandler.removeMessages(MSG_ANIMATE_PAGER_DELETION);
         mAdditionDeletionHandler.sendMessageAtTime(
             mOverviewHandler.obtainMessage(MSG_ANIMATE_PAGER_DELETION),
@@ -348,7 +347,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
 
         final long now = SystemClock.uptimeMillis();
         lastAnimationTime = now;
-        currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
         mAdditionDeletionHandler.removeMessages(MSG_ANIMATE_PAGER_DELETION);
         mAdditionDeletionHandler.sendMessageAtTime(mOverviewHandler.obtainMessage(MSG_ANIMATE_PAGER_DELETION),
             currentAnimatingTime);
@@ -420,7 +419,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
       final float t = (now - lastAnimationTime) / 1000f;
       int animatingOffset = (int) (animatingVelocity * t);
       lastAnimationTime = now;
-      currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
 
       boolean end = true;
       View view;
@@ -477,7 +476,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
       animatingVelocity = velocity;
       long now = SystemClock.uptimeMillis();
       lastAnimationTime = now;
-      currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
       mOverviewLayoutHandler.removeMessages(MSG_ANIMATE_LAYOUT);
       mOverviewLayoutHandler.sendMessageAtTime(
           mOverviewLayoutHandler.obtainMessage(MSG_ANIMATE_LAYOUT),
@@ -716,7 +715,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
       final long now = SystemClock.uptimeMillis();
       final float t = (now - lastAnimationTime) / 1000f;
       lastAnimationTime = currentAnimatingTime;
-      currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
       animatingOffset = (int) (animatingVelocity * t);
     }
 
@@ -824,7 +823,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
       expanded = false;
       animating = true;
       lastAnimationTime = now;
-      currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
       animatingVelocity = velocity;
       mPagerHandler.removeMessages(msg);
       mPagerHandler.sendMessageAtTime(mPagerHandler.obtainMessage(msg),
@@ -1039,7 +1038,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
         animating = false;
       } else {
         lastAnimationTime = now;
-        currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
         mOverviewHandler.removeMessages(MSG_ANIMATE_DECELERATION);
         mOverviewHandler.sendMessageAtTime(
             mOverviewHandler.obtainMessage(MSG_ANIMATE_DECELERATION),
@@ -1060,7 +1059,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
       }
       final long now = SystemClock.uptimeMillis();
       lastAnimationTime = now;
-      currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
       mOverviewHandler.removeMessages(MSG_ANIMATE_DECELERATION);
       mOverviewHandler.sendMessageAtTime(mOverviewHandler.obtainMessage(MSG_ANIMATE_DECELERATION),
           currentAnimatingTime);
@@ -1121,7 +1120,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
       final float t = (now - lastAnimationTime) / 1000f;
       animatingOffset = animatingVelocity * t;
       lastAnimationTime = now;
-      currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
     }
 
     private void computeOverview() {
@@ -1232,7 +1231,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
       animatingVelocity = velocity / count;
       final long now = SystemClock.uptimeMillis();
       lastAnimationTime = now + DELAY;
-      currentAnimatingTime = lastAnimationTime + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = lastAnimationTime + Facade.ANIMATION_FRAME_DURATION;
 
       mSwitchHandler.removeMessages(MSG_ANIMATE_OVERVIEW);
       mSwitchHandler.sendMessageAtTime(mSwitchHandler.obtainMessage(MSG_ANIMATE_OVERVIEW),
@@ -1257,7 +1256,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
       animating = true;
       animatingVelocity = -(velocity / count);
       lastAnimationTime = SystemClock.uptimeMillis();
-      currentAnimatingTime = lastAnimationTime + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = lastAnimationTime + Facade.ANIMATION_FRAME_DURATION;
 
       mSwitchHandler.removeMessages(MSG_ANIMATE_PAGER);
       mSwitchHandler.sendMessageAtTime(mSwitchHandler.obtainMessage(MSG_ANIMATE_PAGER),

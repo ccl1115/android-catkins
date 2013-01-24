@@ -27,6 +27,7 @@
 
         <activity android:name=".app.demo.StackLayoutWithFragmentDemoActivity"/>
 
+        <activity android:name=".app.demo.HorizontalTranslateLayoutActivity"/>
     </application>
 
 </manifest>

@@ -1,4 +1,5 @@
 <resources>
     <item type="id" name="use_animation"/>
     <item type="id" name="page_indicator"/>
+    <item type="id" name="refresher_content"/>
 </resources>
