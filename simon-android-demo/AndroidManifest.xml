@@ -28,6 +28,8 @@
         <activity android:name=".app.demo.StackLayoutWithFragmentDemoActivity"/>
 
         <activity android:name=".app.demo.AwesomeLayoutDemoActivity"/>
+
+        <activity android:name=".app.demo.HorizontalTranslateLayoutActivity"/>
     </application>
 
 </manifest>

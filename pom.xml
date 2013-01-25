@@ -16,8 +16,8 @@
     </modules>
 
     <properties>
-        <platform.version>4.0.1.2
-        </platform.version>
+        <platform.version>4.1.1.4</platform.version>
+        <android.sdk.path>/home/ccl/android-sdk-linux_x86</android.sdk.path>
     </properties>
 
     <dependencyManagement>
@@ -81,21 +81,17 @@
                     <groupId>com.jayway.maven.plugins.android.generation2
                     </groupId>
                     <artifactId>android-maven-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                     <inherited>true</inherited>
                     <configuration>
-                        <androidManifestFile>
-                            ${project.basedir}/AndroidManifest.xml
+                        <androidManifestFile>${project.basedir}/AndroidManifest.xml
                         </androidManifestFile>
-                        <assetsDirectory>${project.basedir}/assets
-                        </assetsDirectory>
-                        <resourceDirectory>${project.basedir}/res
-                        </resourceDirectory>
-                        <nativeLibrariesDirectory>
-                            ${project.basedir}/src/main/native
+                        <assetsDirectory>${project.basedir}/assets</assetsDirectory>
+                        <resourceDirectory>${project.basedir}/res</resourceDirectory>
+                        <nativeLibrariesDirectory>${project.basedir}/src/main/native
                         </nativeLibrariesDirectory>
                         <sdk>
-                            <platform>17</platform>
+                            <platform>16</platform>
                         </sdk>
                         <undeployBeforeDeploy>true</undeployBeforeDeploy>
                     </configuration>

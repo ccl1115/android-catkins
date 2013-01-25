@@ -474,11 +474,6 @@ public class StackLayout extends ViewGroup {
       }
       if (mLeft <= 0) {
         //Log.d(TAG, "@doEntering\n==> entering finished");
-        if (DEBUG) {
-          Log.d(TAG,
-              "@doEntering animation fps " + (1000f * mSingleAnimationCount /
-                  (SystemClock.uptimeMillis() - mSingleAnimationTime)));
-        }
         mAnimating = false;
         mLeft = 0;
         mStopAnimatingAlpha = false;
@@ -487,9 +482,6 @@ public class StackLayout extends ViewGroup {
           mOnStackAnimationListener.onStackPushAnimationEnd();
         }
       } else {
-        if (mLeft < mDecelerationThreshold) {
-          mAnimatingTranslateVelocity = mAnimatingTranslateVelocity * 0.9f;
-        }
         mCurrentAnimationTime += ANIMATION_FRAME_DURATION;
         mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(
             MSG_ENTER_ANIMATION), mCurrentAnimationTime);

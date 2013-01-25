@@ -8,21 +8,6 @@
               format="integer"/>
     </declare-styleable>
 
-    <declare-styleable name="AwesomeLayout">
-        <attr name="left_offset"
-              format="dimension"/>
-        <attr name="right_offset"
-              format="dimension"/>
-        <attr name="top_offset"
-              format="dimension"/>
-        <attr name="bottom_offset"
-              format="dimension"/>
-        <attr name="track"
-              format="string"/>
-        <attr name="tap_back_area"
-              format="string"/>
-    </declare-styleable>
-
     <declare-styleable name="Flip3DLayout">
         <attr name="from"
               format="integer"/>
@@ -39,7 +24,7 @@
               format="reference"/>
     </declare-styleable>
 
-    <declare-styleable name="HorizontalFlipLayout">
+    <declare-styleable name="HorizontalTranslateLayout">
         <attr name="left_offset"
               format="dimension"/>
         <attr name="right_offset"

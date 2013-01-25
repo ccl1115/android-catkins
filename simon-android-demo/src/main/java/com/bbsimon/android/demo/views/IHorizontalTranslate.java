@@ -3,9 +3,9 @@ package com.bbsimon.android.demo.views;
 /**
  * 本接口定义了一个View或者ViewGroup具有四向滑动功能时的方法。
  *
- * @see HorizontalFlipLayout
+ * @see HorizontalTranslateLayout
  */
-public interface IHorizontalFlip {
+public interface IHorizontalTranslate {
     public static final int STATE_COLLAPSE_LEFT   = 10000;
     public static final int STATE_COLLAPSE_RIGHT  = 10001;
     public static final int STATE_EXPAND          = 10004;

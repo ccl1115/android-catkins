@@ -13,8 +13,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
-import android.view.ViewGroup;
-import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import com.bbsimon.android.demo.R;
 
@@ -22,58 +20,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The implementation of HorizontalFlipLayout interface and the interceptions for host view methods.
+ * The implementation of HorizontalTranslateLayout interface and the interceptions for host view methods.
  */
-public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip {
-  private static final String TAG = "HorizontalFlipLayout";
+public class HorizontalTranslateLayout extends FrameLayout implements IHorizontalTranslate {
+  private static final String TAG = "HorizontalTranslateLayoutActivity";
+
+  private enum TrackDirection {left, right, horizontal, none}
 
   private final static int MSG_ANIMATE_LEFT = -100;
   private final static int MSG_ANIMATE_RIGHT = -101;
   private final static int MSG_ANIMATE_LEFT_OPEN = -104;
   private final static int MSG_ANIMATE_RIGHT_OPEN = -105;
 
-  private final static int TRACK_DIRECTION_LEFT_MASK = 0x10 << 2;
-  private final static int TRACK_DIRECTION_RIGHT_MASK = 0x10 << 1;
-  private final static int TRACK_DIRECTION_HORIZONTAL_MASK = 0x10;
-
   private final static int TAP_THRESHOLD = 35;
-
-  private static final Interpolator sInterpolator = new Interpolator() {
-    public float getInterpolation(float t) {
-      t -= 1.0f;
-      return t * t * t * t * t + 1.0f;
-    }
-  };
-
-  private static class LayoutParams extends ViewGroup.LayoutParams {
-    public int leftOffset;
-    public int rightOffset;
-
-
-    public LayoutParams(Context c, AttributeSet attrs) {
-      super(c, attrs);
-    }
-
-    public LayoutParams(int width, int height) {
-      super(width, height);
-    }
-
-    public LayoutParams(ViewGroup.LayoutParams source) {
-      super(source);
-    }
-  }
 
   private float mLeftOffset;
   private float mRightOffset;
 
   private int mLeftTranslate;
 
-  private final int mInterceptTouchEventThreshold;
+  private final int mTouchThreshold;
 
   private boolean mLeftTapBack;
   private boolean mRightTapBack;
 
-  private int mTrackDirection = 0x00;
+  private TrackDirection mTrackDirection;
 
   private int mPositionState;
 
@@ -92,15 +63,12 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
 
   private OnLeftAnimationListener mOnLeftAnimationListener;
   private OnRightAnimationListener mOnRightAnimationListener;
-  private final List<OnOpenAnimationListener> mOnOpenAnimationListener =
-      new ArrayList<OnOpenAnimationListener>();
+  private final List<OnOpenAnimationListener> mOnOpenAnimationListener = new ArrayList<OnOpenAnimationListener>();
   private OnLeftTrackListener mOnLeftTrackListener;
   private OnRightTrackListener mOnRightTrackListener;
   private OnHorizontalTrackListener mOnHorizontalTrackListener;
 
-  private LayoutParams mLayoutParams;
-
-  public HorizontalFlipLayout(Context context, AttributeSet attrs) {
+  public HorizontalTranslateLayout(Context context, AttributeSet attrs) {
     super(context, attrs);
     mHandler = new AnimationHandler();
     mAnimator = new Animator();
@@ -113,7 +81,7 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
     mBackgroundPaint.setColor(0xFFFFFFFF);
 
     float density = res.getDisplayMetrics().density;
-    mInterceptTouchEventThreshold = (int) (TAP_THRESHOLD * density + 0.5);
+    mTouchThreshold = (int) (TAP_THRESHOLD * density + 0.5);
 
     loadAttrs(attrs);
   }
@@ -125,48 +93,30 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
    */
   private void loadAttrs(AttributeSet attrs) {
     TypedArray a =
-        getContext().obtainStyledAttributes(attrs, R.styleable.HorizontalFlipLayout);
+        getContext().obtainStyledAttributes(attrs, R.styleable.HorizontalTranslateLayout);
 
-    mLeftOffset =
-        a.getDimension(R.styleable.HorizontalFlipLayout_left_offset, -1f);
-    mRightOffset =
-        a.getDimension(R.styleable.HorizontalFlipLayout_right_offset, -1f);
+    mLeftOffset = a.getDimension(R.styleable.HorizontalTranslateLayout_left_offset, -1f);
+    mRightOffset = a.getDimension(R.styleable.HorizontalTranslateLayout_right_offset, -1f);
 
-    parseTrack(a);
-    parseTapBackArea(a);
-
-    a.recycle();
-
-    setClickable(true);
-  }
-
-  private void parseTrack(TypedArray a) {
-    final String track = a.getString(R.styleable.HorizontalFlipLayout_track);
+    final String track = a.getString(R.styleable.HorizontalTranslateLayout_track);
     if (track != null && track.length() > 0) {
-      final String[] tracks = track.split("\\|");
-      for (String s : tracks) {
-        if (mLeftOffset != -1 && mRightOffset != -1 &&
-            HORIZONTAL.equals(s) && (mTrackDirection & 0xF0) == 0) {
-          Log.d(TAG, "@parseTrack horizontal");
-          mTrackDirection |= TRACK_DIRECTION_HORIZONTAL_MASK;
-        }
-        if ((mRightOffset != -1) && RIGHT.equals(s) &&
-            (mTrackDirection & 0xF0) == 0) {
-          Log.d(TAG, "@parseTrack right");
-          mTrackDirection |= TRACK_DIRECTION_RIGHT_MASK;
-        }
-        if ((mLeftOffset != -1) && LEFT.equals(s) &&
-            (mTrackDirection & 0xF0) == 0) {
-          Log.d(TAG, "@parseTrack left");
-          mTrackDirection |= TRACK_DIRECTION_LEFT_MASK;
-        }
+      if (mLeftOffset != -1 && mRightOffset != -1 && HORIZONTAL.equals(track)) {
+        Log.d(TAG, "@parseTrack horizontal");
+        mTrackDirection = TrackDirection.horizontal;
+      } else if ((mRightOffset != -1) && RIGHT.equals(track)) {
+        Log.d(TAG, "@parseTrack right");
+        mTrackDirection = TrackDirection.left;
+      } else if ((mLeftOffset != -1) && LEFT.equals(track)) {
+        Log.d(TAG, "@parseTrack left");
+        mTrackDirection = TrackDirection.right;
+      } else {
+        mTrackDirection = TrackDirection.none;
+        Log.d(TAG, "@loadAttrs no direction");
       }
     }
-  }
 
-  private void parseTapBackArea(TypedArray a) {
     final String tapBackArea =
-        a.getString(R.styleable.HorizontalFlipLayout_tap_back_area);
+        a.getString(R.styleable.HorizontalTranslateLayout_tap_back_area);
     if (tapBackArea != null && tapBackArea.length() > 0) {
       final String[] taps = tapBackArea.split("\\|");
       for (String s : taps) {
@@ -180,9 +130,13 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
         }
       }
     }
+
+    a.recycle();
+
+    setClickable(true);
   }
 
-// --------------------- Interface IHorizontalFlip ---------------------
+// --------------------- Interface IHorizontalTranslate ---------------------
 
 
   /**
@@ -378,11 +332,6 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
     canvas.restore();
   }
 
-  @Override
-  public boolean dispatchTouchEvent(MotionEvent ev) {
-    return mAnimator.iAnimating || super.dispatchTouchEvent(ev);
-  }
-
   public int getLeftTranslate() {
     return mLeftTranslate;
   }
@@ -392,7 +341,17 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
   }
 
   @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    return super.dispatchTouchEvent(ev) || true;
+  }
+
+  @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
+    if (mTrackDirection == TrackDirection.none) {
+      // None track direction so do not intercept touch event
+      return false;
+    }
+
     ev.offsetLocation(-mLeftTranslate, 0);
     final int action = ev.getAction() & MotionEvent.ACTION_MASK;
     final int x = (int) ev.getX();
@@ -402,26 +361,31 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
       case MotionEvent.ACTION_DOWN:
         mLastDownX = x;
         mLastDownY = y;
+
+        // Remove all messages to stop animations.
+        mHandler.removeMessages(MSG_ANIMATE_LEFT);
+        mHandler.removeMessages(MSG_ANIMATE_LEFT_OPEN);
+        mHandler.removeMessages(MSG_ANIMATE_RIGHT);
+        mHandler.removeMessages(MSG_ANIMATE_RIGHT_OPEN);
         break;
       case MotionEvent.ACTION_MOVE:
         Log.d(TAG, "@interceptInterceptTouchEvent");
 
         if (mPositionState == STATE_EXPAND) {
-          if (y < mLastDownY - mInterceptTouchEventThreshold ||
-              y > mLastDownY + mInterceptTouchEventThreshold) {
+          if (y < mLastDownY - mTouchThreshold ||
+              y > mLastDownY + mTouchThreshold) {
             return false;
           }
 
-          if ((mTrackDirection & 0xF0) > 0 &&
-              (x < mLastDownX - mInterceptTouchEventThreshold ||
-                  x > mLastDownX +
-                      mInterceptTouchEventThreshold)) {
-            switch (mTrackDirection & 0xF0) {
-              case TRACK_DIRECTION_LEFT_MASK:
+          if ((x < mLastDownX - mTouchThreshold ||
+              x > mLastDownX +
+                  mTouchThreshold)) {
+            switch (mTrackDirection) {
+              case left:
                 return mTracker.prepareLeftTrack();
-              case TRACK_DIRECTION_RIGHT_MASK:
+              case right:
                 return mTracker.prepareRightTrack();
-              case TRACK_DIRECTION_HORIZONTAL_MASK:
+              case horizontal:
                 return mTracker.prepareHorizontalTrack(x - mLastDownX);
               default:
                 break;
@@ -429,19 +393,19 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
           }
           return false;
         } else {
-          switch (mTrackDirection & 0xF0) {
-            case TRACK_DIRECTION_LEFT_MASK:
+          switch (mTrackDirection) {
+            case left:
               return mTracker.prepareLeftTrack();
-            case TRACK_DIRECTION_RIGHT_MASK:
+            case right:
               return mTracker.prepareRightTrack();
-            case TRACK_DIRECTION_HORIZONTAL_MASK:
+            case horizontal:
               return mTracker.prepareHorizontalTrack(x - mLastDownX);
           }
         }
       case MotionEvent.ACTION_CANCEL:
       case MotionEvent.ACTION_UP:
-        if (mLastDownX - mInterceptTouchEventThreshold < x &&
-            x < mLastDownX + mInterceptTouchEventThreshold) {
+        if (mLastDownX - mTouchThreshold < x &&
+            x < mLastDownX + mTouchThreshold) {
           if (mLeftTapBack && mLeftFrameForTap.contains(x, y) &&
               mPositionState == STATE_COLLAPSE_LEFT) {
             mAnimator.animateLeftOpen(mAnimator.kVelocity);
@@ -533,10 +497,10 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
               mLastMoveX = mLastDownX + mLeftTranslate;
               mLastMoveXBeenSet = true;
             } else if (x > mLastDownX) {
-              mLastMoveX = mLastDownX + mInterceptTouchEventThreshold;
+              mLastMoveX = mLastDownX + mTouchThreshold;
               mLastMoveXBeenSet = true;
             } else {
-              mLastMoveX = mLastDownX - mInterceptTouchEventThreshold;
+              mLastMoveX = mLastDownX - mTouchThreshold;
               mLastMoveXBeenSet = true;
             }
           }
@@ -609,7 +573,7 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
     VelocityTracker velocityTracker;
 
     boolean tracking;
-    int direction;
+    TrackDirection direction;
     final int velocityUnit;
     final int minVelocity;
 
@@ -634,7 +598,7 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
         return false;
       }
       prepareTracking();
-      direction = TRACK_DIRECTION_LEFT_MASK;
+      direction = TrackDirection.left;
       return true;
     }
 
@@ -644,13 +608,13 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
         return false;
       }
       prepareTracking();
-      direction = TRACK_DIRECTION_RIGHT_MASK;
+      direction = TrackDirection.right;
       return true;
     }
 
     boolean prepareHorizontalTrack(int d) {
       prepareTracking();
-      direction = TRACK_DIRECTION_HORIZONTAL_MASK;
+      direction = TrackDirection.horizontal;
       if (mOnHorizontalTrackListener != null) {
         final OnHorizontalTrackListener listener = mOnHorizontalTrackListener;
         listener.onHorizontalTrackListener(d);
@@ -664,21 +628,21 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
       }
       final int left = mLeftTranslate;
       switch (direction) {
-        case TRACK_DIRECTION_LEFT_MASK:
+        case left:
           Log.d(TAG, "@move left");
           if (left > mLeftOffset - getMeasuredWidth() && left < 0) {
             mLeftTranslate -= xOffset;
             invalidate();
           }
           break;
-        case TRACK_DIRECTION_RIGHT_MASK:
+        case right:
           Log.d(TAG, "@move right");
           if (left < getMeasuredWidth() - mRightOffset && left > 0) {
             mLeftTranslate -= xOffset;
             invalidate();
           }
           break;
-        case TRACK_DIRECTION_HORIZONTAL_MASK:
+        case horizontal:
           Log.d(TAG, "@move horizontal xOffset=" + xOffset);
           if (left >= mLeftOffset - getMeasuredWidth() + xOffset
               && left <= getMeasuredWidth() - mRightOffset + xOffset) {
@@ -707,13 +671,13 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
       }
 
       switch (direction) {
-        case TRACK_DIRECTION_HORIZONTAL_MASK:
+        case horizontal:
           horizontalFling(xVelocity);
           break;
-        case TRACK_DIRECTION_LEFT_MASK:
+        case left:
           leftFling(xVelocity);
           break;
-        case TRACK_DIRECTION_RIGHT_MASK:
+        case right:
           rightFling(xVelocity);
           break;
         default:
@@ -810,7 +774,7 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
         offset();
       } else {
         float offset = iAnimationDistance *
-            sInterpolator.getInterpolation(
+            Facade.sInterpolator.getInterpolation(
                 iAnimatingPosition / iAnimationDistance);
         Log.d(TAG, "@computeLeftAnimation " + offset);
         mLeftTranslate = (int) (offset + iAnimationStart);
@@ -831,7 +795,7 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
         offset();
       } else {
         float offset = iAnimationDistance *
-            sInterpolator.getInterpolation(
+            Facade.sInterpolator.getInterpolation(
                 iAnimatingPosition / iAnimationDistance);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
@@ -852,7 +816,7 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
         offset();
       } else {
         float offset = iAnimationDistance *
-            sInterpolator.getInterpolation(
+            Facade.sInterpolator.getInterpolation(
                 iAnimatingPosition / iAnimationDistance);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
@@ -873,7 +837,7 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
         offset();
       } else {
         float offset = iAnimationDistance *
-            sInterpolator.getInterpolation(
+            Facade.sInterpolator.getInterpolation(
                 iAnimatingPosition / iAnimationDistance);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
@@ -958,5 +922,13 @@ public class HorizontalFlipLayout extends FrameLayout implements IHorizontalFlip
       mHandler.removeMessages(MSG_ANIMATE_RIGHT);
       mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT), iCurrentAnimationTime);
     }
+  }
+
+  public void dump() {
+    Log.d(TAG, "@dump left offset " + mLeftOffset);
+    Log.d(TAG, "@dump right offset " + mRightOffset);
+    Log.d(TAG, "@dump track " + mTrackDirection);
+    Log.d(TAG, "@dump left tap " + mLeftTapBack);
+    Log.d(TAG, "@dump right tap " + mRightOffset);
   }
 }
