@@ -13,9 +13,9 @@
             simon:left_offset="30dp"
             simon:right_offset="30dp"
             simon:tap_back_area="left|right"
-            simon:track="horizontal">
+            simon:track="right">
 
-        <Button
+        <TextView
                 android:id="@android:id/button1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

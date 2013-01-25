@@ -63,7 +63,8 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
 
   private OnLeftAnimationListener mOnLeftAnimationListener;
   private OnRightAnimationListener mOnRightAnimationListener;
-  private final List<OnOpenAnimationListener> mOnOpenAnimationListener = new ArrayList<OnOpenAnimationListener>();
+  private final List<OnOpenAnimationListener> mOnOpenAnimationListener =
+      new ArrayList<OnOpenAnimationListener>();
   private OnLeftTrackListener mOnLeftTrackListener;
   private OnRightTrackListener mOnRightTrackListener;
   private OnHorizontalTrackListener mOnHorizontalTrackListener;
@@ -105,10 +106,10 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         mTrackDirection = TrackDirection.horizontal;
       } else if ((mRightOffset != -1) && RIGHT.equals(track)) {
         Log.d(TAG, "@parseTrack right");
-        mTrackDirection = TrackDirection.left;
+        mTrackDirection = TrackDirection.right;
       } else if ((mLeftOffset != -1) && LEFT.equals(track)) {
         Log.d(TAG, "@parseTrack left");
-        mTrackDirection = TrackDirection.right;
+        mTrackDirection = TrackDirection.left;
       } else {
         mTrackDirection = TrackDirection.none;
         Log.d(TAG, "@loadAttrs no direction");
@@ -341,6 +342,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
   }
 
   @Override
+  @SuppressWarnings("all")
   public boolean dispatchTouchEvent(MotionEvent ev) {
     return super.dispatchTouchEvent(ev) || true;
   }
@@ -423,65 +425,6 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
     return false;
   }
 
-  /**
-   */
-  @Override
-  protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    super.onLayout(changed, l, t, r, b);
-
-    final int width = r - l;
-    final int height = b - t;
-
-    if (changed) {
-      if (mLeftOffset != -1) {
-        mLeftFrameForTap.set((int) (r - mLeftOffset), t, r, b);
-      }
-
-      if (mRightOffset != -1) {
-        mRightFrameForTap.set(l, t, (int) (l + mRightOffset), b);
-      }
-    }
-
-    if (!mAnimator.iAnimating && !mTracker.tracking) {
-      offset();
-    }
-  }
-
-  /**
-   * The offset will be reset after every layout, so we do an additional offset when layout based on
-   * the position state.
-   */
-  private void offset() {
-    switch (mPositionState) {
-      case STATE_EXPAND:
-        mLeftTranslate = 0;
-        invalidate();
-        break;
-      case STATE_COLLAPSE_LEFT:
-        mLeftTranslate = (int) (mLeftOffset - getMeasuredWidth());
-        invalidate();
-        break;
-      case STATE_COLLAPSE_RIGHT:
-        mLeftTranslate = (int) (getMeasuredWidth() - mRightOffset);
-        invalidate();
-        break;
-    }
-  }
-
-  /**
-   */
-  @Override
-  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    final int widthSize = widthMeasureSpec & ~(0x3 << 30);
-
-    //check the offsets' sizes are not larger than the view's dimension
-    assert widthSize >= mLeftOffset :
-        "left offset should not be larger than the view's width";
-    assert widthSize >= mRightOffset :
-        "right offset should not be larger than the view's width";
-  }
-
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
     final int x = (int) ev.getX();
@@ -538,6 +481,66 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
     return true;
   }
 
+  /**
+   */
+  @Override
+  protected void onLayout(boolean changed, int l, int t, int r, int b) {
+    super.onLayout(changed, l, t, r, b);
+
+    final int width = r - l;
+    final int height = b - t;
+
+    if (changed) {
+      if (mLeftOffset != -1) {
+        mLeftFrameForTap.set((int) (r - mLeftOffset), t, r, b);
+      }
+
+      if (mRightOffset != -1) {
+        mRightFrameForTap.set(l, t, (int) (l + mRightOffset), b);
+      }
+    }
+
+    if (!mAnimator.iAnimating && !mTracker.tracking) {
+      offset();
+    }
+  }
+
+  /**
+   */
+  @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    final int widthSize = widthMeasureSpec & ~(0x3 << 30);
+
+    //check the offsets' sizes are not larger than the view's dimension
+    assert widthSize >= mLeftOffset :
+        "left offset should not be larger than the view's width";
+    assert widthSize >= mRightOffset :
+        "right offset should not be larger than the view's width";
+  }
+
+  /**
+   * The offset will be reset after every re-layout, so we do an additional offset when layout based on
+   * the position state.
+   */
+  private void offset() {
+    switch (mPositionState) {
+      case STATE_EXPAND:
+        mLeftTranslate = 0;
+        invalidate();
+        break;
+      case STATE_COLLAPSE_LEFT:
+        mLeftTranslate = (int) (mLeftOffset - getMeasuredWidth());
+        invalidate();
+        break;
+      case STATE_COLLAPSE_RIGHT:
+        mLeftTranslate = (int) (getMeasuredWidth() - mRightOffset);
+        invalidate();
+        break;
+    }
+  }
+
+
   private class AnimationHandler extends Handler {
     @Override
     public void handleMessage(Message msg) {
@@ -564,7 +567,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
   }
 
   /**
-   * Tracker can handle the dragging of the host view.
+   * Tracker can handle the dragging of the view.
    */
   private class Tracker {
     static final int VELOCITY_UNIT = 200;
@@ -626,7 +629,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       if (!tracking) {
         return;
       }
-      final int left = mLeftTranslate;
+      final int left = mLeftTranslate - xOffset;
       switch (direction) {
         case left:
           Log.d(TAG, "@move left");
@@ -643,9 +646,9 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
           }
           break;
         case horizontal:
-          Log.d(TAG, "@move horizontal xOffset=" + xOffset);
-          if (left >= mLeftOffset - getMeasuredWidth() + xOffset
-              && left <= getMeasuredWidth() - mRightOffset + xOffset) {
+          Log.d(TAG, "@move horizontal");
+          if (left >= mLeftOffset - getMeasuredWidth()
+              && left <= getMeasuredWidth() - mRightOffset) {
             mLeftTranslate -= xOffset;
             invalidate();
           }
@@ -779,7 +782,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         Log.d(TAG, "@computeLeftAnimation " + offset);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_LEFT), iCurrentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT, iCurrentAnimationTime);
       }
     }
 
@@ -799,7 +802,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
                 iAnimatingPosition / iAnimationDistance);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT), iCurrentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT, iCurrentAnimationTime);
       }
     }
 
@@ -820,7 +823,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
                 iAnimatingPosition / iAnimationDistance);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_LEFT_OPEN), iCurrentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT_OPEN, iCurrentAnimationTime);
       }
     }
 
@@ -841,7 +844,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
                 iAnimatingPosition / iAnimationDistance);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
-        mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT_OPEN), iCurrentAnimationTime);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT_OPEN, iCurrentAnimationTime);
       }
     }
 
@@ -862,7 +865,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       mHandler.removeMessages(MSG_ANIMATE_LEFT_OPEN);
       Log.d(TAG, "@animateLeftOpen " + iAnimationDistance);
       Log.d(TAG, "@animateLeftOpen " + velocity);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_LEFT_OPEN), iCurrentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT_OPEN, iCurrentAnimationTime);
     }
 
     void animateRightOpen(float velocity) {
@@ -882,7 +885,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       Log.d(TAG, "@animateRightOpen " + iAnimationDistance);
       Log.d(TAG, "@animateRightOpen " + velocity);
       mHandler.removeMessages(MSG_ANIMATE_RIGHT_OPEN);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT_OPEN), iCurrentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT_OPEN, iCurrentAnimationTime);
     }
 
     void animateLeft(float velocity) {
@@ -901,7 +904,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       Log.d(TAG, "@animateLeft " + iAnimationDistance);
       Log.d(TAG, "@animateLeft " + velocity);
       mHandler.removeMessages(MSG_ANIMATE_LEFT);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_LEFT), iCurrentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT, iCurrentAnimationTime);
     }
 
     void animateRight(float velocity) {
@@ -920,7 +923,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       Log.d(TAG, "@animateRight " + iAnimationDistance);
       Log.d(TAG, "@animateRight " + velocity);
       mHandler.removeMessages(MSG_ANIMATE_RIGHT);
-      mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATE_RIGHT), iCurrentAnimationTime);
+      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT, iCurrentAnimationTime);
     }
   }
 
