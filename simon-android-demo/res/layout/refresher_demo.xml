@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!--
+  ~ Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
+  -->
+
 <com.bbsimon.android.demo.views.refresh.RefresherView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
-        android:background="#33000000"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/refresher"
+        android:id="@+id/refresher_view"
         simon:empty_view="@+id/empty_view"
         simon:refresher_content="@+id/refresher_content"
         simon:refresher_head="@+id/refresher_header"
-        simon:max_height="400dp"
-        simon:threshold_height="200dp">
+        simon:max_height="200dp"
+        simon:threshold_height="100dp">
 
     <TextView
             android:background="#FF032F32"
@@ -22,7 +25,7 @@
             android:text="HEADER"/>
 
     <ListView
-            android:background="#FF39281A"
+            android:background="#FF398282"
             android:id="@+id/refresher_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

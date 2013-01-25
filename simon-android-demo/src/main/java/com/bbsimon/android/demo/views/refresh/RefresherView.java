@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.views.Facade;
 
@@ -35,9 +34,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private ViewGroup mRefresherContent;
   private View mRefresherHeader;
   private View mEmptyView;
-  private boolean mHasContent;
-  private boolean mShouldDrawEmptyView = true;
-  private boolean mEnable;
+  private boolean mEnable = true;
   private int mLastDownY;
   private final int[] mContentLocation = new int[2];
   private final int[] mTempLocation = new int[2];
@@ -48,6 +45,8 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private AnimatorHandler mHandler;
   private OnRefreshListener mOnRefreshListener;
   private RefreshAsyncTask mRefreshAsyncTask;
+
+  private State mState = State.idle;
 
   public RefresherView(Context context) {
     this(context, null, 0);
@@ -110,18 +109,20 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     final int widthSize = widthMeasureSpec & ~(0x3 << 30);
     final int heightSize = heightMeasureSpec & ~(0x3 << 30);
-    if (mHasContent) {
+    if (mRefresherContent != null) {
       measureChild(mRefresherContent, widthSize + MeasureSpec.EXACTLY,
           heightSize + MeasureSpec.EXACTLY);
     }
 
-    if (mShouldDrawEmptyView) {
+    if (mEmptyView != null) {
       measureChild(mEmptyView, widthSize + MeasureSpec.AT_MOST,
           heightSize + MeasureSpec.AT_MOST);
     }
 
-    measureChild(mRefresherHeader, widthSize + MeasureSpec.EXACTLY,
-        heightSize + MeasureSpec.AT_MOST);
+    if (mRefresherHeader != null) {
+      measureChild(mRefresherHeader, widthSize + MeasureSpec.EXACTLY,
+          heightSize + MeasureSpec.AT_MOST);
+    }
 
     setMeasuredDimension(widthSize, heightSize);
   }
@@ -130,21 +131,29 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
     final int width = r - l;
     final int height = b - t;
-    if (mHasContent) {
+    if (mRefresherContent != null) {
       mRefresherContent.layout(0, 0, width, height);
     }
 
-    if (mShouldDrawEmptyView) {
+    if (mEmptyView != null) {
       mEmptyView.layout((width - mEmptyView.getMeasuredWidth()) / 2,
           (height - mEmptyView.getMeasuredHeight()) / 2,
           (width + mEmptyView.getMeasuredWidth()) / 2,
           (height + mEmptyView.getMeasuredHeight()) / 2);
     }
 
-    mRefresherHeader.layout(0, -mRefresherHeader.getMeasuredHeight(), width, 0);
+    if (mRefresherHeader != null) {
+      mRefresherHeader.layout(0, -mRefresherHeader.getMeasuredHeight(), width, 0);
+    }
 
     getLocationOnScreen(mTempLocation);
     mAbsY = mTempLocation[1];
+  }
+
+  @Override
+  @SuppressWarnings("all")
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    return super.dispatchTouchEvent(ev) || true;
   }
 
   @Override
@@ -167,18 +176,22 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         if (childAt != null) {
           childAt.getLocationOnScreen(mContentLocation);
           if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
-            mYOffset = y - mLastDownY;
-            invalidate();
-
+            mState = State.pulling_no_refresh;
+            final OnRefreshListener onRefreshListener = mOnRefreshListener;
+            if (onRefreshListener != null) {
+              onRefreshListener.onStateChanged(State.pulling_no_refresh);
+            }
             return true;
           }
         } else {
           // If there's no child.
           mRefresherContent.getLocationOnScreen(mContentLocation);
           if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
-            mYOffset = y - mLastDownY;
-            invalidate();
-
+            mState = State.pulling_no_refresh;
+            final OnRefreshListener onRefreshListener = mOnRefreshListener;
+            if (onRefreshListener != null) {
+              onRefreshListener.onStateChanged(State.pulling_no_refresh);
+            }
             return true;
           }
         }
@@ -198,16 +211,22 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       case MotionEvent.ACTION_MOVE:
         mYOffset = Math.max(0, Math.min(y - mLastDownY, mMaxHeight * 2));
 
-        if (mYOffset > mThresholdHeight) {
+        if (mYOffset > mThresholdHeight && mState == State.pulling_no_refresh) {
+          mState = State.pulling_refresh;
+          final OnRefreshListener onRefreshListener = mOnRefreshListener;
+          if (onRefreshListener != null) {
+            onRefreshListener.onStateChanged(State.pulling_refresh);
+          }
+        } else if (mState == State.pulling_refresh) {
+          mState = State.pulling_no_refresh;
 
-        } else {
-
+          final OnRefreshListener onRefreshListener = mOnRefreshListener;
+          if (onRefreshListener != null) {
+            onRefreshListener.onStateChanged(State.pulling_no_refresh);
+          }
         }
-
         invalidate();
-
         break;
-
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
         if (mYOffset > mThresholdHeight) {
@@ -216,9 +235,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         } else {
           mBackPosition = 0;
         }
-
         mAnimator.animate();
-
         break;
       default:
         break;
@@ -227,18 +244,41 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     return true;
   }
 
+  @Override
+  protected void dispatchDraw(Canvas canvas) {
+    final long drawingTime = getDrawingTime();
+
+    if (mEmptyView != null) {
+      drawChild(canvas, mEmptyView, drawingTime);
+    }
+
+    canvas.save();
+    canvas.translate(0, mYOffset / 2);
+    drawChild(canvas, mRefresherContent, drawingTime);
+    if (mYOffset > 0) {
+      drawChild(canvas, mRefresherHeader, drawingTime);
+    }
+    canvas.restore();
+  }
+
   public void setOnRefreshListener(OnRefreshListener listener) {
     mOnRefreshListener = listener;
   }
 
   @Override
   public void setEnable(boolean enable) {
-    mEnable = enable;
+    // Can be true only when the refresher content and header are not null.
+    mEnable = enable && mRefresherContent != null && mRefresherHeader != null;
   }
 
   @Override
   public boolean isEnabled() {
     return mEnable;
+  }
+
+  @Override
+  public State getState() {
+    return mState;
   }
 
   public void refresh() {
@@ -247,24 +287,6 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       mRefreshAsyncTask = new RefreshAsyncTask();
       mRefreshAsyncTask.execute((Void[]) null);
     }
-  }
-
-  @Override
-  protected void dispatchDraw(Canvas canvas) {
-    final long drawingTime = getDrawingTime();
-
-    if (mShouldDrawEmptyView) {
-      drawChild(canvas, mEmptyView, drawingTime);
-    }
-
-    canvas.save();
-    canvas.translate(0, mYOffset / 2);
-    if (mYOffset > 0) {
-      drawChild(canvas, mRefresherHeader, drawingTime);
-      invalidate();
-    }
-    drawChild(canvas, mRefresherContent, drawingTime);
-    canvas.restore();
   }
 
   private class Animator {
@@ -278,8 +300,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     private int animationDistance;
 
     public Animator() {
-      kVelocity =
-          (int) (getResources().getDisplayMetrics().density * VELOCITY + 0.5);
+      kVelocity = (int) (getResources().getDisplayMetrics().density * VELOCITY + 0.5);
     }
 
     void compute() {
@@ -291,10 +312,15 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       if (animatingPosition >= animationDistance) {
         mYOffset = mBackPosition;
         animating = false;
+        mState = State.idle;
+        final OnRefreshListener onRefreshListener = mOnRefreshListener;
+        if (onRefreshListener != null) {
+          onRefreshListener.onStateChanged(State.idle);
+        }
       } else {
         mYOffset = (int)
             (mBackPosition + animationDistance * (1 - Facade.sInterpolator.getInterpolation(
-            animatingPosition / (float) animationDistance)));
+                animatingPosition / (float) animationDistance)));
         lastAnimationTime = now;
         currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
         mHandler.removeMessages(MSG_ANIMATE);
@@ -317,6 +343,12 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       mHandler.removeMessages(MSG_ANIMATE);
       mHandler.sendEmptyMessageAtTime(MSG_ANIMATE,
           currentAnimatingTime);
+
+      mState = State.animating;
+      final OnRefreshListener onRefreshListener = mOnRefreshListener;
+      if (onRefreshListener != null) {
+        onRefreshListener.onStateChanged(State.animating);
+      }
     }
   }
 
@@ -339,11 +371,9 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     removeView(mRefresherContent);
     mRefresherContent = view;
     if (mRefresherContent == null) {
-      mHasContent = false;
       mEnable = false;
     } else {
       addView(mRefresherContent);
-      mHasContent = true;
       mEnable = mRefresherHeader != null && mRefresherContent != null;
     }
 
@@ -402,7 +432,6 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       if (mListener != null) {
         mListener.onRefreshData();
       }
-
       return null;
     }
 

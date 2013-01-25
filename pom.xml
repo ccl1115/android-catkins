@@ -16,8 +16,7 @@
     </modules>
 
     <properties>
-        <platform.version>4.1.1.4</platform.version>
-        <android.sdk.path>/home/ccl/android-sdk-linux_x86</android.sdk.path>
+        <platform.version>4.0.1.2</platform.version>
     </properties>
 
     <dependencyManagement>
@@ -91,7 +90,7 @@
                         <nativeLibrariesDirectory>${project.basedir}/src/main/native
                         </nativeLibrariesDirectory>
                         <sdk>
-                            <platform>16</platform>
+                            <platform>17</platform>
                         </sdk>
                         <undeployBeforeDeploy>true</undeployBeforeDeploy>
                     </configuration>

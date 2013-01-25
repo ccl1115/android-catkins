@@ -1,36 +1,37 @@
 package com.bbsimon.android.demo.views.refresh;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
-import android.os.SystemClock;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import com.bbsimon.android.demo.R;
-import com.bbsimon.android.demo.views.Facade;
-import de.akquinet.android.androlog.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  */
 public interface IRefreshable {
+
+  /**
+   * 这里仅仅涉及到下拉的状态，而没有刷新的状态。
+   */
+  public enum State {
+    /**
+     * 等待状态
+     */
+    idle,
+
+    /**
+     * 下拉状态，松手不会触发刷新
+     */
+    pulling_no_refresh,
+
+    /**
+     * 回弹动画状态
+     */
+    animating,
+
+    /**
+     * 下拉状态，松手会触发下拉刷新
+     */
+    pulling_refresh
+  }
+
   /**
    * @param listener listener
    */
@@ -45,6 +46,8 @@ public interface IRefreshable {
    * @return true if refreshable.
    */
   boolean isEnabled();
+
+  State getState();
 
   /**
    */
@@ -61,4 +64,14 @@ public interface IRefreshable {
   View getRefresherHeader();
 
   View getEmptyView();
+
+  interface OnRefreshListener {
+    void onStateChanged(State state);
+
+    void onPreRefresh();
+
+    void onRefreshData();
+
+    void onRefreshUI();
+  }
 }
