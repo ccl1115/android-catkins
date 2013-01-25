@@ -482,7 +482,7 @@ public interface IRefreshable {
               * (1 - Facade.sInterpolator.getInterpolation(animatingPosition
               / (float) animationDistance)));
           lastAnimationTime = now;
-          currentAnimatingTime = now + Facade.FRAME_ANIMATION_DURATION;
+          currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
           mHandler.removeMessages(MSG_ANIMATE_PULL_BACK);
           mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_PULL_BACK,
               currentAnimatingTime);
@@ -496,7 +496,7 @@ public interface IRefreshable {
         final long now = SystemClock.uptimeMillis();
 
         lastAnimationTime = now;
-        currentAnimatingTime = now + Facade.FRAME_ANIMATION_DURATION;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
         animationDistance = mYOffset;
         animating = true;
         animatingPosition = 0;

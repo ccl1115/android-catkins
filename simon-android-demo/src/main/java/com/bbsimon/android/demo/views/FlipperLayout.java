@@ -55,7 +55,6 @@ public class FlipperLayout extends ViewGroup {
   private static final int MSG_FLIP_RIGHT_ANIMATE = 1000;
   private static final int MSG_BOUNCE_ANIMATE = 1001;
   private static final int MSG_FLIP_LEFT_ANIMATE = 1002;
-  private static final int ANIMATION_FRAME_DURATION = 1000 / 60;
   private static final int HANDLER_WIDTH = 60;
   private static final int HANDLER_OVER_SCROLL_WIDTH = 40;
 
@@ -359,7 +358,7 @@ public class FlipperLayout extends ViewGroup {
     mHandler.removeMessages(MSG_FLIP_LEFT_ANIMATE);
     long now = SystemClock.currentThreadTimeMillis();
     mAnimationLastTime = now;
-    mCurrentAnimationTime = now + ANIMATION_FRAME_DURATION;
+    mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
     mAnimating = true;
   }
 
@@ -430,7 +429,7 @@ public class FlipperLayout extends ViewGroup {
       long now = SystemClock.uptimeMillis();
       mAnimatedVelocity = 0;
       mAnimationLastTime = now;
-      mCurrentAnimationTime = now + ANIMATION_FRAME_DURATION;
+      mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
       mAnimating = true;
       mHandler.removeMessages(MSG_BOUNCE_ANIMATE);
       mHandler.sendMessage(mHandler.obtainMessage(MSG_BOUNCE_ANIMATE));
@@ -470,7 +469,7 @@ public class FlipperLayout extends ViewGroup {
 
     long now = SystemClock.uptimeMillis();
     mAnimationLastTime = now;
-    mCurrentAnimationTime = now + ANIMATION_FRAME_DURATION;
+    mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
     mAnimating = true;
     mHandler.removeMessages(MSG_FLIP_RIGHT_ANIMATE);
     mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_FLIP_RIGHT_ANIMATE), mCurrentAnimationTime);
@@ -511,7 +510,7 @@ public class FlipperLayout extends ViewGroup {
 
     long now = SystemClock.uptimeMillis();
     mAnimationLastTime = now;
-    mCurrentAnimationTime = now + ANIMATION_FRAME_DURATION;
+    mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
     mAnimating = true;
     mHandler.removeMessages(MSG_FLIP_LEFT_ANIMATE);
     mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_FLIP_LEFT_ANIMATE), mCurrentAnimationTime);
@@ -651,7 +650,7 @@ public class FlipperLayout extends ViewGroup {
         flipperOpen();
       } else {
         moveHead((int) mAnimationPosition, false);
-        mCurrentAnimationTime += ANIMATION_FRAME_DURATION;
+        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
         mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_FLIP_RIGHT_ANIMATE),
             mCurrentAnimationTime);
       }
@@ -675,7 +674,7 @@ public class FlipperLayout extends ViewGroup {
         flipperOpen();
       } else {
         moveHead((int) mAnimationPosition, true);
-        mCurrentAnimationTime += ANIMATION_FRAME_DURATION;
+        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
         mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_FLIP_LEFT_ANIMATE), mCurrentAnimationTime);
       }
     }
@@ -695,7 +694,7 @@ public class FlipperLayout extends ViewGroup {
         flipperRight();
       } else {
         moveHead((int) mAnimationPosition, false);
-        mCurrentAnimationTime += ANIMATION_FRAME_DURATION;
+        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
         mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_BOUNCE_ANIMATE), mCurrentAnimationTime);
       }
     }

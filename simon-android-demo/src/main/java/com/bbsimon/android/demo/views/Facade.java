@@ -10,10 +10,7 @@ import android.view.animation.Interpolator;
  */
 public class Facade {
   public static final float ONE_SECOND = 1000f;
-  public static final int FRAME_RATE = 60;
-
-  public static final int FRAME_ANIMATION_DURATION =
-      (int) (ONE_SECOND / FRAME_RATE);
+  public static final int ANIMATION_FRAME_DURATION = 16; // equals 1000 / 60
 
   public static final Interpolator sInterpolator = new Interpolator() {
     public float getInterpolation(float t) {

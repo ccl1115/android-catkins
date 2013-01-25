@@ -14,6 +14,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
+import com.bbsimon.android.demo.views.Facade;
 
 @SuppressWarnings("unused")
 public class ScalableLayout extends FrameLayout implements IScalable {
@@ -31,8 +32,6 @@ public class ScalableLayout extends FrameLayout implements IScalable {
 
   private static final int MSG_EXPAND = 0xF9;
   private static final int MSG_SCALE = 0xFA;
-
-  private static final int FRAME_ANIMATION_DURATION = 1000 / 60;
 
   private int mState;
   private int mType;
@@ -221,7 +220,7 @@ public class ScalableLayout extends FrameLayout implements IScalable {
         }
       } else {
         mScale = animatingPosition;
-        mCurrentAnimationTime += FRAME_ANIMATION_DURATION;
+        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
         mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_SCALE), mCurrentAnimationTime);
       }
       invalidate();
@@ -241,7 +240,7 @@ public class ScalableLayout extends FrameLayout implements IScalable {
         }
       } else {
         mScale = animatingPosition;
-        mCurrentAnimationTime += FRAME_ANIMATION_DURATION;
+        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
         mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_EXPAND), mCurrentAnimationTime);
       }
       invalidate();
@@ -253,7 +252,7 @@ public class ScalableLayout extends FrameLayout implements IScalable {
       animating = true;
       final long now = SystemClock.uptimeMillis();
       mLastAnimationTime = now;
-      mCurrentAnimationTime = now + FRAME_ANIMATION_DURATION;
+      mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
       mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_SCALE), mCurrentAnimationTime);
     }
 
@@ -263,7 +262,7 @@ public class ScalableLayout extends FrameLayout implements IScalable {
       animating = true;
       final long now = SystemClock.uptimeMillis();
       mLastAnimationTime = now;
-      mCurrentAnimationTime = now + FRAME_ANIMATION_DURATION;
+      mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
       mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_EXPAND), mCurrentAnimationTime);
     }
   }

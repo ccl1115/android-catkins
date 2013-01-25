@@ -733,8 +733,6 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
   private class Animator {
     static final String TAG = "IAwesomeImpl$Animator";
 
-    static final int FRAME_ANIMATION_DURATION = 1000 / 60;
-
     static final int VELOCITY = 600;
     static final int MIN_VELOCITY = 300;
 
@@ -762,7 +760,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       final float t = (now - iLastAnimationTime) / 1000f;
       iAnimatingPosition += iAnimatingVelocity * t;
       iLastAnimationTime = now;
-      iCurrentAnimationTime += FRAME_ANIMATION_DURATION;
+      iCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
     }
 
     void computeLeftAnimation() {
@@ -857,7 +855,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       iAnimating = true;
       final long now = SystemClock.uptimeMillis();
       iLastAnimationTime = now;
-      iCurrentAnimationTime = now + FRAME_ANIMATION_DURATION;
+      iCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
       iAnimatingVelocity = velocity;
       iAnimatingPosition = 0;
       iAnimationDistance = 0 - mLeftTranslate;
@@ -877,7 +875,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       iAnimating = true;
       final long now = SystemClock.uptimeMillis();
       iLastAnimationTime = now;
-      iCurrentAnimationTime = now + FRAME_ANIMATION_DURATION;
+      iCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
       iAnimatingVelocity = velocity;
       iAnimatingPosition = 0;
       iAnimationDistance = 0 - mLeftTranslate;
@@ -896,7 +894,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       iAnimating = true;
       final long now = SystemClock.uptimeMillis();
       iLastAnimationTime = now;
-      iCurrentAnimationTime = now + FRAME_ANIMATION_DURATION;
+      iCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
       iAnimatingVelocity = velocity;
       iAnimatingPosition = 0;
       iAnimationDistance = -getMeasuredWidth() + mLeftOffset - mLeftTranslate;
@@ -915,7 +913,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
       iAnimating = true;
       final long now = SystemClock.uptimeMillis();
       iLastAnimationTime = now;
-      iCurrentAnimationTime = now + FRAME_ANIMATION_DURATION;
+      iCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
       iAnimatingVelocity = velocity;
       iAnimatingPosition = 0;
       iAnimationDistance = (getMeasuredWidth() - mRightOffset) - mLeftTranslate;

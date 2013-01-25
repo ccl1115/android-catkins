@@ -23,7 +23,6 @@ import com.bbsimon.android.demo.views.Facade;
 public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRefreshable {
   private static final String TAG = "RefresherView";
 
-  private static final int FRAME_ANIMATION_DURATION = 1000 / 60;
   private static final int MSG_ANIMATE = 1000;
 
   private static final int REFRESH_HEADER_MAX_HEIGHT = 300;
@@ -305,7 +304,7 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
             (mBackPosition + animationDistance * (1 - Facade.sInterpolator.getInterpolation(
             animatingPosition / (float) animationDistance)));
         lastAnimationTime = now;
-        currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
         mHandler.removeMessages(MSG_ANIMATE);
         mHandler.sendEmptyMessageAtTime(MSG_ANIMATE, currentAnimatingTime);
       }
@@ -317,7 +316,7 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
       final long now = SystemClock.uptimeMillis();
 
       lastAnimationTime = now;
-      currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
       animationDistance = mYOffset - mBackPosition;
       Log.d(TAG, "@animatePullBack animating distance " + animationDistance);
       animating = true;
