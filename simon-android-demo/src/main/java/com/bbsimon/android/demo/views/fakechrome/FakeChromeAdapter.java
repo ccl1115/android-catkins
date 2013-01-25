@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class FakeChromeAdapter implements Iterable<TabFragment> {
+public abstract class FakeChromeAdapter {
   private static final String TAG = "FakeChromeAdapter";
 
   private FragmentManager mManager;
@@ -39,11 +39,6 @@ public abstract class FakeChromeAdapter implements Iterable<TabFragment> {
   public void remove(int position) {
     TabFragment fragment = getList().remove(position);
     destroyItem(fragment);
-  }
-
-  @Override
-  public Iterator<TabFragment> iterator() {
-    return getList().iterator();
   }
 
   protected final void dataSetChanged() {
