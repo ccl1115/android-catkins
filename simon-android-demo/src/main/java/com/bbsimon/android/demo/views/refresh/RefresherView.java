@@ -20,9 +20,7 @@ import com.bbsimon.android.demo.views.Facade;
 /**
  */
 @SuppressWarnings("unused")
-public class RefresherView<T extends ViewGroup> extends ViewGroup
-    implements IRefreshable {
-
+public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRefreshable {
   private static final String TAG = "RefresherView";
 
   private static final int FRAME_ANIMATION_DURATION = 1000 / 60;
@@ -189,8 +187,7 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup
 
     switch (action) {
       case MotionEvent.ACTION_MOVE:
-        mYOffset = Math.max(0,
-            Math.min(y - mLastDownY, kRefreshHeaderMaxHeight * 2));
+        mYOffset = Math.max(0, Math.min(y - mLastDownY, kRefreshHeaderMaxHeight * 2));
 
         if (mYOffset > kRefreshThreshold) {
           mText.setText(kReleaseToRefresh);
@@ -304,10 +301,9 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup
         mYOffset = mBackPosition;
         animating = false;
       } else {
-        mYOffset = (int) (mBackPosition
-                    + animationDistance
-                    * (1 - Facade.sInterpolator.getInterpolation(
-                    animatingPosition / (float) animationDistance)));
+        mYOffset = (int)
+            (mBackPosition + animationDistance * (1 - Facade.sInterpolator.getInterpolation(
+            animatingPosition / (float) animationDistance)));
         lastAnimationTime = now;
         currentAnimatingTime = now + FRAME_ANIMATION_DURATION;
         mHandler.removeMessages(MSG_ANIMATE);

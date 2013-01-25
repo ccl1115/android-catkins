@@ -898,7 +898,7 @@ public class FlipperLayout extends ViewGroup {
           break;
         case MotionEvent.ACTION_UP:
         case MotionEvent.ACTION_CANCEL:
-          if (!(mHead.getLeft() != mHeadLeft) && mState == STATE_COLLAPSED_RIGHT) {
+          if (mHead.getLeft() == mHeadLeft && mState == STATE_COLLAPSED_RIGHT) {
             mAnimating = false;
             animateOpen();
             return true;
