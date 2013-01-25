@@ -344,6 +344,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
   @Override
   @SuppressWarnings("all")
   public boolean dispatchTouchEvent(MotionEvent ev) {
+    // 保证无论子View是否可点击，都能够将后续的事件分发给onInterceptTouchEvent方法。
     return super.dispatchTouchEvent(ev) || true;
   }
 
@@ -364,7 +365,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         mLastDownX = x;
         mLastDownY = y;
 
-        // Remove all messages to stop animations.
+        // 停止所有的动画
         mHandler.removeMessages(MSG_ANIMATE_LEFT);
         mHandler.removeMessages(MSG_ANIMATE_LEFT_OPEN);
         mHandler.removeMessages(MSG_ANIMATE_RIGHT);
@@ -374,14 +375,11 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         Log.d(TAG, "@interceptInterceptTouchEvent");
 
         if (mPositionState == STATE_EXPAND) {
-          if (y < mLastDownY - mTouchThreshold ||
-              y > mLastDownY + mTouchThreshold) {
+          if (y < mLastDownY - mTouchThreshold || y > mLastDownY + mTouchThreshold) {
             return false;
           }
 
-          if ((x < mLastDownX - mTouchThreshold ||
-              x > mLastDownX +
-                  mTouchThreshold)) {
+          if ((x < mLastDownX - mTouchThreshold || x > mLastDownX + mTouchThreshold)) {
             switch (mTrackDirection) {
               case left:
                 return mTracker.prepareLeftTrack();
@@ -406,13 +404,12 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         }
       case MotionEvent.ACTION_CANCEL:
       case MotionEvent.ACTION_UP:
-        if (mLastDownX - mTouchThreshold < x &&
-            x < mLastDownX + mTouchThreshold) {
-          if (mLeftTapBack && mLeftFrameForTap.contains(x, y) &&
-              mPositionState == STATE_COLLAPSE_LEFT) {
+        if (mLastDownX - mTouchThreshold < x && x < mLastDownX + mTouchThreshold) {
+          if (mLeftTapBack && mLeftFrameForTap.contains(x, y)
+              && mPositionState == STATE_COLLAPSE_LEFT) {
             mAnimator.animateLeftOpen(mAnimator.kVelocity);
-          } else if (mRightTapBack && mRightFrameForTap.contains(x, y) &&
-              mPositionState == STATE_COLLAPSE_RIGHT) {
+          } else if (mRightTapBack && mRightFrameForTap.contains(x, y)
+              && mPositionState == STATE_COLLAPSE_RIGHT) {
             mAnimator.animateRightOpen(-mAnimator.kVelocity);
           } else {
             return false;
@@ -456,18 +453,23 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         break;
       case MotionEvent.ACTION_UP:
         Log.d(TAG, "@onTouchEvent up");
+        // 当不在展开的状态下的时候，我们要判断是否可以通过单击侧边区域做展开动画。
+        // 只有在侧边区域的点击才能进行计算。
         if (mPositionState != STATE_EXPAND) {
           mTracker.stopTracking();
           mLastMoveXBeenSet = false;
-          if (mLeftTapBack && mPositionState == STATE_COLLAPSE_LEFT) {
+          if (mLeftTapBack && mPositionState == STATE_COLLAPSE_LEFT
+              && mLeftFrameForTap.contains(x, y)) {
             Log.d(TAG, "@onTouchEvent left open");
             mAnimator.animateLeftOpen(mAnimator.kVelocity);
-          } else if (mRightTapBack && mPositionState == STATE_COLLAPSE_RIGHT) {
+          } else if (mRightTapBack && mPositionState == STATE_COLLAPSE_RIGHT
+              && mRightFrameForTap.contains(x, y)) {
             Log.d(TAG, "@onTouchEvent right open");
             mAnimator.animateRightOpen(-mAnimator.kVelocity);
           }
           return true;
         }
+
         if (mTracker.tracking) {
           Log.d(TAG, "@onTouchEvent");
           mTracker.stopTracking();
