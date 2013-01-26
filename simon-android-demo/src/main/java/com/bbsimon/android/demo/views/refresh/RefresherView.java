@@ -35,7 +35,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private int mRefresherHeaderId;
   private int mEmptyViewId;
 
-  private ViewGroup mRefresherContent;
+  private View mRefresherContent;
   private View mRefresherHeader;
   private View mEmptyView;
   private boolean mEnable = true;
@@ -179,16 +179,18 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         break;
 
       case MotionEvent.ACTION_MOVE:
-        View childAt = mRefresherContent.getChildAt(0);
-        if (childAt != null) {
-          childAt.getLocationOnScreen(mContentLocation);
-          if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
-            mState = State.pulling_no_refresh;
-            final OnRefreshListener onRefreshListener = mOnRefreshListener;
-            if (onRefreshListener != null) {
-              onRefreshListener.onStateChanged(State.pulling_no_refresh);
+        if (mRefresherContent instanceof ViewGroup) {
+          View childAt = ((ViewGroup) mRefresherContent).getChildAt(0);
+          if (childAt != null) {
+            childAt.getLocationOnScreen(mContentLocation);
+            if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
+              mState = State.pulling_no_refresh;
+              final OnRefreshListener onRefreshListener = mOnRefreshListener;
+              if (onRefreshListener != null) {
+                onRefreshListener.onStateChanged(State.pulling_no_refresh);
+              }
+              return true;
             }
-            return true;
           }
         } else {
           // If there's no child.
@@ -359,18 +361,19 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     }
   }
 
-  public ViewGroup getRefresherContent() {
+  @Override
+  public View getRefresherContent() {
     return mRefresherContent;
   }
 
   @Override
   public View getRefresherHeader() {
-    return null;
+    return mRefresherHeader;
   }
 
   @Override
   public View getEmptyView() {
-    return null;
+    return mEmptyView;
   }
 
   @Override

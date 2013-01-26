@@ -59,7 +59,7 @@ public interface IRefreshable {
 
   void setEmptyView(View view);
 
-  ViewGroup getRefresherContent();
+  View getRefresherContent();
 
   View getRefresherHeader();
 
