@@ -29,7 +29,7 @@
 
         <activity android:name=".app.demo.HorizontalTranslateLayoutActivity"/>
 
-        <activity android:name=".app.demo.RefresherViewActivity"/>
+        <activity android:name=".app.demo.refresher.RefresherViewFromXmlActivity"/>
     </application>
 
 </manifest>

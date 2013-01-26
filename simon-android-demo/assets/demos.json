@@ -27,6 +27,6 @@
     {
         "name" : "RefresherView",
         "description" : "A container view can use pull-down-to-refresh.",
-        "activity" : "com.bbsimon.android.demo.app.demo.RefresherViewActivity"
+        "activity" : "com.bbsimon.android.demo.app.demo.refresher.RefresherViewFromXmlActivity"
     }
 ]

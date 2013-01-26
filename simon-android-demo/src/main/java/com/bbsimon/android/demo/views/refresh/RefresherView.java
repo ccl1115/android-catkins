@@ -24,6 +24,10 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
   private static final int MSG_ANIMATE = 1000;
 
+  private static final int MIN_VELOCITY = 100;
+
+  private final int kMinVelocity;
+
   private int mThresholdHeight;
   private int mMaxHeight;
 
@@ -63,6 +67,8 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
     final Resources r = getResources();
     final float density = r.getDisplayMetrics().density;
+
+    kMinVelocity = (int) (MIN_VELOCITY * density + 0.5f);
 
     TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RefresherView);
 
@@ -169,6 +175,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       case MotionEvent.ACTION_DOWN:
         mLastDownY = y;
 
+        mHandler.removeMessages(MSG_ANIMATE);
         break;
 
       case MotionEvent.ACTION_MOVE:
@@ -217,7 +224,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
           if (onRefreshListener != null) {
             onRefreshListener.onStateChanged(State.pulling_refresh);
           }
-        } else if (mState == State.pulling_refresh) {
+        } else if (mYOffset < mThresholdHeight && mState == State.pulling_refresh) {
           mState = State.pulling_no_refresh;
 
           final OnRefreshListener onRefreshListener = mOnRefreshListener;
@@ -339,7 +346,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       Log.d(TAG, "@animatePullBack animating distance " + animationDistance);
       animating = true;
       animatingPosition = 0;
-      animatingVelocity = (mYOffset - mBackPosition) * 2;
+      animatingVelocity = Math.max(kMinVelocity, (mYOffset - mBackPosition) * 2);
       mHandler.removeMessages(MSG_ANIMATE);
       mHandler.sendEmptyMessageAtTime(MSG_ANIMATE,
           currentAnimatingTime);
