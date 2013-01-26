@@ -20,8 +20,20 @@ public class Facade {
     }
   };
 
-  public static int computeInterpolator(float distance, float position) {
-    float proportion = sInterpolator.getInterpolation(position / distance);
-    return (int) (distance * proportion);
+  /**
+   * Deceleration interpolator computation
+   * @param distance the total length
+   * @param position the current length
+   * @param reverse true if from distance value to 0
+   * @return the interpolated length
+   */
+  public static int computeInterpolator(float distance, float position, boolean reverse) {
+    if (reverse) {
+      float proportion = sInterpolator.getInterpolation(position / (position - distance));
+      return (int) (distance - distance * proportion);
+    } else {
+      float proportion = sInterpolator.getInterpolation(position / distance);
+      return (int) (distance * proportion);
+    }
   }
 }

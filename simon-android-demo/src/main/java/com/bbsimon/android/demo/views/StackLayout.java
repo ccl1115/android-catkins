@@ -39,7 +39,7 @@ public class StackLayout extends ViewGroup {
   private static final int MSG_ENTER_ANIMATION = -1000;
   private static final int MSG_EXIT_ANIMATION = -1001;
 
-  private static final int TRANSLATE_VELOCITY = 1000;
+  private static final int TRANSLATE_VELOCITY = 600;
   private static final int ALPHA_VELOCITY = 200;
   private static final int DECELERATION_THRESHOLD = 50;
 
@@ -480,7 +480,7 @@ public class StackLayout extends ViewGroup {
     final float v = mAnimatingTranslateVelocity;
     // compute position
     mAnimationPosition = p + (v * t);
-    mLeft = (int) mAnimationPosition;
+    mLeft = Facade.computeInterpolator(getMeasuredWidth(), mAnimationPosition, false);
 
     // compute shade
     if (!mStopAnimatingAlpha) {
@@ -501,7 +501,7 @@ public class StackLayout extends ViewGroup {
     final float v = mAnimatingTranslateVelocity;
     // compute position
     mAnimationPosition = p + (v * t);
-    mLeft = (int) mAnimationPosition;
+    mLeft = Facade.computeInterpolator(getMeasuredWidth(), mAnimationPosition, true);
 
     // compute shade
     if (!mStopAnimatingAlpha) {

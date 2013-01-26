@@ -147,7 +147,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
   }
 
   /**
-   * @param proportion the proportion
+   * @param proportion the proportion while the range is [-1, 1]
    */
   @Override
   public void setProportion(float proportion) {
@@ -808,7 +808,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         mPositionState = STATE_COLLAPSE_LEFT;
         offset();
       } else {
-        float offset = Facade.computeInterpolator(iAnimationDistance, iAnimatingPosition);
+        float offset = Facade.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
         Log.d(TAG, "@computeLeftAnimation " + offset);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
@@ -827,7 +827,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         mPositionState = STATE_COLLAPSE_RIGHT;
         offset();
       } else {
-        float offset = Facade.computeInterpolator(iAnimationDistance, iAnimatingPosition);
+        float offset = Facade.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
         mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT, iCurrentAnimationTime);
@@ -846,7 +846,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         mPositionState = STATE_EXPAND;
         offset();
       } else {
-        float offset = Facade.computeInterpolator(iAnimationDistance, iAnimatingPosition);
+        float offset = Facade.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
         mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT_OPEN, iCurrentAnimationTime);
@@ -865,7 +865,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
         mPositionState = STATE_EXPAND;
         offset();
       } else {
-        float offset = Facade.computeInterpolator(iAnimationDistance, iAnimatingPosition);
+        float offset = Facade.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
         mLeftTranslate = (int) (offset + iAnimationStart);
         invalidate();
         mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT_OPEN, iCurrentAnimationTime);
