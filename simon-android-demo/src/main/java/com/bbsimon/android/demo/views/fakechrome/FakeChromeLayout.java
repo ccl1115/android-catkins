@@ -1465,7 +1465,7 @@ public final class FakeChromeLayout extends ViewGroup implements IFakeChrome {
   }
 
   private TabFragment findFragment(View view) {
-    for (TabFragment f : mAdapter) {
+    for (TabFragment f : mAdapter.getList()) {
       if (view.equals(f.getView())) {
         return f;
       }

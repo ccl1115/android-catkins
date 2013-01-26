@@ -19,4 +19,9 @@ public class Facade {
       return t * t * t * t * t + 1.0f;
     }
   };
+
+  public static int computeInterpolator(float distance, float position) {
+    float proportion = sInterpolator.getInterpolation(position / (float) distance);
+    return (int) (distance * proportion);
+  }
 }
