@@ -34,4 +34,17 @@
         <attr name="tap_back_area"
               format="string"/>
     </declare-styleable>
+
+    <declare-styleable name="RefresherView">
+        <attr name="max_height"
+              format="dimension"/>
+        <attr name="threshold_height"
+              format="dimension"/>
+        <attr name="refresher_head"
+              format="integer"/>
+        <attr name="refresher_content"
+              format="integer"/>
+        <attr name="empty_view"
+              format="integer"/>
+    </declare-styleable>
 </resources>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.bbsimon.android.demo.views.refresh.RefresherView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
+        android:background="#33000000"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        simon:empty_view="@+id/empty_view"
+        simon:refresher_content="@+id/refresher_content"
+        simon:refresher_head="@+id/refresher_header"
+        simon:max_height="400dp"
+        simon:threshold_height="200dp">
+
+    <TextView
+            android:id="@+id/refresher_header"
+            android:background="#FF032F32"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:gravity="center"
+            android:text="HEADER"/>
+
+    <ListView
+            android:background="#FF39281A"
+            android:id="@+id/refresher_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    <TextView
+            android:background="#FF392109"
+            android:text="EMPTY_VIEW"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+</com.bbsimon.android.demo.views.refresh.RefresherView>

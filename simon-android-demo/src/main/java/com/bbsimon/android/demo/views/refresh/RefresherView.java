@@ -2,6 +2,7 @@ package com.bbsimon.android.demo.views.refresh;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -13,33 +14,26 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.views.Facade;
 
 /**
  */
 @SuppressWarnings("unused")
-public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRefreshable {
+public class RefresherView extends ViewGroup implements IRefreshable {
   private static final String TAG = "RefresherView";
 
   private static final int MSG_ANIMATE = 1000;
 
-  private static final int REFRESH_HEADER_MAX_HEIGHT = 300;
-  private static final int REFRESH_HEADER_HEIGHT = 100;
-  private static final int REFRESH_THRESHOLD = 200;
+  private int mThresholdHeight;
+  private int mMaxHeight;
 
-  private final String kPullDownToRefresh;
-  private final String kReleaseToRefresh;
-  private final String kRefreshing;
+  private int mRefresherContentId;
+  private int mRefresherHeaderId;
+  private int mEmptyViewId;
 
-  private final int kRefreshThreshold;
-  private final int kRefreshHeaderHeight;
-  private final int kRefreshHeaderMaxHeight;
-
-  private T mRefresherContent;
+  private ViewGroup mRefresherContent;
   private View mRefresherHeader;
-  private TextView mText;
   private View mEmptyView;
   private boolean mHasContent;
   private boolean mShouldDrawEmptyView = true;
@@ -71,37 +65,44 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
     final Resources r = getResources();
     final float density = r.getDisplayMetrics().density;
 
-    kRefreshHeaderHeight = (int) (REFRESH_HEADER_HEIGHT * density + 0.5f);
-    kRefreshHeaderMaxHeight =
-        (int) (REFRESH_HEADER_MAX_HEIGHT * density + 0.5f);
-    kRefreshThreshold = (int) (REFRESH_THRESHOLD * density + 0.5f);
+    TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RefresherView);
 
-    kPullDownToRefresh = r.getString(R.string.refresher_pull_down_to_refresh);
-    kRefreshing = r.getString(R.string.refresher_refreshing);
-    kReleaseToRefresh = r.getString(R.string.refresher_release_to_refresh);
+    mThresholdHeight = ta.getDimensionPixelOffset(R.styleable.RefresherView_threshold_height, -1);
+    mMaxHeight = ta.getDimensionPixelOffset(R.styleable.RefresherView_max_height, -1);
 
-    mEmptyView = new ProgressBar(context);
-    addView(mEmptyView, new LayoutParams(LayoutParams.MATCH_PARENT,
-        LayoutParams.MATCH_PARENT));
-
-    mRefresherHeader = View.inflate(context, R.layout.refresher, null);
-    mText = (TextView) mRefresherHeader.findViewById(R.id.text);
-    addView(mRefresherHeader, new LayoutParams(LayoutParams.MATCH_PARENT,
-        LayoutParams.WRAP_CONTENT));
+    mRefresherContentId = ta.getResourceId(R.styleable.RefresherView_refresher_content, -1);
+    mRefresherHeaderId = ta.getResourceId(R.styleable.RefresherView_refresher_head, -1);
+    mEmptyViewId = ta.getResourceId(R.styleable.RefresherView_empty_view, -1);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   protected void onFinishInflate() {
-    if (mRefresherContent == null) {
-      mRefresherContent = (T) findViewById(R.id.refresher_content);
-    }
-    if (mRefresherContent == null) {
-      mHasContent = false;
-      mEnable = false;
+    if (mRefresherContentId == -1) {
+      throw new RuntimeException("refresher content id is not set in xml, or call setRefresherContent before add it to a view tree.");
     } else {
-      mHasContent = true;
-      mEnable = true;
+      mRefresherContent = (ViewGroup) findViewById(mRefresherContentId);
+      if (mRefresherContent == null) {
+        throw new RuntimeException("refresher content not found in the view tree by the content id.");
+      }
+    }
+
+    if (mRefresherHeaderId == -1) {
+      throw new RuntimeException("refresher head id is not set in xml, or call setRefresherHeader before add it to a view tree.");
+    } else {
+      mRefresherHeader = findViewById(mRefresherHeaderId);
+      if (mRefresherHeader == null) {
+        throw new RuntimeException("refresher header not found in the view tree by the header id.");
+      }
+    }
+
+    if (mEmptyViewId == -1) {
+      throw new RuntimeException("empty view id is not set in xml, or call setEmptyView before add it to a view tree");
+    } else {
+      mEmptyView = findViewById(mEmptyViewId);
+      if (mEmptyView == null) {
+        throw new RuntimeException("empty view not found in the view tree by the empty view's id");
+      }
     }
   }
 
@@ -120,7 +121,7 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
     }
 
     measureChild(mRefresherHeader, widthSize + MeasureSpec.EXACTLY,
-        kRefreshHeaderHeight + MeasureSpec.EXACTLY);
+        heightSize + MeasureSpec.AT_MOST);
 
     setMeasuredDimension(widthSize, heightSize);
   }
@@ -148,7 +149,7 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    if (!mEnable || mAnimator.animating) {
+    if (!mEnable) {
       return false;
     }
 
@@ -166,7 +167,16 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
         if (childAt != null) {
           childAt.getLocationOnScreen(mContentLocation);
           if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
-            mYOffset = Math.min(y - mLastDownY, kRefreshHeaderMaxHeight);
+            mYOffset = y - mLastDownY;
+            invalidate();
+
+            return true;
+          }
+        } else {
+          // If there's no child.
+          mRefresherContent.getLocationOnScreen(mContentLocation);
+          if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
+            mYOffset = y - mLastDownY;
             invalidate();
 
             return true;
@@ -186,12 +196,12 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
 
     switch (action) {
       case MotionEvent.ACTION_MOVE:
-        mYOffset = Math.max(0, Math.min(y - mLastDownY, kRefreshHeaderMaxHeight * 2));
+        mYOffset = Math.max(0, Math.min(y - mLastDownY, mMaxHeight * 2));
 
-        if (mYOffset > kRefreshThreshold) {
-          mText.setText(kReleaseToRefresh);
+        if (mYOffset > mThresholdHeight) {
+
         } else {
-          mText.setText(kPullDownToRefresh);
+
         }
 
         invalidate();
@@ -200,9 +210,8 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
 
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
-        if (mYOffset > kRefreshThreshold) {
-          mBackPosition = kRefreshThreshold;
-          mText.setText(kRefreshing);
+        if (mYOffset > mThresholdHeight) {
+          mBackPosition = mThresholdHeight;
           refresh();
         } else {
           mBackPosition = 0;
@@ -228,7 +237,7 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
   }
 
   @Override
-  public boolean getEnable() {
+  public boolean isEnabled() {
     return mEnable;
   }
 
@@ -238,23 +247,6 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
       mRefreshAsyncTask = new RefreshAsyncTask();
       mRefreshAsyncTask.execute((Void[]) null);
     }
-  }
-
-  @Override
-  public void showEmptyView() {
-    mShouldDrawEmptyView = true;
-    addView(mEmptyView, new LayoutParams(LayoutParams.MATCH_PARENT,
-        LayoutParams.MATCH_PARENT));
-  }
-
-  @Override
-  public void hideEmptyView() {
-    mShouldDrawEmptyView = false;
-    removeView(mEmptyView);
-  }
-
-  @Override
-  public void setRefreshIndicator(IRefreshIndicator indicator) {
   }
 
   @Override
@@ -328,23 +320,54 @@ public class RefresherView<T extends ViewGroup> extends ViewGroup implements IRe
     }
   }
 
-  public T getRefresherContent() {
+  public ViewGroup getRefresherContent() {
     return mRefresherContent;
   }
 
-  public void setRefresherContent(T refresherContent) {
+  @Override
+  public View getRefresherHeader() {
+    return null;
+  }
+
+  @Override
+  public View getEmptyView() {
+    return null;
+  }
+
+  @Override
+  public void setRefresherContent(ViewGroup view) {
     removeView(mRefresherContent);
-    mRefresherContent = refresherContent;
+    mRefresherContent = view;
     if (mRefresherContent == null) {
       mHasContent = false;
       mEnable = false;
     } else {
-      addView(mRefresherContent, new LayoutParams(LayoutParams.MATCH_PARENT,
-          LayoutParams.MATCH_PARENT));
+      addView(mRefresherContent);
       mHasContent = true;
-      mEnable = true;
+      mEnable = mRefresherHeader != null && mRefresherContent != null;
     }
 
+  }
+
+  @Override
+  public void setRefresherHeader(View view) {
+    removeView(mRefresherHeader);
+    mRefresherHeader = view;
+    if (mRefresherHeader == null) {
+      mEnable = false;
+    } else {
+      addView(mRefresherHeader);
+      mEnable = mRefresherHeader != null && mRefresherContent != null;
+    }
+  }
+
+  @Override
+  public void setEmptyView(View view) {
+    removeView(mEmptyView);
+    mEmptyView = view;
+    if (mEmptyView != null) {
+      addView(mEmptyView);
+    }
   }
 
   private class AnimatorHandler extends Handler {

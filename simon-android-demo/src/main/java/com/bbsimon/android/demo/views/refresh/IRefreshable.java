@@ -44,16 +44,21 @@ public interface IRefreshable {
   /**
    * @return true if refreshable.
    */
-  boolean getEnable();
+  boolean isEnabled();
 
   /**
    */
   void refresh();
 
-  void showEmptyView();
+  void setRefresherContent(ViewGroup view);
 
-  void hideEmptyView();
+  void setRefresherHeader(View view);
 
-  void setRefreshIndicator(IRefreshIndicator indicator);
+  void setEmptyView(View view);
 
+  ViewGroup getRefresherContent();
+
+  View getRefresherHeader();
+
+  View getEmptyView();
 }
