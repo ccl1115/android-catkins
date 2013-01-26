@@ -9,7 +9,7 @@ import android.view.animation.Interpolator;
 /**
  */
 public class Facade {
-  public static final float ONE_SECOND = 1000f;
+  public static final float ONE_SECOND_FLOAT = 1000f;
   public static final int ANIMATION_FRAME_DURATION = 16; // equals 1000 / 60
 
   public static final Interpolator sInterpolator = new Interpolator() {
@@ -21,7 +21,7 @@ public class Facade {
   };
 
   public static int computeInterpolator(float distance, float position) {
-    float proportion = sInterpolator.getInterpolation(position / (float) distance);
+    float proportion = sInterpolator.getInterpolation(position / distance);
     return (int) (distance * proportion);
   }
 }

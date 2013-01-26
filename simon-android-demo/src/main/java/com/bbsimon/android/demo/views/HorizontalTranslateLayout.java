@@ -10,20 +10,22 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.widget.FrameLayout;
 import com.bbsimon.android.demo.R;
+import de.akquinet.android.androlog.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The implementation of HorizontalTranslateLayout interface and the interceptions for host view methods.
+ *
+ * <b>This layout doesn't support using drawable as background. Only color supported</b>
  */
 public class HorizontalTranslateLayout extends FrameLayout implements IHorizontalTranslate {
-  private static final String TAG = "HorizontalTranslateLayoutActivity";
+  private static final String TAG = "HorizontalTranslateLayout";
 
   private enum TrackDirection {left, right, horizontal, none}
 
@@ -71,6 +73,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
 
   public HorizontalTranslateLayout(Context context, AttributeSet attrs) {
     super(context, attrs);
+    Log.init(context);
     mHandler = new AnimationHandler();
     mAnimator = new Animator();
     mTracker = new Tracker();
@@ -135,6 +138,11 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
     a.recycle();
 
     setClickable(true);
+  }
+
+  @Override
+  public void setBackgroundColor(int color) {
+    mBackgroundPaint.setColor(color);
   }
 
   /**
