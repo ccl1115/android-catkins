@@ -179,18 +179,17 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         break;
 
       case MotionEvent.ACTION_MOVE:
-        if (mRefresherContent instanceof ViewGroup) {
-          View childAt = ((ViewGroup) mRefresherContent).getChildAt(0);
-          if (childAt != null) {
-            childAt.getLocationOnScreen(mContentLocation);
-            if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
-              mState = State.pulling_no_refresh;
-              final OnRefreshListener onRefreshListener = mOnRefreshListener;
-              if (onRefreshListener != null) {
-                onRefreshListener.onStateChanged(State.pulling_no_refresh);
-              }
-              return true;
+        View childAt;
+        if (mRefresherContent instanceof ViewGroup
+            && (childAt = ((ViewGroup) mRefresherContent).getChildAt(0)) != null) {
+          childAt.getLocationOnScreen(mContentLocation);
+          if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
+            mState = State.pulling_no_refresh;
+            final OnRefreshListener onRefreshListener = mOnRefreshListener;
+            if (onRefreshListener != null) {
+              onRefreshListener.onStateChanged(State.pulling_no_refresh);
             }
+            return true;
           }
         } else {
           // If there's no child.

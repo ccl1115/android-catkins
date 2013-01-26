@@ -10,7 +10,6 @@ import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.app.BaseActivity;
 import com.bbsimon.android.demo.views.refresh.IRefreshable;
 import com.bbsimon.android.demo.views.refresh.RefresherView;
-import de.akquinet.android.androlog.Log;
 
 /**
  */
