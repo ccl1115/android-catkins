@@ -143,6 +143,7 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
   @Override
   public void setBackgroundColor(int color) {
     mBackgroundPaint.setColor(color);
+    invalidate();
   }
 
   /**
