@@ -150,15 +150,22 @@ public class HorizontalTranslateLayout extends FrameLayout implements IHorizonta
    */
   @Override
   public void setProportion(float proportion) {
-    if (proportion < -1 || proportion > 1) {
+    if (proportion < -1f || proportion > 1f) {
       return;
     }
-    if (proportion < 0) {
+    if (proportion < 0f) {
       mLeftTranslate = (int) ((mLeftOffset - getMeasuredWidth()) * -proportion);
-    } else if (proportion > 0) {
+    } else if (proportion > 0f) {
       mLeftTranslate = (int) ((getMeasuredWidth() - mRightOffset) * proportion);
-    } else {
+    } else if (proportion == 0f) {
       mLeftTranslate = 0;
+      mPositionState = STATE_EXPAND;
+    } else if (proportion == -1f) {
+      mLeftOffset = mLeftOffset - getMeasuredWidth();
+      mPositionState = STATE_COLLAPSE_LEFT;
+    } else if (proportion == 1f) {
+      mLeftOffset = getMeasuredWidth() - mRightOffset;
+      mPositionState = STATE_COLLAPSE_RIGHT;
     }
     invalidate();
   }
