@@ -15,13 +15,17 @@
               format="integer"/>
     </declare-styleable>
 
-    <declare-styleable name="PagerIndicator">
-        <attr name="space"
+    <declare-styleable name="Indicator">
+        <attr name="spacing"
               format="dimension"/>
         <attr name="drawable"
               format="reference"/>
         <attr name="selector"
               format="reference"/>
+        <attr name="autoHide"
+              format="boolean"/>
+        <attr name="count"
+              format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="HorizontalTranslateLayout">
