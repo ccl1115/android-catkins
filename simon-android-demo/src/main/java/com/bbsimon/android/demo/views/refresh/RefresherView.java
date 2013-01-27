@@ -39,6 +39,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private View mRefresherHeader;
   private View mEmptyView;
   private boolean mEnable = true;
+  private boolean mRefreshing;
   private int mLastDownY;
   private final int[] mContentLocation = new int[2];
   private final int[] mTempLocation = new int[2];
@@ -164,7 +165,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    if (!mEnable) {
+    if (!mEnable || mRefreshing) {
       return false;
     }
 
@@ -325,6 +326,13 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         if (onRefreshListener != null) {
           onRefreshListener.onStateChanged(State.idle);
         }
+
+        if (mBackPosition == 0) {
+          if (onRefreshListener != null) {
+            onRefreshListener.onRefreshUI();
+            mRefreshing = false;
+          }
+        }
       } else {
         mYOffset = (int)
             (mBackPosition + animationDistance * (1 - Facade.sInterpolator.getInterpolation(
@@ -438,6 +446,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
     @Override
     protected Void doInBackground(final Void... params) {
+      mRefreshing = true;
       if (mListener != null) {
         mListener.onRefreshData();
       }
@@ -446,9 +455,6 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
     @Override
     protected void onPostExecute(final Void aVoid) {
-      if (mListener != null) {
-        mListener.onRefreshUI();
-      }
       mBackPosition = 0;
       mAnimator.animate();
     }

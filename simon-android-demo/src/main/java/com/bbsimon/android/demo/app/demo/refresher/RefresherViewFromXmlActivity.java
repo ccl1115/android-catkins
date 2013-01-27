@@ -38,6 +38,13 @@ public class RefresherViewFromXmlActivity extends BaseActivity {
 
       @Override
       public void onRefreshData() {
+        try {
+          synchronized (this) {
+            wait(2000);
+          }
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
       }
 
       @Override
