@@ -60,10 +60,10 @@
     </parent>
 
     <groupId>com.bbsimon.android.demo</groupId>
-    <artifactId>catkins-demo</artifactId>
+    <artifactId>catkins-lib</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>apk</packaging>
-    <name>catkins-demo - Application</name>
+    <packaging>apklib</packaging>
+    <name>catkins-lib - Application</name>
 
     <dependencies>
         <dependency>
@@ -90,11 +90,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.bbsimon.android.demo</groupId>
-            <artifactId>catkins-lib</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
