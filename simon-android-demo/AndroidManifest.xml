@@ -28,8 +28,6 @@
         <activity android:name=".app.demo.StackLayoutWithFragmentDemoActivity"/>
 
         <activity android:name=".app.demo.HorizontalTranslateLayoutActivity"/>
-
-        <activity android:name=".app.demo.FakeChromeDemoActivity"/>
     </application>
 
 </manifest>
