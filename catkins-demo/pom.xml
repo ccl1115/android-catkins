@@ -60,10 +60,10 @@
     </parent>
 
     <groupId>com.bbsimon.android.demo</groupId>
-    <artifactId>simon-android-demo</artifactId>
+    <artifactId>catkins-demo</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>apk</packaging>
-    <name>simon-android-demo - Application</name>
+    <name>catkins-demo - Application</name>
 
     <dependencies>
         <dependency>

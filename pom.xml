@@ -8,11 +8,11 @@
     <artifactId>simon-android-demo-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>simon-android-demo - Parent</name>
+    <name>catkins - Parent</name>
 
     <modules>
-        <module>simon-android-demo</module>
-        <module>simon-android-demo-it</module>
+        <module>catkins-demo</module>
+        <module>catkins-demo-it</module>
     </modules>
 
     <properties>
