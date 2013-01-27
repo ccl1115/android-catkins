@@ -276,11 +276,13 @@ public interface Indicator {
       }
 
       @Override
-      public void interceptionTouchEvent(MotionEvent event) {
+      public boolean interceptionTouchEvent(MotionEvent event) {
+        return false;
       }
 
       @Override
-      public void touchEvent(MotionEvent event) {
+      public boolean touchEvent(MotionEvent event) {
+        return false;
       }
 
       @Override
