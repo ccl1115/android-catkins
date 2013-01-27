@@ -271,7 +271,8 @@ public interface Indicator {
       }
 
       @Override
-      public void dispatchTouchEvent(MotionEvent event) {
+      public boolean dispatchTouchEvent(MotionEvent event) {
+        return false;
       }
 
       @Override

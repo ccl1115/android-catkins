@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
+ */
+
 package com.bbsimon.android.demo.views;
 
 import android.graphics.Canvas;
@@ -12,11 +16,11 @@ public interface TransitionAnimator {
 
   void draw(Canvas canvas);
 
-  void dispatchTouchEvent(MotionEvent event);
+  boolean dispatchTouchEvent(MotionEvent event);
 
-  void interceptionTouchEvent(MotionEvent event);
+  boolean interceptionTouchEvent(MotionEvent event);
 
-  void touchEvent(MotionEvent event);
+  boolean touchEvent(MotionEvent event);
 
   void animate(int msg);
 }

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.views.Facade;
+import com.bbsimon.android.demo.views.TransitionAnimator;
 
 /**
  */
@@ -50,6 +51,8 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private AnimatorHandler mHandler;
   private OnRefreshListener mOnRefreshListener;
   private RefreshAsyncTask mRefreshAsyncTask;
+
+  private TransitionAnimator mTransitionAnimator = new RefreshTransitionAnimator();
 
   private State mState = State.idle;
 
@@ -87,7 +90,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     if (mRefresherContentId == -1) {
       throw new RuntimeException("refresher content id is not set in xml, or call setRefresherContent before add it to a view tree.");
     } else {
-      mRefresherContent = (ViewGroup) findViewById(mRefresherContentId);
+      mRefresherContent = findViewById(mRefresherContentId);
       if (mRefresherContent == null) {
         throw new RuntimeException("refresher content not found in the view tree by the content id.");
       }
@@ -114,160 +117,33 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    final int widthSize = widthMeasureSpec & ~(0x3 << 30);
-    final int heightSize = heightMeasureSpec & ~(0x3 << 30);
-    if (mRefresherContent != null) {
-      measureChild(mRefresherContent, widthSize + MeasureSpec.EXACTLY,
-          heightSize + MeasureSpec.EXACTLY);
-    }
-
-    if (mEmptyView != null) {
-      measureChild(mEmptyView, widthSize + MeasureSpec.AT_MOST,
-          heightSize + MeasureSpec.AT_MOST);
-    }
-
-    if (mRefresherHeader != null) {
-      measureChild(mRefresherHeader, widthSize + MeasureSpec.EXACTLY,
-          heightSize + MeasureSpec.AT_MOST);
-    }
-
-    setMeasuredDimension(widthSize, heightSize);
+    mTransitionAnimator.measure(widthMeasureSpec, heightMeasureSpec);
   }
 
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    final int width = r - l;
-    final int height = b - t;
-    if (mRefresherContent != null) {
-      mRefresherContent.layout(0, 0, width, height);
-    }
-
-    if (mEmptyView != null) {
-      mEmptyView.layout((width - mEmptyView.getMeasuredWidth()) / 2,
-          (height - mEmptyView.getMeasuredHeight()) / 2,
-          (width + mEmptyView.getMeasuredWidth()) / 2,
-          (height + mEmptyView.getMeasuredHeight()) / 2);
-    }
-
-    if (mRefresherHeader != null) {
-      mRefresherHeader.layout(0, -mRefresherHeader.getMeasuredHeight(), width, 0);
-    }
-
-    getLocationOnScreen(mTempLocation);
-    mAbsY = mTempLocation[1];
+    mTransitionAnimator.layout(changed, l, t, r, b);
   }
 
   @Override
   @SuppressWarnings("all")
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    return super.dispatchTouchEvent(ev) || true;
+    return mTransitionAnimator.dispatchTouchEvent(ev);
   }
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    if (!mEnable || mRefreshing) {
-      return false;
-    }
-
-    final int action = ev.getAction() & MotionEvent.ACTION_MASK;
-    final int y = (int) ev.getY();
-
-    switch (action) {
-      case MotionEvent.ACTION_DOWN:
-        mLastDownY = y;
-
-        mHandler.removeMessages(MSG_ANIMATE);
-        break;
-
-      case MotionEvent.ACTION_MOVE:
-        View childAt;
-        if (mRefresherContent instanceof ViewGroup
-            && (childAt = ((ViewGroup) mRefresherContent).getChildAt(0)) != null) {
-          childAt.getLocationOnScreen(mContentLocation);
-          if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
-            mState = State.pulling_no_refresh;
-            final OnRefreshListener onRefreshListener = mOnRefreshListener;
-            if (onRefreshListener != null) {
-              onRefreshListener.onStateChanged(State.pulling_no_refresh);
-            }
-            return true;
-          }
-        } else {
-          // If there's no child.
-          mRefresherContent.getLocationOnScreen(mContentLocation);
-          if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
-            mState = State.pulling_no_refresh;
-            final OnRefreshListener onRefreshListener = mOnRefreshListener;
-            if (onRefreshListener != null) {
-              onRefreshListener.onStateChanged(State.pulling_no_refresh);
-            }
-            return true;
-          }
-        }
-      default:
-        break;
-    }
-
-    return false;
+    return mTransitionAnimator.interceptionTouchEvent(ev);
   }
 
   @Override
   public final boolean onTouchEvent(final MotionEvent event) {
-    final int action = event.getAction() & MotionEvent.ACTION_MASK;
-    final int y = (int) event.getY();
-
-    switch (action) {
-      case MotionEvent.ACTION_MOVE:
-        mYOffset = Math.max(0, Math.min(y - mLastDownY, mMaxHeight * 2));
-
-        if (mYOffset > mThresholdHeight && mState == State.pulling_no_refresh) {
-          mState = State.pulling_refresh;
-          final OnRefreshListener onRefreshListener = mOnRefreshListener;
-          if (onRefreshListener != null) {
-            onRefreshListener.onStateChanged(State.pulling_refresh);
-          }
-        } else if (mYOffset < mThresholdHeight && mState == State.pulling_refresh) {
-          mState = State.pulling_no_refresh;
-
-          final OnRefreshListener onRefreshListener = mOnRefreshListener;
-          if (onRefreshListener != null) {
-            onRefreshListener.onStateChanged(State.pulling_no_refresh);
-          }
-        }
-        invalidate();
-        break;
-      case MotionEvent.ACTION_UP:
-      case MotionEvent.ACTION_CANCEL:
-        if (mYOffset > mThresholdHeight) {
-          mBackPosition = mThresholdHeight;
-          refresh();
-        } else {
-          mBackPosition = 0;
-        }
-        mAnimator.animate();
-        break;
-      default:
-        break;
-    }
-
-    return true;
+    return mTransitionAnimator.touchEvent(event);
   }
 
   @Override
   protected void dispatchDraw(Canvas canvas) {
-    final long drawingTime = getDrawingTime();
-
-    if (mEmptyView != null) {
-      drawChild(canvas, mEmptyView, drawingTime);
-    }
-
-    canvas.save();
-    canvas.translate(0, mYOffset / 2);
-    drawChild(canvas, mRefresherContent, drawingTime);
-    if (mYOffset > 0) {
-      drawChild(canvas, mRefresherHeader, drawingTime);
-    }
-    canvas.restore();
+    mTransitionAnimator.draw(canvas);
   }
 
   public void setOnRefreshListener(OnRefreshListener listener) {
@@ -299,18 +175,12 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   }
 
   private class Animator {
-    final static int VELOCITY = 600;
     private boolean animating;
     private long lastAnimationTime;
     private long currentAnimatingTime;
-    private final int kVelocity;
     private int animatingVelocity;
     private int animatingPosition;
     private int animationDistance;
-
-    public Animator() {
-      kVelocity = (int) (getResources().getDisplayMetrics().density * VELOCITY + 0.5);
-    }
 
     void compute() {
       final long now = SystemClock.uptimeMillis();
@@ -457,6 +327,170 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     protected void onPostExecute(final Void aVoid) {
       mBackPosition = 0;
       mAnimator.animate();
+    }
+  }
+
+  private class RefreshTransitionAnimator implements TransitionAnimator {
+
+    @Override
+    public void measure(int widthMeasureSpec, int heightMeasureSpec) {
+      final int widthSize = widthMeasureSpec & ~(0x3 << 30);
+      final int heightSize = heightMeasureSpec & ~(0x3 << 30);
+      if (mRefresherContent != null) {
+        measureChild(mRefresherContent, widthSize + MeasureSpec.EXACTLY,
+            heightSize + MeasureSpec.EXACTLY);
+      }
+
+      if (mEmptyView != null) {
+        measureChild(mEmptyView, widthSize + MeasureSpec.AT_MOST,
+            heightSize + MeasureSpec.AT_MOST);
+      }
+
+      if (mRefresherHeader != null) {
+        measureChild(mRefresherHeader, widthSize + MeasureSpec.EXACTLY,
+            heightSize + MeasureSpec.AT_MOST);
+      }
+
+      setMeasuredDimension(widthSize, heightSize);
+    }
+
+    @Override
+    public void layout(boolean changed, int l, int t, int r, int b) {
+      final int width = r - l;
+      final int height = b - t;
+      if (mRefresherContent != null) {
+        mRefresherContent.layout(0, 0, width, height);
+      }
+
+      if (mEmptyView != null) {
+        mEmptyView.layout((width - mEmptyView.getMeasuredWidth()) / 2,
+            (height - mEmptyView.getMeasuredHeight()) / 2,
+            (width + mEmptyView.getMeasuredWidth()) / 2,
+            (height + mEmptyView.getMeasuredHeight()) / 2);
+      }
+
+      if (mRefresherHeader != null) {
+        mRefresherHeader.layout(0, -mRefresherHeader.getMeasuredHeight(), width, 0);
+      }
+
+      getLocationOnScreen(mTempLocation);
+      mAbsY = mTempLocation[1];
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+      final long drawingTime = getDrawingTime();
+
+      if (mEmptyView != null) {
+        drawChild(canvas, mEmptyView, drawingTime);
+      }
+
+      canvas.save();
+      canvas.translate(0, mYOffset / 2);
+      drawChild(canvas, mRefresherContent, drawingTime);
+      if (mYOffset > 0) {
+        drawChild(canvas, mRefresherHeader, drawingTime);
+      }
+      canvas.restore();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+      return RefresherView.super.dispatchTouchEvent(event) || true;
+    }
+
+    @Override
+    public boolean interceptionTouchEvent(MotionEvent ev) {
+      if (!mEnable || mRefreshing) {
+        return false;
+      }
+
+      final int action = ev.getAction() & MotionEvent.ACTION_MASK;
+      final int y = (int) ev.getY();
+
+      switch (action) {
+        case MotionEvent.ACTION_DOWN:
+          mLastDownY = y;
+
+          mHandler.removeMessages(MSG_ANIMATE);
+          break;
+
+        case MotionEvent.ACTION_MOVE:
+          View childAt;
+          if (mRefresherContent instanceof ViewGroup
+              && (childAt = ((ViewGroup) mRefresherContent).getChildAt(0)) != null) {
+            childAt.getLocationOnScreen(mContentLocation);
+            if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
+              mState = State.pulling_no_refresh;
+              final OnRefreshListener onRefreshListener = mOnRefreshListener;
+              if (onRefreshListener != null) {
+                onRefreshListener.onStateChanged(State.pulling_no_refresh);
+              }
+              return true;
+            }
+          } else {
+            // If there's no child.
+            mRefresherContent.getLocationOnScreen(mContentLocation);
+            if (mContentLocation[1] == mAbsY && (y > mLastDownY)) {
+              mState = State.pulling_no_refresh;
+              final OnRefreshListener onRefreshListener = mOnRefreshListener;
+              if (onRefreshListener != null) {
+                onRefreshListener.onStateChanged(State.pulling_no_refresh);
+              }
+              return true;
+            }
+          }
+        default:
+          break;
+      }
+
+      return false;
+    }
+
+    @Override
+    public boolean touchEvent(MotionEvent event) {
+      final int action = event.getAction() & MotionEvent.ACTION_MASK;
+      final int y = (int) event.getY();
+
+      switch (action) {
+        case MotionEvent.ACTION_MOVE:
+          mYOffset = Math.max(0, Math.min(y - mLastDownY, mMaxHeight * 2));
+
+          if (mYOffset > mThresholdHeight && mState == State.pulling_no_refresh) {
+            mState = State.pulling_refresh;
+            final OnRefreshListener onRefreshListener = mOnRefreshListener;
+            if (onRefreshListener != null) {
+              onRefreshListener.onStateChanged(State.pulling_refresh);
+            }
+          } else if (mYOffset < mThresholdHeight && mState == State.pulling_refresh) {
+            mState = State.pulling_no_refresh;
+
+            final OnRefreshListener onRefreshListener = mOnRefreshListener;
+            if (onRefreshListener != null) {
+              onRefreshListener.onStateChanged(State.pulling_no_refresh);
+            }
+          }
+          invalidate();
+          break;
+        case MotionEvent.ACTION_UP:
+        case MotionEvent.ACTION_CANCEL:
+          if (mYOffset > mThresholdHeight) {
+            mBackPosition = mThresholdHeight;
+            refresh();
+          } else {
+            mBackPosition = 0;
+          }
+          mAnimator.animate();
+          break;
+        default:
+          break;
+      }
+
+      return true;
+    }
+
+    @Override
+    public void animate(int msg) {
     }
   }
 }
