@@ -161,29 +161,6 @@
                         <groupId>com.jayway.maven.plugins.android.generation2
                         </groupId>
                         <artifactId>android-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>zipalign-application-apk</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>zipalign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <zipalign>
-                                <verbose>true</verbose>
-                                <inputApk>
-                                    ${project.build.directory}/${project.artifactId}-${project.version}.apk
-                                </inputApk>
-                                <outputApk>
-                                    ${project.build.directory}/${project.artifactId}-${project.version}-signed-aligned.apk
-                                </outputApk>
-                            </zipalign>
-                            <sign>
-                                <debug>false</debug>
-                            </sign>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>

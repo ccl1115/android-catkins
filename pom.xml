@@ -11,9 +11,9 @@
     <name>catkins - Parent</name>
 
     <modules>
+        <module>catkins-lib</module>
         <module>catkins-demo</module>
         <module>catkins-demo-it</module>
-        <module>catkins-lib</module>
     </modules>
 
     <properties>
