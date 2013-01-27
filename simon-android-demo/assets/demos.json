@@ -23,10 +23,5 @@
         "name" : "HorizontalTranslateLayout",
         "description" : "A layout that can be translate to left/right/both direction.",
         "activity" : "com.bbsimon.android.demo.app.demo.HorizontalTranslateLayoutActivity"
-    },
-    {
-        "name" : "FakeChromeDemoActivity",
-        "description" : "A adapter view looks like the layout of Chrome for android.",
-        "activity" : "com.bbsimon.android.demo.app.demo.FakeChromeDemoActivity"
     }
 ]
