@@ -6,7 +6,7 @@
 
 <com.simon.catkins.views.refresh.RefresherView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:catkins="http://schemas.android.com/apk/lib/com.simon.catkins"
+        xmlns:catkins="http://schemas.android.com/apk/res/com.simon.catkins.demo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         catkins:empty_view="@+id/empty_view"

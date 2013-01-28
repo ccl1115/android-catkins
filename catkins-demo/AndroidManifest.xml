@@ -12,24 +12,24 @@
             android:theme="@style/DefaultTheme"
             android:icon="@drawable/icon"
             android:label="@string/app_name">
-        <activity android:name="com.simon.catkins.demo.app.HomeActivity">
+        <activity android:name=".app.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".app.demo.FlipperLayoutDemoActivity"/>
+        <activity android:name=".app.FlipperLayoutDemoActivity"/>
 
-        <activity android:name=".app.demo.Flip3DLayoutDemoActivity"/>
+        <activity android:name=".app.Flip3DLayoutDemoActivity"/>
 
-        <activity android:name=".app.demo.StackLayoutDemoActivity"/>
+        <activity android:name=".app.StackLayoutDemoActivity"/>
 
-        <activity android:name=".app.demo.StackLayoutWithFragmentDemoActivity"/>
+        <activity android:name=".app.StackLayoutWithFragmentDemoActivity"/>
 
-        <activity android:name=".app.demo.HorizontalTranslateLayoutActivity"/>
+        <activity android:name=".app.HorizontalTranslateLayoutActivity"/>
 
-        <activity android:name=".app.demo.refresher.RefresherViewFromXmlActivity"/>
+        <activity android:name=".app.refresher.RefresherViewFromXmlActivity"/>
     </application>
 
 </manifest>

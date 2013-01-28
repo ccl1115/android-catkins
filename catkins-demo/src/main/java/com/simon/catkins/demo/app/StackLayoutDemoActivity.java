@@ -2,7 +2,7 @@
  * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.simon.catkins.demo.app.demo;
+package com.simon.catkins.demo.app;
 
 import android.os.Bundle;
 import android.view.Gravity;

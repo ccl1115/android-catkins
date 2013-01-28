@@ -54,7 +54,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.bbsimon.android.demo</groupId>
+        <groupId>com.simon.catkins</groupId>
         <artifactId>catkins-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>

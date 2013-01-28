@@ -12,11 +12,11 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.demo.R;
 import com.simon.catkins.demo.data.json.models.Demo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.simon.catkins.app.BaseActivity;
 import de.akquinet.android.androlog.Log;
 
 import java.io.IOException;

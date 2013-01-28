@@ -1,7 +1,7 @@
 package com.simon.catkins.demo.test.app;
 
 import android.test.ActivityInstrumentationTestCase2;
-import com.bbsimon.android.demo.app.HomeActivity;
+import com.simon.catkins.demo.app.HomeActivity;
 
 public class HomeActivityTest extends ActivityInstrumentationTestCase2<HomeActivity> {
 
@@ -14,4 +14,3 @@ public class HomeActivityTest extends ActivityInstrumentationTestCase2<HomeActiv
     assertNotNull(activity);
   }
 }
-

@@ -2,7 +2,7 @@
  * Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.simon.catkins.demo.app.demo.refresher;
+package com.simon.catkins.demo.app.refresher;
 
 import android.os.Bundle;
 import android.widget.TextView;

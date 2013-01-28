@@ -2,31 +2,31 @@
     {
         "name" : "FlipperLayout",
         "description" : "A layout acting like a drawer. It can be flinged to the right side out of the screen.",
-        "activity" : "com.bbsimon.android.demo.app.demo.FlipperLayoutDemoActivity"
+        "activity" : "com.simon.catkins.demo.app.FlipperLayoutDemoActivity"
     },
     {
         "name" : "Flip3DLayout",
         "description" : "Flip or reverse flip between two children layouts",
-        "activity" : "com.bbsimon.android.demo.app.demo.Flip3DLayoutDemoActivity"
+        "activity" : "com.simon.catkins.demo.app.Flip3DLayoutDemoActivity"
     },
     {
         "name" : "StackLayout",
         "description" : "Acting like FrameLayout, but has an optional translate animation when adding or removing to it.",
-        "activity" : "com.bbsimon.android.demo.app.demo.StackLayoutDemoActivity"
+        "activity" : "com.simon.catkins.demo.app.StackLayoutDemoActivity"
     },
     {
         "name" : "StackLayout /w Fragment",
         "description" : "The same as StackLayout, but manages the children with FragmentManager using the android support package.",
-        "activity" : "com.bbsimon.android.demo.app.demo.StackLayoutWithFragmentDemoActivity"
+        "activity" : "com.simon.catkins.demo.app.StackLayoutWithFragmentDemoActivity"
     },
     {
         "name" : "HorizontalTranslateLayout",
         "description" : "A layout that can be translate to left/right/both direction.",
-        "activity" : "com.bbsimon.android.demo.app.demo.HorizontalTranslateLayoutActivity"
+        "activity" : "com.simon.catkins.demo.app.HorizontalTranslateLayoutActivity"
     },
     {
         "name" : "RefresherView",
         "description" : "A container view can use pull-down-to-refresh.",
-        "activity" : "com.bbsimon.android.demo.app.demo.refresher.RefresherViewFromXmlActivity"
+        "activity" : "com.simon.catkins.demo.app.refresher.RefresherViewFromXmlActivity"
     }
 ]

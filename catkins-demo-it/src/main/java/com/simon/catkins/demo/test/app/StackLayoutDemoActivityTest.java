@@ -2,10 +2,10 @@
  * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.simon.catkins.demo.test.app.demo;
+package com.simon.catkins.demo.test.app;
 
 import android.test.ActivityInstrumentationTestCase2;
-import com.bbsimon.android.demo.app.demo.StackLayoutDemoActivity;
+import com.simon.catkins.demo.app.StackLayoutDemoActivity;
 
 /**
  * @author bb.simon.yu@gmail.com

@@ -1,4 +1,4 @@
-package com.simon.catkins.demo.app.demo;
+package com.simon.catkins.demo.app;
 
 import android.os.Bundle;
 import android.view.View;

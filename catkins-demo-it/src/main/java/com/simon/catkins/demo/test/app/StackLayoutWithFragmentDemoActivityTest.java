@@ -1,7 +1,7 @@
-package com.simon.catkins.demo.test.app.demo;
+package com.simon.catkins.demo.test.app;
 
 import android.test.ActivityInstrumentationTestCase2;
-import com.bbsimon.android.demo.app.demo.StackLayoutWithFragmentDemoActivity;
+import com.simon.catkins.demo.app.StackLayoutWithFragmentDemoActivity;
 
 /**
  * @author bb.simon.yu@gmail.com

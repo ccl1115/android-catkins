@@ -1,7 +1,7 @@
-package com.simon.catkins.demo.test.app.demo;
+package com.simon.catkins.demo.test.app;
 
 import android.test.ActivityInstrumentationTestCase2;
-import com.bbsimon.android.demo.app.demo.FlipperLayoutDemoActivity;
+import com.simon.catkins.demo.app.FlipperLayoutDemoActivity;
 
 /**
  * @author bb.simon.yu@gmail.com
