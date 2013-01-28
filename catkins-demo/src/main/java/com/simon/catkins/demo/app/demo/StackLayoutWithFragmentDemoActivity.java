@@ -2,7 +2,7 @@
  * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.bbsimon.android.demo.app.demo;
+package com.simon.catkins.demo.app.demo;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,8 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.bbsimon.android.demo.R;
 import com.simon.catkins.app.BaseActivity;
+import com.simon.catkins.demo.R;
 import com.simon.catkins.views.StackLayout;
 
 import java.util.Stack;

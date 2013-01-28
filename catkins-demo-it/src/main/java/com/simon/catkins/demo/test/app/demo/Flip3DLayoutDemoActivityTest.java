@@ -1,4 +1,4 @@
-package com.bbsimon.android.demo.test.app.demo;
+package com.simon.catkins.demo.test.app.demo;
 
 import android.test.ActivityInstrumentationTestCase2;
 import com.bbsimon.android.demo.app.demo.Flip3DLayoutDemoActivity;

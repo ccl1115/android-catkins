@@ -2,11 +2,11 @@
  * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.bbsimon.android.demo.app.demo;
+package com.simon.catkins.demo.app.demo;
 
 import android.os.Bundle;
-import com.bbsimon.android.demo.R;
 import com.simon.catkins.app.BaseActivity;
+import com.simon.catkins.demo.R;
 import de.akquinet.android.androlog.Log;
 
 /**

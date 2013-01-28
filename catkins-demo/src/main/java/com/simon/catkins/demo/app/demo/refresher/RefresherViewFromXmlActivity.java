@@ -2,12 +2,12 @@
  * Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.bbsimon.android.demo.app.demo.refresher;
+package com.simon.catkins.demo.app.demo.refresher;
 
 import android.os.Bundle;
 import android.widget.TextView;
-import com.bbsimon.android.demo.R;
 import com.simon.catkins.app.BaseActivity;
+import com.simon.catkins.demo.R;
 import com.simon.catkins.views.refresh.IRefreshable;
 import com.simon.catkins.views.refresh.RefresherView;
 

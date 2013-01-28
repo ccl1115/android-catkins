@@ -1,9 +1,9 @@
-package com.bbsimon.android.demo.app.demo;
+package com.simon.catkins.demo.app.demo;
 
 import android.os.Bundle;
 import android.view.View;
-import com.bbsimon.android.demo.R;
 import com.simon.catkins.app.BaseActivity;
+import com.simon.catkins.demo.R;
 import com.simon.catkins.views.HorizontalTranslateLayout;
 
 /**

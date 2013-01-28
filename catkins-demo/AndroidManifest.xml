@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.bbsimon.android.demo"
+          package="com.simon.catkins.demo"
           android:versionCode="1"
           android:versionName="1.0-SNAPSHOT">
 
@@ -12,7 +12,7 @@
             android:theme="@style/DefaultTheme"
             android:icon="@drawable/icon"
             android:label="@string/app_name">
-        <activity android:name=".app.HomeActivity">
+        <activity android:name="com.simon.catkins.demo.app.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

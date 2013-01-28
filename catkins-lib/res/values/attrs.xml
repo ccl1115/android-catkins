@@ -1,3 +1,7 @@
+<!--
+  ~ Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
+  -->
+
 <resources>
     <declare-styleable name="FlipperLayout">
         <attr name="content"

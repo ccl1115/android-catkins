@@ -1,3 +1,7 @@
+<!--
+  ~ Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
+  -->
+
 <resources>
     <item type="id" name="use_animation"/>
     <item type="id" name="page_indicator"/>

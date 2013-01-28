@@ -1,4 +1,4 @@
-package com.bbsimon.android.demo.test.app;
+package com.simon.catkins.demo.test.app;
 
 import android.test.ActivityInstrumentationTestCase2;
 import com.bbsimon.android.demo.app.HomeActivity;

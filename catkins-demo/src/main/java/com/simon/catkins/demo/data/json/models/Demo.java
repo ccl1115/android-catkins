@@ -2,7 +2,7 @@
  * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.bbsimon.android.demo.data.json.models;
+package com.simon.catkins.demo.data.json.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;

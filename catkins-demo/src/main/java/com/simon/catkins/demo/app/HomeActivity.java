@@ -2,7 +2,7 @@
  * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.bbsimon.android.demo.app;
+package com.simon.catkins.demo.app;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +12,8 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.bbsimon.android.demo.R;
-import com.bbsimon.android.demo.data.json.models.Demo;
+import com.simon.catkins.demo.R;
+import com.simon.catkins.demo.data.json.models.Demo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simon.catkins.app.BaseActivity;
