@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.app.BaseActivity;
-import com.bbsimon.android.demo.views.StackLayout;
+import com.simon.catkins.views.StackLayout;
 
 /**
  * @author bb.simon.yu@gmail.com

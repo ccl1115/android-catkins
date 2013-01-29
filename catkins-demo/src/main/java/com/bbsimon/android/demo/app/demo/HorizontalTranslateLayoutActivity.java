@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.app.BaseActivity;
-import com.bbsimon.android.demo.views.HorizontalTranslateLayout;
+import com.simon.catkins.views.HorizontalTranslateLayout;
 
 /**
  */

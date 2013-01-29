@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.widget.TextView;
 import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.app.BaseActivity;
-import com.bbsimon.android.demo.views.refresh.IRefreshable;
-import com.bbsimon.android.demo.views.refresh.RefresherView;
+import com.simon.catkins.views.refresh.IRefreshable;
+import com.simon.catkins.views.refresh.RefresherView;
 
 /**
  */

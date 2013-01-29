@@ -4,7 +4,7 @@
   ~ Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
   -->
 
-<com.bbsimon.android.demo.views.refresh.RefresherView
+<com.simon.catkins.views.refresh.RefresherView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
         android:layout_width="match_parent"
@@ -35,4 +35,4 @@
             android:text="EMPTY_VIEW"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-</com.bbsimon.android.demo.views.refresh.RefresherView>
+</com.simon.catkins.views.refresh.RefresherView>

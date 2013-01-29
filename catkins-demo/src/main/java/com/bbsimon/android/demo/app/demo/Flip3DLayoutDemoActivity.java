@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.app.BaseActivity;
-import com.bbsimon.android.demo.views.Flip3DLayout;
+import com.simon.catkins.views.Flip3DLayout;
 
 /**
  * @author bb.simon.yu@gmail.com

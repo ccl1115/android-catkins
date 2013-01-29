@@ -10,7 +10,7 @@
             android:layout_height="match_parent"
             android:background="#FF332233"/>
 
-    <com.bbsimon.android.demo.views.FlipperLayout
+    <com.simon.catkins.views.FlipperLayout
             simon:content="@+id/content"
             simon:head="@+id/head"
             simon:handle="@+id/handle"
@@ -37,6 +37,6 @@
                 android:background="#FF883933"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
-    </com.bbsimon.android.demo.views.FlipperLayout>
+    </com.simon.catkins.views.FlipperLayout>
 
 </FrameLayout>
