@@ -3,7 +3,7 @@ package com.bbsimon.android.demo.app.demo;
 import android.os.Bundle;
 import android.view.View;
 import com.bbsimon.android.demo.R;
-import com.bbsimon.android.demo.app.BaseActivity;
+import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.views.HorizontalTranslateLayout;
 
 /**

@@ -91,6 +91,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.simon.catkins</groupId>
+            <artifactId>catkins-lib</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>apklib</type>
+        </dependency>
     </dependencies>
 
     <build>

@@ -16,6 +16,7 @@ import com.bbsimon.android.demo.R;
 import com.bbsimon.android.demo.data.json.models.Demo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.simon.catkins.app.BaseActivity;
 import de.akquinet.android.androlog.Log;
 
 import java.io.IOException;

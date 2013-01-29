@@ -6,7 +6,7 @@ package com.bbsimon.android.demo.app.demo;
 
 import android.os.Bundle;
 import com.bbsimon.android.demo.R;
-import com.bbsimon.android.demo.app.BaseActivity;
+import com.simon.catkins.app.BaseActivity;
 import de.akquinet.android.androlog.Log;
 
 /**

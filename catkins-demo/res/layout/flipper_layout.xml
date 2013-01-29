@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
+             xmlns:catkins="http://schemas.android.com/apk/lib/com.simon.catkins"
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
@@ -11,9 +11,9 @@
             android:background="#FF332233"/>
 
     <com.simon.catkins.views.FlipperLayout
-            simon:content="@+id/content"
-            simon:head="@+id/head"
-            simon:handle="@+id/handle"
+            catkins:content="@+id/content"
+            catkins:head="@+id/head"
+            catkins:handle="@+id/handle"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

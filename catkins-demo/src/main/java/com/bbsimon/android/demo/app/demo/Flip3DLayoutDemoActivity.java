@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import com.bbsimon.android.demo.R;
-import com.bbsimon.android.demo.app.BaseActivity;
+import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.views.Flip3DLayout;
 
 /**

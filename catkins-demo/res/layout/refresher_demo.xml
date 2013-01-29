@@ -6,14 +6,14 @@
 
 <com.simon.catkins.views.refresh.RefresherView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
+        xmlns:catkins="http://schemas.android.com/apk/lib/com.simon.catkins"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        simon:empty_view="@+id/empty_view"
-        simon:refresher_content="@+id/refresher_content"
-        simon:refresher_head="@+id/refresher_header"
-        simon:max_height="200dp"
-        simon:threshold_height="100dp">
+        catkins:empty_view="@+id/empty_view"
+        catkins:refresher_content="@+id/refresher_content"
+        catkins:refresher_head="@+id/refresher_header"
+        catkins:max_height="200dp"
+        catkins:threshold_height="100dp">
 
     <TextView
             android:background="#FF032F32"

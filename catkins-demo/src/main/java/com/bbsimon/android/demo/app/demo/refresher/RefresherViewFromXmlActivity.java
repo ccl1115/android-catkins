@@ -7,7 +7,7 @@ package com.bbsimon.android.demo.app.demo.refresher;
 import android.os.Bundle;
 import android.widget.TextView;
 import com.bbsimon.android.demo.R;
-import com.bbsimon.android.demo.app.BaseActivity;
+import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.views.refresh.IRefreshable;
 import com.simon.catkins.views.refresh.RefresherView;
 

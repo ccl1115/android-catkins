@@ -2,7 +2,7 @@
 
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:simon="http://schemas.android.com/apk/res/com.bbsimon.android.demo"
+        xmlns:catkins="http://schemas.android.com/apk/lib/com.simon.catkins"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -13,8 +13,8 @@
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:layout_height="0dp"
-            simon:from="@+id/from"
-            simon:to="@+id/to">
+            catkins:from="@+id/from"
+            catkins:to="@+id/to">
 
         <View
                 android:id="@+id/from"
