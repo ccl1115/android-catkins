@@ -1,4 +1,4 @@
-package com.bbsimon.android.demo.views.refresh;
+package com.simon.catkins.views.refresh;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -13,9 +13,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import com.bbsimon.android.demo.R;
-import com.bbsimon.android.demo.views.Facade;
-import com.bbsimon.android.demo.views.TransitionAnimator;
+import com.simon.catkins.R;
+import com.simon.catkins.views.Facade;
+import com.simon.catkins.views.TransitionAnimator;
 
 /**
  */

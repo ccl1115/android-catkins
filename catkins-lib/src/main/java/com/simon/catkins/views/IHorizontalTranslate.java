@@ -1,4 +1,4 @@
-package com.bbsimon.android.demo.views;
+package com.simon.catkins.views;
 
 /**
  * 本接口定义了一个View或者ViewGroup具有四向滑动功能时的方法。

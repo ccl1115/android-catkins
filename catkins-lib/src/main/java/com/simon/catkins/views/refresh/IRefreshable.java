@@ -1,4 +1,4 @@
-package com.bbsimon.android.demo.views.refresh;
+package com.simon.catkins.views.refresh;
 
 import android.view.View;
 import android.view.ViewGroup;

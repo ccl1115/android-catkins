@@ -2,7 +2,7 @@
  * Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.bbsimon.android.demo.views;
+package com.simon.catkins.views;
 
 import android.graphics.Canvas;
 import android.view.MotionEvent;

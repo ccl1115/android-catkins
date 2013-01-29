@@ -2,7 +2,7 @@
  * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.bbsimon.android.demo.views;
+package com.simon.catkins.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -18,7 +18,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import com.bbsimon.android.demo.R;
+import com.simon.catkins.R;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

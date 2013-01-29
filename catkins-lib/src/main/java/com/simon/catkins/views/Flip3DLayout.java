@@ -2,7 +2,7 @@
  * Copyright (c) 2012. All rights reserved by bb.simon.yu@gmail.com
  */
 
-package com.bbsimon.android.demo.views;
+package com.simon.catkins.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -18,7 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
-import com.bbsimon.android.demo.R;
+import com.simon.catkins.R;
 
 public class Flip3DLayout extends FrameLayout {
   private static final String TAG = "Flip3DLayout";

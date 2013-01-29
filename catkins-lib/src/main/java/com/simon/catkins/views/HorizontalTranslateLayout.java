@@ -1,4 +1,4 @@
-package com.bbsimon.android.demo.views;
+package com.simon.catkins.views;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -13,7 +13,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.widget.FrameLayout;
-import com.bbsimon.android.demo.R;
+import com.simon.catkins.R;
 import de.akquinet.android.androlog.Log;
 
 import java.util.ArrayList;

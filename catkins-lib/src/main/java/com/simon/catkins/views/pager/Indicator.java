@@ -1,4 +1,4 @@
-package com.bbsimon.android.demo.views.pager;
+package com.simon.catkins.views.pager;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -7,8 +7,8 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import com.bbsimon.android.demo.R;
-import com.bbsimon.android.demo.views.TransitionAnimator;
+import com.simon.catkins.R;
+import com.simon.catkins.views.TransitionAnimator;
 
 /**
  */

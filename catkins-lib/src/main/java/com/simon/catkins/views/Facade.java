@@ -1,4 +1,4 @@
-package com.bbsimon.android.demo.views;
+package com.simon.catkins.views;
 
 import android.graphics.Matrix;
 import android.graphics.Paint;
