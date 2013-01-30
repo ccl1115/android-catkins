@@ -9,13 +9,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import com.simon.catkins.R;
 import com.simon.catkins.views.Facade;
 import com.simon.catkins.views.TransitionAnimator;
+import de.akquinet.android.androlog.Log;
 
 /**
  */
@@ -23,11 +23,14 @@ import com.simon.catkins.views.TransitionAnimator;
 public class RefresherView extends ViewGroup implements IRefreshable {
   private static final String TAG = "RefresherView";
 
-  private static final int MSG_ANIMATE = 1000;
+  private static final int MSG_ANIMATE_BACK = 1000;
+  private static final int MSG_ANIMATE_DOWN = 1001;
 
   private static final int MIN_VELOCITY = 100;
+  private static final int VELOCITY = 500;
 
   private final int kMinVelocity;
+  private final int kVelocity;
 
   private int mThresholdHeight;
   private int mMaxHeight;
@@ -66,6 +69,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
   public RefresherView(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
+    Log.init(context);
     mAnimator = new Animator();
     mHandler = new AnimatorHandler();
 
@@ -73,6 +77,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     final float density = r.getDisplayMetrics().density;
 
     kMinVelocity = (int) (MIN_VELOCITY * density + 0.5f);
+    kVelocity = (int) (VELOCITY * density + 0.5f);
 
     TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RefresherView);
 
@@ -174,6 +179,11 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     }
   }
 
+  @Override
+  public void refreshShowingHeader() {
+    mTransitionAnimator.animate(MSG_ANIMATE_DOWN);
+  }
+
   private class Animator {
     private boolean animating;
     private long lastAnimationTime;
@@ -182,7 +192,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     private int animatingPosition;
     private int animationDistance;
 
-    void compute() {
+    void computeBack() {
       final long now = SystemClock.uptimeMillis();
       final float t = (now - lastAnimationTime) / 1000f;
 
@@ -209,33 +219,71 @@ public class RefresherView extends ViewGroup implements IRefreshable {
                 animatingPosition / (float) animationDistance)));
         lastAnimationTime = now;
         currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
-        mHandler.removeMessages(MSG_ANIMATE);
-        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE, currentAnimatingTime);
+        mHandler.removeMessages(MSG_ANIMATE_BACK);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BACK, currentAnimatingTime);
       }
 
       invalidate();
     }
 
-    void animate() {
+    void computeDown() {
       final long now = SystemClock.uptimeMillis();
+      final float t = (now - lastAnimationTime) / 1000f;
 
+      animatingPosition += animatingVelocity * t;
+
+      if (animatingPosition >= animationDistance) {
+        mYOffset = mThresholdHeight;
+        animating = false;
+        mState = State.idle;
+        final OnRefreshListener onRefreshListener = mOnRefreshListener;
+        if (onRefreshListener != null) {
+          onRefreshListener.onStateChanged(State.idle);
+          refresh();
+        }
+      } else {
+        mYOffset = Facade.computeInterpolator(animationDistance, animatingPosition, false);
+        lastAnimationTime = now;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+        mHandler.removeMessages(MSG_ANIMATE_DOWN);
+        mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_DOWN, currentAnimatingTime);
+      }
+
+      invalidate();
+    }
+
+    void animate(final int msg) {
+      Log.d(TAG, "@animate");
+      final long now = SystemClock.uptimeMillis();
+      final OnRefreshListener onRefreshListener;
       lastAnimationTime = now;
       currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
-      animationDistance = mYOffset - mBackPosition;
-      Log.d(TAG, "@animatePullBack animating distance " + animationDistance);
       animating = true;
-      animatingPosition = 0;
-      animatingVelocity = Math.max(kMinVelocity, (mYOffset - mBackPosition) * 2);
-      mHandler.removeMessages(MSG_ANIMATE);
-      mHandler.sendEmptyMessageAtTime(MSG_ANIMATE,
-          currentAnimatingTime);
+
+      switch (msg) {
+        case MSG_ANIMATE_BACK:
+          animationDistance = mYOffset - mBackPosition;
+          animatingPosition = 0;
+          animatingVelocity = Math.max(kMinVelocity, (mYOffset - mBackPosition) * 2);
+          mHandler.removeMessages(MSG_ANIMATE_BACK);
+          mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BACK, currentAnimatingTime);
+          break;
+        case MSG_ANIMATE_DOWN:
+          animationDistance = mThresholdHeight;
+          animatingPosition = 0;
+          animatingVelocity = kVelocity;
+          mHandler.removeMessages(MSG_ANIMATE_DOWN);
+          mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_DOWN, currentAnimatingTime);
+          break;
+      }
 
       mState = State.animating;
-      final OnRefreshListener onRefreshListener = mOnRefreshListener;
+      onRefreshListener = mOnRefreshListener;
       if (onRefreshListener != null) {
         onRefreshListener.onStateChanged(State.animating);
       }
     }
+
   }
 
   @Override
@@ -290,8 +338,10 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private class AnimatorHandler extends Handler {
     @Override
     public void handleMessage(Message msg) {
-      if (msg.what == MSG_ANIMATE) {
-        mAnimator.compute();
+      if (msg.what == MSG_ANIMATE_BACK) {
+        mAnimator.computeBack();
+      } else if (msg.what == MSG_ANIMATE_DOWN) {
+        mAnimator.computeDown();
       }
     }
   }
@@ -310,6 +360,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     @Override
     protected void onPreExecute() {
       if (mListener != null) {
+        mBackPosition = mThresholdHeight;
         mListener.onPreRefresh();
       }
     }
@@ -326,7 +377,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     @Override
     protected void onPostExecute(final Void aVoid) {
       mBackPosition = 0;
-      mAnimator.animate();
+      mTransitionAnimator.animate(MSG_ANIMATE_BACK);
     }
   }
 
@@ -395,6 +446,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     }
 
     @Override
+    @SuppressWarnings("all")
     public boolean dispatchTouchEvent(MotionEvent event) {
       return RefresherView.super.dispatchTouchEvent(event) || true;
     }
@@ -412,7 +464,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         case MotionEvent.ACTION_DOWN:
           mLastDownY = y;
 
-          mHandler.removeMessages(MSG_ANIMATE);
+          mHandler.removeMessages(MSG_ANIMATE_BACK);
           break;
 
         case MotionEvent.ACTION_MOVE:
@@ -475,12 +527,11 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         case MotionEvent.ACTION_UP:
         case MotionEvent.ACTION_CANCEL:
           if (mYOffset > mThresholdHeight) {
-            mBackPosition = mThresholdHeight;
             refresh();
           } else {
             mBackPosition = 0;
           }
-          mAnimator.animate();
+          animate(MSG_ANIMATE_BACK);
           break;
         default:
           break;
@@ -491,6 +542,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
     @Override
     public void animate(int msg) {
+      mAnimator.animate(msg);
     }
   }
 }

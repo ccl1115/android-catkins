@@ -5,6 +5,8 @@
 package com.simon.catkins.demo.app.refresher;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.demo.R;
@@ -23,7 +25,7 @@ public class RefresherViewFromXmlActivity extends BaseActivity {
     getTitleBar().setTitle(TAG);
     setContentView(R.layout.refresher_demo);
 
-    RefresherView refresherView = (RefresherView) findViewById(R.id.content);
+    final RefresherView refresherView = (RefresherView) findViewById(R.id.refresher);
     final TextView headerText = (TextView) findViewById(R.id.refresher_header);
 
     refresherView.setOnRefreshListener(new IRefreshable.OnRefreshListener() {
@@ -49,6 +51,14 @@ public class RefresherViewFromXmlActivity extends BaseActivity {
 
       @Override
       public void onRefreshUI() {
+      }
+    });
+
+    final Button refreshButton = (Button) findViewById(R.id.refresh);
+    refreshButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        refresherView.refreshShowingHeader();
       }
     });
   }

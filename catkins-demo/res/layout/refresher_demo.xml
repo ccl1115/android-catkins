@@ -4,35 +4,50 @@
   ~ Copyright (c) 2013. All rights reserved by bb.simon.yu@gmail.com
   -->
 
-<com.simon.catkins.views.refresh.RefresherView
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:catkins="http://schemas.android.com/apk/res/com.simon.catkins.demo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        catkins:empty_view="@+id/empty_view"
-        catkins:refresher_content="@+id/refresher_content"
-        catkins:refresher_head="@+id/refresher_header"
-        catkins:max_height="200dp"
-        catkins:threshold_height="100dp">
+        android:orientation="vertical">
 
-    <TextView
-            android:background="#FF032F32"
-            android:id="@+id/refresher_header"
+    <com.simon.catkins.views.refresh.RefresherView
             android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:gravity="center"
-            android:text="HEADER"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/refresher"
+            catkins:empty_view="@+id/empty_view"
+            catkins:refresher_content="@+id/refresher_content"
+            catkins:refresher_head="@+id/refresher_header"
+            catkins:max_height="200dp"
+            catkins:threshold_height="100dp">
 
-    <ListView
-            android:background="#FF398282"
-            android:id="@+id/refresher_content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+        <TextView
+                android:background="#FF032F32"
+                android:id="@+id/refresher_header"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:gravity="center"
+                android:text="HEADER"/>
 
-    <TextView
-            android:background="#FF392109"
-            android:id="@+id/empty_view"
-            android:text="EMPTY_VIEW"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-</com.simon.catkins.views.refresh.RefresherView>
+        <ListView
+                android:background="#FF398282"
+                android:id="@+id/refresher_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        <TextView
+                android:background="#FF392109"
+                android:id="@+id/empty_view"
+                android:text="EMPTY_VIEW"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+    </com.simon.catkins.views.refresh.RefresherView>
+
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/refresh"
+        android:text="Refresh"/>
+</LinearLayout>
+
