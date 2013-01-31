@@ -4,10 +4,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import com.simon.catkins.R;
+import com.simon.catkins.views.Facade;
 import com.simon.catkins.views.TransitionAnimator;
 
 /**
@@ -57,6 +61,7 @@ public interface Indicator {
     private int mCount;
 
     private float mPosition;
+    private float mTargetPosition;
 
     private Drawable mDrawable;
     private Drawable mSelector;
@@ -187,6 +192,20 @@ public interface Indicator {
     }
 
     private class HorizontalTransitionAnimator implements TransitionAnimator {
+      private final int kVelocity;
+
+      private long lastAnimationTime;
+      private long currentAnimatingTime;
+      private int animatingVelocity;
+      private float animatingPosition;
+      private float animatingDistance;
+      private boolean animating;
+      private AnimationHandler handler = new AnimationHandler();
+
+      HorizontalTransitionAnimator() {
+        final float density = getResources().getDisplayMetrics().density;
+        kVelocity = (int) (density * 1 + 0.5f);
+      }
 
       @Override
       public void measure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -287,6 +306,67 @@ public interface Indicator {
 
       @Override
       public void animate(int msg) {
+        if (mTargetPosition > mPosition) {
+          animatingVelocity = kVelocity;
+        } else if (mTargetPosition < mPosition) {
+          animatingVelocity = -kVelocity;
+        } else {
+          return;
+        }
+        animatingDistance =  mTargetPosition - mPosition;
+        animatingPosition = mPosition;
+
+        lastAnimationTime = SystemClock.uptimeMillis();
+        currentAnimatingTime = lastAnimationTime + Facade.ANIMATION_FRAME_DURATION;
+        handler.removeMessages(AnimationHandler.MSG_ANIMATE);
+        handler.sendEmptyMessageAtTime(AnimationHandler.MSG_ANIMATE, currentAnimatingTime);
+      }
+
+      private void compute() {
+        final long now = SystemClock.uptimeMillis();
+        final float t = (now - lastAnimationTime) / Facade.ONE_SECOND_FLOAT;
+
+        animatingPosition += animatingVelocity * t;
+
+        lastAnimationTime = now;
+        currentAnimatingTime = lastAnimationTime + Facade.ANIMATION_FRAME_DURATION;
+
+        if (animatingVelocity < 0) {
+          if (animatingPosition < mTargetPosition) {
+            mPosition = mTargetPosition;
+            animating = false;
+          } else {
+            mPosition = animatingPosition;
+
+            handler.removeMessages(AnimationHandler.MSG_ANIMATE);
+            handler.sendEmptyMessageAtTime(AnimationHandler.MSG_ANIMATE, currentAnimatingTime);
+          }
+        } else {
+          if (animatingPosition > mTargetPosition) {
+            mPosition = mTargetPosition;
+            animating = false;
+          } else {
+            mPosition = animatingPosition;
+
+            handler.removeMessages(AnimationHandler.MSG_ANIMATE);
+            handler.sendEmptyMessageAtTime(AnimationHandler.MSG_ANIMATE, currentAnimatingTime);
+          }
+        }
+
+        invalidate();
+      }
+
+      private class AnimationHandler extends Handler {
+        private static final int MSG_ANIMATE = 1000;
+
+        @Override
+        public void handleMessage(Message msg) {
+          switch (msg.what) {
+            case MSG_ANIMATE:
+              compute();
+              break;
+          }
+        }
       }
     }
   }

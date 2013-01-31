@@ -11,6 +11,7 @@ import android.view.animation.Interpolator;
 public class Facade {
   public static final float ONE_SECOND_FLOAT = 1000f;
   public static final int ANIMATION_FRAME_DURATION = 16; // equals 1000 / 60
+  public static final int VELOCITY = 500;
 
   public static final Interpolator sInterpolator = new Interpolator() {
     public float getInterpolation(float t) {
@@ -35,5 +36,13 @@ public class Facade {
       float proportion = sInterpolator.getInterpolation(position / distance);
       return (int) (distance * proportion);
     }
+  }
+
+  /**
+   * Get a velocity based on the current screen size
+   * @return the calculated screen size
+   */
+  public static int screenPixelSizeVelocity(int screenSize) {
+    return 0;
   }
 }
