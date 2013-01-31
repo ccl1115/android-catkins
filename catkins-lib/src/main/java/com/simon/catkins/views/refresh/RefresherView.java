@@ -181,7 +181,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
   @Override
   public void refreshShowingHeader() {
-    mTransitionAnimator.animate(MSG_ANIMATE_DOWN);
+    if (!mRefreshing) mTransitionAnimator.animate(MSG_ANIMATE_DOWN);
   }
 
   private class Animator {
