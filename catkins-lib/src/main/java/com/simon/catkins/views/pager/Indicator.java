@@ -322,6 +322,11 @@ public interface Indicator {
         handler.sendEmptyMessageAtTime(AnimationHandler.MSG_ANIMATE, currentAnimatingTime);
       }
 
+      @Override
+      public boolean isAnimating() {
+        return animating;
+      }
+
       private void compute() {
         final long now = SystemClock.uptimeMillis();
         final float t = (now - lastAnimationTime) / Facade.ONE_SECOND_FLOAT;

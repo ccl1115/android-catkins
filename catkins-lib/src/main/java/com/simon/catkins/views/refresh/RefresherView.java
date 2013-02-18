@@ -26,6 +26,9 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private static final int MSG_ANIMATE_BACK = 1000;
   private static final int MSG_ANIMATE_DOWN = 1001;
 
+  private static final int DEFAULT_THRESHOLD_HEIGHT = 200; // dips
+  private static final int DEFAULT_MAX_HEIGHT = 400; // dips
+
   private static final int MIN_VELOCITY = 100;
   private static final int VELOCITY = 500;
 
@@ -45,17 +48,20 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private boolean mEnable = true;
   private boolean mRefreshing;
   private int mLastDownY;
+  private int mLastDownX;
   private final int[] mContentLocation = new int[2];
   private final int[] mTempLocation = new int[2];
   private int mAbsY;
+  private int mAbsX;
   private int mYOffset;
+  private int mXOffset;
   private int mBackPosition;
   private Animator mAnimator;
   private AnimatorHandler mHandler;
   private OnRefreshListener mOnRefreshListener;
   private RefreshAsyncTask mRefreshAsyncTask;
 
-  private TransitionAnimator mTransitionAnimator = new RefreshTransitionAnimator();
+  private TransitionAnimator mTransitionAnimator = new SideRefreshTransitionAnimator();
 
   private State mState = State.idle;
 
@@ -82,7 +88,14 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RefresherView);
 
     mThresholdHeight = ta.getDimensionPixelOffset(R.styleable.RefresherView_threshold_height, -1);
+    if (mThresholdHeight == -1) {
+      mThresholdHeight = (int) (DEFAULT_THRESHOLD_HEIGHT * density + 0.5f);
+    }
+
     mMaxHeight = ta.getDimensionPixelOffset(R.styleable.RefresherView_max_height, -1);
+    if (mMaxHeight == -1) {
+      mMaxHeight = (int) (DEFAULT_MAX_HEIGHT * density + 0.5f);
+    }
 
     mRefresherContentId = ta.getResourceId(R.styleable.RefresherView_refresher_content, -1);
     mRefresherHeaderId = ta.getResourceId(R.styleable.RefresherView_refresher_head, -1);
@@ -543,6 +556,296 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     @Override
     public void animate(int msg) {
       mAnimator.animate(msg);
+    }
+
+    @Override
+    public boolean isAnimating() {
+      return mAnimator.animating;
+    }
+  }
+
+  private class SideRefreshTransitionAnimator extends Handler implements TransitionAnimator {
+
+    private boolean animating;
+    private long currentAnimatingTime;
+    private long lastAnimationTime;
+    private float animatingPosition;
+    private float animationDistance;
+    private int animatingVelocity;
+
+    @Override
+    public void handleMessage(Message msg) {
+      switch (msg.what) {
+        case MSG_ANIMATE_DOWN:
+          computeDown();
+          break;
+        case MSG_ANIMATE_BACK:
+          computeBack();
+          break;
+      }
+    }
+
+    @Override
+    public void measure(int widthMeasureSpec, int heightMeasureSpec) {
+      final int widthSize = widthMeasureSpec & ~(0x3 << 30);
+      final int heightSize = heightMeasureSpec & ~(0x3 << 30);
+      if (mRefresherContent != null) {
+        measureChild(mRefresherContent, widthSize + MeasureSpec.EXACTLY,
+            heightSize + MeasureSpec.EXACTLY);
+      }
+
+      if (mEmptyView != null) {
+        measureChild(mEmptyView, widthSize + MeasureSpec.AT_MOST,
+            heightSize + MeasureSpec.AT_MOST);
+      }
+
+      if (mRefresherHeader != null) {
+        measureChild(mRefresherHeader, widthSize + MeasureSpec.AT_MOST,
+            heightSize + MeasureSpec.EXACTLY);
+      }
+
+      setMeasuredDimension(widthSize, heightSize);
+    }
+
+    @Override
+    public void layout(boolean changed, int l, int t, int r, int b) {
+      final int width = r - l;
+      final int height = b - t;
+      if (mRefresherContent != null) {
+        mRefresherContent.layout(0, 0, width, height);
+      }
+
+      if (mEmptyView != null) {
+        mEmptyView.layout((width - mEmptyView.getMeasuredWidth()) / 2,
+            (height - mEmptyView.getMeasuredHeight()) / 2,
+            (width + mEmptyView.getMeasuredWidth()) / 2,
+            (height + mEmptyView.getMeasuredHeight()) / 2);
+      }
+
+      if (mRefresherHeader != null) {
+        mRefresherHeader.layout(-mRefresherHeader.getMeasuredWidth(), 0, 0, height);
+      }
+
+      getLocationOnScreen(mTempLocation);
+      mAbsX = mTempLocation[0];
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+      final long drawingTime = getDrawingTime();
+
+      if (mEmptyView != null) {
+        drawChild(canvas, mEmptyView, drawingTime);
+      }
+
+      canvas.save();
+      canvas.translate(mXOffset >> 1, 0);
+      drawChild(canvas, mRefresherContent, drawingTime);
+      if (mXOffset > 0) {
+        drawChild(canvas, mRefresherHeader, drawingTime);
+      }
+      canvas.restore();
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public boolean dispatchTouchEvent(MotionEvent event) {
+      return RefresherView.super.dispatchTouchEvent(event) || true;
+    }
+
+    @Override
+    public boolean interceptionTouchEvent(MotionEvent ev) {
+      if (!mEnable || mRefreshing) {
+        return false;
+      }
+
+      final int action = ev.getAction() & MotionEvent.ACTION_MASK;
+      final int x = (int) ev.getX();
+
+      switch (action) {
+        case MotionEvent.ACTION_DOWN:
+          mLastDownX = x;
+
+          removeMessages(MSG_ANIMATE_BACK);
+          removeMessages(MSG_ANIMATE_DOWN);
+          break;
+
+        case MotionEvent.ACTION_MOVE:
+          View childAt;
+          if (mRefresherContent instanceof ViewGroup
+              && (childAt = ((ViewGroup) mRefresherContent).getChildAt(0)) != null) {
+            childAt.getLocationOnScreen(mContentLocation);
+            if (mContentLocation[0] == mAbsX && (x > mLastDownX)) {
+              mState = State.pulling_no_refresh;
+              final OnRefreshListener onRefreshListener = mOnRefreshListener;
+              if (onRefreshListener != null) {
+                onRefreshListener.onStateChanged(State.pulling_no_refresh);
+              }
+              return true;
+            }
+          } else {
+            // If there's no child.
+            mRefresherContent.getLocationOnScreen(mContentLocation);
+            if (mContentLocation[0] == mAbsX && (x > mLastDownX)) {
+              mState = State.pulling_no_refresh;
+              final OnRefreshListener onRefreshListener = mOnRefreshListener;
+              if (onRefreshListener != null) {
+                onRefreshListener.onStateChanged(State.pulling_no_refresh);
+              }
+              return true;
+            }
+          }
+        default:
+          break;
+      }
+
+      return false;
+    }
+
+    @Override
+    public boolean touchEvent(MotionEvent event) {
+      final int action = event.getAction() & MotionEvent.ACTION_MASK;
+      final int x = (int) event.getX();
+
+      switch (action) {
+        case MotionEvent.ACTION_MOVE:
+          mXOffset = Math.max(0, Math.min(x - mLastDownX, mMaxHeight * 2));
+
+          if (mXOffset > mThresholdHeight && mState == State.pulling_no_refresh) {
+            mState = State.pulling_refresh;
+            final OnRefreshListener onRefreshListener = mOnRefreshListener;
+            if (onRefreshListener != null) {
+              onRefreshListener.onStateChanged(State.pulling_refresh);
+            }
+          } else if (mXOffset < mThresholdHeight && mState == State.pulling_refresh) {
+            mState = State.pulling_no_refresh;
+
+            final OnRefreshListener onRefreshListener = mOnRefreshListener;
+            if (onRefreshListener != null) {
+              onRefreshListener.onStateChanged(State.pulling_no_refresh);
+            }
+          }
+          invalidate();
+          break;
+        case MotionEvent.ACTION_UP:
+        case MotionEvent.ACTION_CANCEL:
+          if (mXOffset > mThresholdHeight) {
+            refresh();
+          } else {
+            mBackPosition = 0;
+          }
+          animate(MSG_ANIMATE_BACK);
+          break;
+        default:
+          break;
+      }
+
+      return true;
+    }
+
+    @Override
+    public void animate(int msg) {
+      switch (msg) {
+        case MSG_ANIMATE_DOWN:
+          animateDown();
+          break;
+        case MSG_ANIMATE_BACK:
+          animateBack();
+          break;
+      }
+    }
+
+    @Override
+    public boolean isAnimating() {
+      return animating;
+    }
+
+    private void animateDown() {
+      final long now = SystemClock.uptimeMillis();
+
+      lastAnimationTime = now;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      animating = true;
+      animationDistance = mThresholdHeight;
+      animatingPosition = 0;
+      animatingVelocity = kVelocity;
+
+      removeMessages(MSG_ANIMATE_DOWN);
+      sendEmptyMessageAtTime(MSG_ANIMATE_DOWN, currentAnimatingTime);
+    }
+
+    private void animateBack() {
+      final long now = SystemClock.uptimeMillis();
+
+      lastAnimationTime = now;
+      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      animating = true;
+      animationDistance = mXOffset - mBackPosition;
+      animatingPosition = 0;
+      animatingVelocity = Math.max(kMinVelocity, (mXOffset - mBackPosition) * 2);
+
+      removeMessages(MSG_ANIMATE_BACK);
+      sendEmptyMessageAtTime(MSG_ANIMATE_BACK, currentAnimatingTime);
+    }
+
+    private void computeDown() {
+      final long now = SystemClock.uptimeMillis();
+      final float t = (now - lastAnimationTime) / 1000f;
+
+      animatingPosition += animatingVelocity * t;
+
+      if (animatingPosition >= animationDistance) {
+        mXOffset = mThresholdHeight;
+        animating = false;
+        mState = State.idle;
+        final OnRefreshListener onRefreshListener = mOnRefreshListener;
+        if (onRefreshListener != null) {
+          onRefreshListener.onStateChanged(State.idle);
+          refresh();
+        }
+      } else {
+        mXOffset = Facade.computeInterpolator(animationDistance, animatingPosition, false);
+        lastAnimationTime = now;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+        removeMessages(MSG_ANIMATE_DOWN);
+        sendEmptyMessageAtTime(MSG_ANIMATE_DOWN, currentAnimatingTime);
+      }
+
+      invalidate();
+    }
+
+    private void computeBack() {
+      final long now = SystemClock.uptimeMillis();
+      final float t = (now - lastAnimationTime) / 1000f;
+
+      animatingPosition += animatingVelocity * t;
+
+      if (animatingPosition >= animationDistance) {
+        mXOffset = mBackPosition;
+        animating = false;
+        mState = State.idle;
+        final OnRefreshListener onRefreshListener = mOnRefreshListener;
+        if (onRefreshListener != null) {
+          onRefreshListener.onStateChanged(State.idle);
+        }
+
+        if (mBackPosition == 0) {
+          if (onRefreshListener != null) {
+            onRefreshListener.onRefreshUI();
+            mRefreshing = false;
+          }
+        }
+      } else {
+        mXOffset = (int)
+            (mBackPosition + animationDistance * (1 - Facade.sInterpolator.getInterpolation(
+                animatingPosition / animationDistance)));
+        lastAnimationTime = now;
+        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+        removeMessages(MSG_ANIMATE_BACK);
+        sendEmptyMessageAtTime(MSG_ANIMATE_BACK, currentAnimatingTime);
+      }
+
+      invalidate();
     }
   }
 }

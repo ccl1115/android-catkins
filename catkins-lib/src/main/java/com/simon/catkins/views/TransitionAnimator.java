@@ -23,4 +23,6 @@ public interface TransitionAnimator {
   boolean touchEvent(MotionEvent event);
 
   void animate(int msg);
+
+  boolean isAnimating();
 }
