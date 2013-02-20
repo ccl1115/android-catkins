@@ -577,12 +577,21 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   }
 
   private class SideRefreshTransitionAnimator extends Handler implements TransitionAnimator {
+    private static final String TAG = "RefresherView$SideRefreshTransitionAnimator";
+
+    private final int moveThreshold;
+
     private boolean animating;
     private long currentAnimatingTime;
     private long lastAnimationTime;
     private float animatingPosition;
     private float animationDistance;
     private int animatingVelocity;
+
+    public SideRefreshTransitionAnimator() {
+      final float density = getResources().getDisplayMetrics().density;
+      moveThreshold = (int) (Facade.TOUCH_EVENT_MOVE_THRESHOLD_LARGE * density + 0.5);
+    }
 
     @Override
     public void handleMessage(Message msg) {
@@ -686,7 +695,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
           if (mRefresherContent instanceof ViewGroup
               && (childAt = ((ViewGroup) mRefresherContent).getChildAt(0)) != null) {
             childAt.getLocationOnScreen(mContentLocation);
-            if (mContentLocation[0] == mAbsX && (x > mLastDownX)) {
+            if (mContentLocation[0] == mAbsX && (x > mLastDownX + moveThreshold)) {
               mState = State.pulling_no_refresh;
               final OnRefreshListener onRefreshListener = mOnRefreshListener;
               if (onRefreshListener != null) {
@@ -697,7 +706,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
           } else {
             // If there's no child.
             mRefresherContent.getLocationOnScreen(mContentLocation);
-            if (mContentLocation[0] == mAbsX && (x > mLastDownX)) {
+            if (mContentLocation[0] == mAbsX && (x > mLastDownX + moveThreshold)) {
               mState = State.pulling_no_refresh;
               final OnRefreshListener onRefreshListener = mOnRefreshListener;
               if (onRefreshListener != null) {
@@ -720,7 +729,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
       switch (action) {
         case MotionEvent.ACTION_MOVE:
-          mXOffset = Math.max(0, Math.min(x - mLastDownX, mMaxHeight * 2));
+          mXOffset = Math.max(0, Math.min(x - mLastDownX - moveThreshold, mMaxHeight * 2));
 
           if (mXOffset > mThresholdHeight && mState == State.pulling_no_refresh) {
             mState = State.pulling_refresh;
