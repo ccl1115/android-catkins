@@ -20,7 +20,8 @@
             catkins:refresher_content="@+id/refresher_content"
             catkins:refresher_head="@+id/refresher_header"
             catkins:max_height="200dp"
-            catkins:threshold_height="100dp">
+            catkins:threshold_height="100dp"
+            catkins:direction="side">
 
         <TextView
                 android:background="#FF032F32"

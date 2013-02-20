@@ -23,6 +23,9 @@ import de.akquinet.android.androlog.Log;
 public class RefresherView extends ViewGroup implements IRefreshable {
   private static final String TAG = "RefresherView";
 
+  private static final String DIRECTION_TOP = "top";
+  private static final String DIRECTION_SIDE = "side";
+
   private static final int MSG_ANIMATE_BACK = 1000;
   private static final int MSG_ANIMATE_DOWN = 1001;
 
@@ -61,7 +64,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private OnRefreshListener mOnRefreshListener;
   private RefreshAsyncTask mRefreshAsyncTask;
 
-  private TransitionAnimator mTransitionAnimator = new SideRefreshTransitionAnimator();
+  private TransitionAnimator mTransitionAnimator;
 
   private State mState = State.idle;
 
@@ -95,6 +98,15 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     mMaxHeight = ta.getDimensionPixelOffset(R.styleable.RefresherView_max_height, -1);
     if (mMaxHeight == -1) {
       mMaxHeight = (int) (DEFAULT_MAX_HEIGHT * density + 0.5f);
+    }
+
+    String direction = ta.getString(R.styleable.RefresherView_direction);
+    if (direction == null) {
+      mTransitionAnimator = new TopRefreshTransitionAnimator();
+    } else if (direction.equals(DIRECTION_SIDE)) {
+      mTransitionAnimator = new SideRefreshTransitionAnimator();
+    } else if (direction.equals(DIRECTION_TOP)) {
+      mTransitionAnimator = new TopRefreshTransitionAnimator();
     }
 
     mRefresherContentId = ta.getResourceId(R.styleable.RefresherView_refresher_content, -1);
@@ -394,7 +406,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     }
   }
 
-  private class RefreshTransitionAnimator implements TransitionAnimator {
+  private class TopRefreshTransitionAnimator implements TransitionAnimator {
 
     @Override
     public void measure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -565,7 +577,6 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   }
 
   private class SideRefreshTransitionAnimator extends Handler implements TransitionAnimator {
-
     private boolean animating;
     private long currentAnimatingTime;
     private long lastAnimationTime;

@@ -44,6 +44,8 @@
     </declare-styleable>
 
     <declare-styleable name="RefresherView">
+        <attr name="direction"
+              format="string"/>
         <attr name="max_height"
               format="dimension"/>
         <attr name="threshold_height"

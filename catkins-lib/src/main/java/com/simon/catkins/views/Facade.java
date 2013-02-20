@@ -1,5 +1,8 @@
 package com.simon.catkins.views;
 
+import android.app.ActivityManager;
+import android.app.Application;
+import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
