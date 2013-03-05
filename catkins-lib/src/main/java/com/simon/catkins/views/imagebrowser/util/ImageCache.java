@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.simon.catkins.views.imagebroswer.util;
+package com.simon.catkins.views.imagebrowser.util;
 
 import android.annotation.TargetApi;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -31,7 +30,6 @@ import android.support.v4.util.LruCache;
 import android.util.Log;
 
 import com.simon.catkins.BuildConfig;
-import com.simon.catkins.views.imagebroswer.util.DiskLruCache;
 
 import java.io.File;
 import java.io.IOException;

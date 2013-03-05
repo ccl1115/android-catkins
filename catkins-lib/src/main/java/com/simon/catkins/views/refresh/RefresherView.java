@@ -33,7 +33,6 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private static final int DEFAULT_MAX_HEIGHT = 400; // dips
 
   private static final int MIN_VELOCITY = 100;
-  private static final int VELOCITY = 500;
 
   private final int kMinVelocity;
   private final int kVelocity;
@@ -86,7 +85,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     final float density = r.getDisplayMetrics().density;
 
     kMinVelocity = (int) (MIN_VELOCITY * density + 0.5f);
-    kVelocity = (int) (VELOCITY * density + 0.5f);
+    kVelocity = (int) (Facade.VELOCITY_SMALL * density + 0.5f);
 
     TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RefresherView);
 

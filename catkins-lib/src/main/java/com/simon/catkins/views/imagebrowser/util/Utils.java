@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.simon.catkins.views.imagebroswer.util;
+package com.simon.catkins.views.imagebrowser.util;
 
 import android.annotation.TargetApi;
 import android.os.Build;

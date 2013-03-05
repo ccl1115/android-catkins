@@ -1,9 +1,8 @@
-package com.simon.catkins.views.imagebroswer;
+package com.simon.catkins.views.imagebrowser;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.SurfaceView;
-import android.view.View;
 
 /**
  * @author bb.simon.yu@gmail.com
