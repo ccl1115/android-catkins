@@ -68,7 +68,6 @@ public class HomeActivity extends BaseActivity {
   }
 
   private class Adapter extends BaseAdapter {
-    private ViewHolder mHolder = new ViewHolder();
 
     @Override
     public int getCount() {
@@ -87,16 +86,21 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+      ViewHolder holder;
       if (convertView == null) {
         convertView = View.inflate(HomeActivity.this,
             R.layout.demo_list_item, null);
-        mHolder.mName = (TextView) convertView.findViewById(R.id.name);
-        mHolder.mDescription =
+        holder = new ViewHolder();
+        holder.mName = (TextView) convertView.findViewById(R.id.name);
+        holder.mDescription =
             (TextView) convertView.findViewById(R.id.description);
+        convertView.setTag(holder);
+      } else {
+        holder = (ViewHolder) convertView.getTag();
       }
       final Demo demo = mDemos.get(position);
-      mHolder.mName.setText(demo.name);
-      mHolder.mDescription.setText(demo.description);
+      holder.mName.setText(demo.name);
+      holder.mDescription.setText(demo.description);
       return convertView;
     }
   }

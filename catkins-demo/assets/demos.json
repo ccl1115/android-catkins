@@ -28,5 +28,10 @@
         "name" : "RefresherView",
         "description" : "A container view can use pull-down-to-refresh.",
         "activity" : "com.simon.catkins.demo.app.refresher.RefresherViewFromXmlActivity"
+    },
+    {
+        "name" : "ImageSurfaceView",
+        "description" : "A pan and scalable image viewer",
+        "activity" : "com.simon.catkins.demo.app.image.ImageSurfaceViewActivity"
     }
 ]

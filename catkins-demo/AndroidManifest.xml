@@ -30,6 +30,8 @@
         <activity android:name=".app.HorizontalTranslateLayoutActivity"/>
 
         <activity android:name=".app.refresher.RefresherViewFromXmlActivity"/>
+
+        <activity android:name=".app.image.ImageSurfaceViewActivity"/>
     </application>
 
 </manifest>

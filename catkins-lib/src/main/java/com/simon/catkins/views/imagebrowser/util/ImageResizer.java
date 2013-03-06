@@ -221,4 +221,14 @@ public class ImageResizer extends ImageWorker {
         }
         return inSampleSize;
     }
+
+  public static int[] getBitmapSizeFromFile(String filename) {
+    final int[] ret = new int[2];
+    BitmapFactory.Options options = new BitmapFactory.Options();
+    options.inJustDecodeBounds = true;
+    BitmapFactory.decodeFile(filename, options);
+    ret[0] = options.outWidth;
+    ret[1] = options.outHeight;
+    return ret;
+  }
 }
