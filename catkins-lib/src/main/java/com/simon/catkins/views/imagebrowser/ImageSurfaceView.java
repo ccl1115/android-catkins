@@ -6,25 +6,36 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.VelocityTracker;
 import com.simon.catkins.views.TransitionAnimator;
 
 /**
  * @author bb.simon.yu@gmail.com
  */
-public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callback2 {
+  private static final String TAG = "ImageSurfaceView";
 
   private Bitmap mBitmap;
   private Paint mPaint = new Paint();
 
   private int mBitmapWidth;
   private int mBitmapHeight;
+  private int mWidth;
+  private int mHeight;
+  private float mLastDownX;
+  private float mLastDownY;
+  private float mLastMoveX;
+  private float mLastMoveY;
 
-  private float mScale = 1;
+  private float mScale = 1f;
   private float mXOffset;
   private float mYOffset;
+
+  private VelocityTracker mVelocityTracker;
 
   private final TransitionAnimator mTransitionAnimator = new DefaultTransactionAnimator();
 
@@ -54,16 +65,13 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
   @Override
   public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-    Canvas c = holder.lockCanvas();
+  }
 
-    c.drawColor(0xFF000000);
-
-    c.drawBitmap(mBitmap,
-        (width - mBitmapWidth + mXOffset) * mScale,
-        (height - mBitmapHeight + mYOffset) * mScale,
-        mPaint);
-
-    holder.unlockCanvasAndPost(c);
+  @Override
+  public void surfaceRedrawNeeded(SurfaceHolder holder) {
+    Canvas canvas = holder.lockCanvas();
+    mTransitionAnimator.draw(canvas);
+    holder.unlockCanvasAndPost(canvas);
   }
 
   @Override
@@ -86,6 +94,8 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     public void measure(int widthMeasureSpec, int heightMeasureSpec) {
       final int widthSize = widthMeasureSpec & ~(0x3 << 30);
       final int heightSize = heightMeasureSpec & ~(0x3 << 30);
+      mWidth = widthSize;
+      mHeight = heightSize;
       setMeasuredDimension(widthSize, heightSize);
     }
 
@@ -95,6 +105,18 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
     @Override
     public void draw(Canvas canvas) {
+      canvas.drawColor(0xFF000000);
+
+      final int savedCount = canvas.save();
+
+      canvas.translate(mXOffset, mYOffset);
+      canvas.scale(mScale, mScale);
+      canvas.drawBitmap(mBitmap,
+          (mWidth - mBitmapWidth) / 2,
+          (mHeight - mBitmapHeight) / 2,
+          mPaint);
+
+      canvas.restoreToCount(savedCount);
     }
 
     @Override
@@ -111,12 +133,30 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     public boolean touchEvent(MotionEvent event) {
       final int action = event.getAction() & MotionEvent.ACTION_MASK;
 
+      final float x = event.getX();
+      final float y = event.getY();
+
       switch (action) {
         case MotionEvent.ACTION_DOWN:
+          mLastDownX = x;
+          mLastDownY = y;
+          mLastMoveX = x;
+          mLastMoveY = y;
+          mVelocityTracker = VelocityTracker.obtain();
           break;
         case MotionEvent.ACTION_MOVE:
-          invalidate();
+          mXOffset += x - mLastMoveX;
+          mYOffset += y - mLastMoveY;
+          mLastMoveX = x;
+          mLastMoveY = y;
+          surfaceRedrawNeeded(getHolder());
           break;
+        case MotionEvent.ACTION_POINTER_DOWN:
+          break;
+        case MotionEvent.ACTION_UP:
+        case MotionEvent.ACTION_CANCEL:
+          break;
+
       }
 
       return true;
