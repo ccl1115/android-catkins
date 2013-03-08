@@ -1,23 +1,26 @@
 package com.simon.catkins.views.imagebrowser;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.VelocityTracker;
+import android.view.*;
 import com.simon.catkins.views.TransitionAnimator;
+
+import static android.view.MotionEvent.*;
 
 /**
  * @author bb.simon.yu@gmail.com
  */
-public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callback2 {
+public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callback2, ScaleGestureDetector.OnScaleGestureListener {
   private static final String TAG = "ImageSurfaceView";
+
+  private static final int BACKGROUND_COLOR = 0xFF000000;
+
+  private static final float SCALE_MIN = 0.5f;
+  private static final float SCALE_MAX = 2.f;
 
   private Bitmap mBitmap;
   private Paint mPaint = new Paint();
@@ -31,9 +34,14 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
   private float mLastMoveX;
   private float mLastMoveY;
 
-  private float mScale = 1f;
+  private float mScale = 1.f;
   private float mXOffset;
   private float mYOffset;
+
+  private int mActivePointerId = INVALID_POINTER_ID;
+
+  private ScaleGestureDetector mScaleGestureDetector;
+
 
   private VelocityTracker mVelocityTracker;
 
@@ -50,6 +58,7 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
   public ImageSurfaceView(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
     getHolder().addCallback(this);
+    mScaleGestureDetector = new ScaleGestureDetector(context, this);
   }
 
   public void setBitmap(Bitmap bitmap) {
@@ -88,6 +97,23 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     return mTransitionAnimator.touchEvent(event);
   }
 
+  @Override
+  public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
+    mScale *= scaleGestureDetector.getScaleFactor();
+    mScale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, mScale));
+    surfaceRedrawNeeded(getHolder());
+    return true;
+  }
+
+  @Override
+  public boolean onScaleBegin(ScaleGestureDetector scaleGestureDetector) {
+    return true;
+  }
+
+  @Override
+  public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
+  }
+
   private class DefaultTransactionAnimator implements TransitionAnimator {
 
     @Override
@@ -105,16 +131,13 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
     @Override
     public void draw(Canvas canvas) {
-      canvas.drawColor(0xFF000000);
+      canvas.drawColor(BACKGROUND_COLOR);
 
       final int savedCount = canvas.save();
 
-      canvas.translate(mXOffset, mYOffset);
-      canvas.scale(mScale, mScale);
-      canvas.drawBitmap(mBitmap,
-          (mWidth - mBitmapWidth) / 2,
-          (mHeight - mBitmapHeight) / 2,
-          mPaint);
+      canvas.scale(mScale, mScale, mWidth / 2, mHeight / 2);
+      canvas.translate((mWidth - mBitmapWidth) / 2, (mHeight - mBitmapHeight) / 2);
+      canvas.drawBitmap(mBitmap, mXOffset / mScale, mYOffset / mScale, mPaint);
 
       canvas.restoreToCount(savedCount);
     }
@@ -131,31 +154,57 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
     @Override
     public boolean touchEvent(MotionEvent event) {
-      final int action = event.getAction() & MotionEvent.ACTION_MASK;
 
-      final float x = event.getX();
-      final float y = event.getY();
+      mScaleGestureDetector.onTouchEvent(event);
+
+      final int action = MotionEventCompat.getActionMasked(event);
+
 
       switch (action) {
-        case MotionEvent.ACTION_DOWN:
-          mLastDownX = x;
-          mLastDownY = y;
+        case ACTION_DOWN: {
+          final int pointerIndex = MotionEventCompat.getActionIndex(event);
+          final float x = MotionEventCompat.getX(event, pointerIndex);
+          final float y = MotionEventCompat.getY(event, pointerIndex);
           mLastMoveX = x;
           mLastMoveY = y;
           mVelocityTracker = VelocityTracker.obtain();
+          mActivePointerId = MotionEventCompat.getPointerId(event, pointerIndex);
           break;
-        case MotionEvent.ACTION_MOVE:
-          mXOffset += x - mLastMoveX;
-          mYOffset += y - mLastMoveY;
+        }
+        case ACTION_MOVE: {
+          final int pointerIndex = MotionEventCompat.findPointerIndex(event, mActivePointerId);
+          final float x = MotionEventCompat.getX(event, pointerIndex);
+          final float y = MotionEventCompat.getY(event, pointerIndex);
+
+
+          if (!mScaleGestureDetector.isInProgress()) {
+            mXOffset += x - mLastMoveX;
+            mYOffset += y - mLastMoveY;
+            surfaceRedrawNeeded(getHolder());
+          }
+
           mLastMoveX = x;
           mLastMoveY = y;
-          surfaceRedrawNeeded(getHolder());
+
           break;
-        case MotionEvent.ACTION_POINTER_DOWN:
+
+        }
+        case ACTION_UP:
+        case ACTION_CANCEL: {
+          mActivePointerId = INVALID_POINTER_ID;
           break;
-        case MotionEvent.ACTION_UP:
-        case MotionEvent.ACTION_CANCEL:
-          break;
+        }
+        case ACTION_POINTER_UP: {
+          final int pointerIndex = MotionEventCompat.getActionIndex(event);
+          final int pointerId = MotionEventCompat.getPointerId(event, pointerIndex);
+
+          if (pointerId == mActivePointerId) {
+            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+            mLastMoveX = MotionEventCompat.getX(event, newPointerIndex);
+            mLastMoveY = MotionEventCompat.getY(event, newPointerIndex);
+            mActivePointerId = MotionEventCompat.getPointerId(event, newPointerIndex);
+          }
+        }
 
       }
 
