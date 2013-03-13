@@ -1,37 +1,37 @@
 [
     {
         "name" : "FlipperLayout",
-        "description" : "A layout acting like a drawer. It can be flinged to the right side out of the screen.",
+        "description" : "抽屉视图布局，提供将上层视图滑动到右侧收起从而显示下层视图的界面框架。",
         "activity" : "com.simon.catkins.demo.app.FlipperLayoutDemoActivity"
     },
     {
         "name" : "Flip3DLayout",
-        "description" : "Flip or reverse flip between two children layouts",
+        "description" : "实现3D的两个视图之间的反转动画切换。",
         "activity" : "com.simon.catkins.demo.app.Flip3DLayoutDemoActivity"
     },
     {
         "name" : "StackLayout",
-        "description" : "Acting like FrameLayout, but has an optional translate animation when adding or removing to it.",
+        "description" : "类似与系统提供的FrameLayout，但是在动态添加和删除子视图的时候可以添加一个向右运动的动画效果。",
         "activity" : "com.simon.catkins.demo.app.StackLayoutDemoActivity"
     },
     {
         "name" : "StackLayout /w Fragment",
-        "description" : "The same as StackLayout, but manages the children with FragmentManager using the android support package.",
+        "description" : "同StackLayout相同，但是将所有的子视图通过Fragment机制来管理，提供更全面的对象生命周期控制。",
         "activity" : "com.simon.catkins.demo.app.StackLayoutWithFragmentDemoActivity"
     },
     {
         "name" : "HorizontalTranslateLayout",
-        "description" : "A layout that can be translate to left/right/both direction.",
+        "description" : "一个基于FlipperLayout抽屉控件的增强，可以在水平方向左或向右收起或者展开，作为一个双向的抽屉。",
         "activity" : "com.simon.catkins.demo.app.HorizontalTranslateLayoutActivity"
     },
     {
         "name" : "RefresherView",
-        "description" : "A container view can use pull-down-to-refresh.",
+        "description" : "下拉刷新的控件。",
         "activity" : "com.simon.catkins.demo.app.refresher.RefresherViewFromXmlActivity"
     },
     {
         "name" : "ImageSurfaceView",
-        "description" : "A pan and scalable image viewer",
+        "description" : "单张图片浏览控件，实现平移和滑动效果。",
         "activity" : "com.simon.catkins.demo.app.image.ImageSurfaceViewActivity"
     }
 ]
