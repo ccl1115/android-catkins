@@ -358,6 +358,10 @@ public class Flip3DLayout extends FrameLayout {
     }
   }
 
+  public int getState() {
+    return mState;
+  }
+
   public interface OnAnimationEndListener {
     void onFlipAnimationEnd();
 
