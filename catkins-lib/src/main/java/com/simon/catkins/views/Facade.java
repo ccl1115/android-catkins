@@ -10,9 +10,9 @@ public abstract class Facade {
   public static final int VELOCITY_SMALL = 500;
   public static final int VELOCITY_MEDIUM = 800;
   public static final int VELOCITY_LARGE = 1100;
-  public static final float PROPORTION_VELOCITY_SMALL = 0.01f;
-  public static final float PROPORTION_VELOCITY_MEDIUM = 0.02f;
-  public static final float PROPORTION_VELOCITY_LARGE = 0.03f;
+  public static final float PROPORTION_VELOCITY_SMALL = 1.0f;
+  public static final float PROPORTION_VELOCITY_MEDIUM = 2.0f;
+  public static final float PROPORTION_VELOCITY_LARGE = 4.0f;
   public static final int TOUCH_EVENT_MOVE_THRESHOLD_SMALL = 25;
   public static final int TOUCH_EVENT_MOVE_THRESHOLD_MEDIUM = 50;
   public static final int TOUCH_EVENT_MOVE_THRESHOLD_LARGE = 75;
@@ -22,6 +22,13 @@ public abstract class Facade {
       t -= 1.0f;
 
       return t * t * t * t * t + 1.0f;
+    }
+  };
+
+  public static final Interpolator sReverseInterpolator = new Interpolator() {
+    @Override
+    public float getInterpolation(float t) {
+      return t * t * t * t * t;
     }
   };
 
