@@ -1,53 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE project [
-        <!ELEMENT project (modelVersion|parent|groupId|artifactId|version|packaging|name|dependencies|build|profiles)*>
-        <!ATTLIST project
-                xmlns CDATA #REQUIRED
-                xmlns:xsi CDATA #REQUIRED
-                xsi:schemaLocation CDATA #REQUIRED>
-        <!ELEMENT modelVersion (#PCDATA)>
-        <!ELEMENT parent (groupId|artifactId|version)*>
-        <!ELEMENT groupId (#PCDATA)>
-        <!ELEMENT artifactId (#PCDATA)>
-        <!ELEMENT version (#PCDATA)>
-        <!ELEMENT packaging (#PCDATA)>
-        <!ELEMENT name (#PCDATA)>
-        <!ELEMENT dependencies (dependency)*>
-        <!ELEMENT dependency (groupId|artifactId|version|scope)*>
-        <!ELEMENT build (plugins)*>
-        <!ELEMENT plugins (plugin)*>
-        <!ELEMENT plugin (groupId|artifactId|extensions|executions|dependencies|configuration)*>
-        <!ELEMENT extensions (#PCDATA)>
-        <!ELEMENT profiles (profile)*>
-        <!ELEMENT profile (id|build)*>
-        <!ELEMENT id (#PCDATA)>
-        <!ELEMENT executions (execution)*>
-        <!ELEMENT execution (id|phase|goals|configuration)*>
-        <!ELEMENT phase (#PCDATA)>
-        <!ELEMENT goals (goal)*>
-        <!ELEMENT goal (#PCDATA)>
-        <!ELEMENT configuration (proguardVersion|maxMemory|injar|libs|obfuscate|addMavenDescriptor|proguardInclude|zipalign|sign|artifacts)*>
-        <!ELEMENT proguardVersion (#PCDATA)>
-        <!ELEMENT maxMemory (#PCDATA)>
-        <!ELEMENT injar (#PCDATA)>
-        <!ELEMENT libs (lib)*>
-        <!ELEMENT lib (#PCDATA)>
-        <!ELEMENT obfuscate (#PCDATA)>
-        <!ELEMENT addMavenDescriptor (#PCDATA)>
-        <!ELEMENT proguardInclude (#PCDATA)>
-        <!ELEMENT scope (#PCDATA)>
-        <!ELEMENT zipalign (verbose|inputApk|outputApk)*>
-        <!ELEMENT verbose (#PCDATA)>
-        <!ELEMENT inputApk (#PCDATA)>
-        <!ELEMENT outputApk (#PCDATA)>
-        <!ELEMENT sign (debug)*>
-        <!ELEMENT debug (#PCDATA)>
-        <!ELEMENT artifacts (artifact)*>
-        <!ELEMENT artifact (file|type|classifier)*>
-        <!ELEMENT file (#PCDATA)>
-        <!ELEMENT type (#PCDATA)>
-        <!ELEMENT classifier (#PCDATA)>
-        ]>
+<!DOCTYPE project>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -59,7 +11,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.simon.catkins</groupId>
     <artifactId>catkins-lib</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>apklib</packaging>
@@ -81,6 +32,10 @@
         <dependency>
             <groupId>de.akquinet.android.androlog</groupId>
             <artifactId>androlog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
     </dependencies>
 

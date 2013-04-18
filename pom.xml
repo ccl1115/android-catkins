@@ -78,6 +78,12 @@
                 <artifactId>jackson-annotations</artifactId>
                 <version>2.1.2</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>14.0.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
