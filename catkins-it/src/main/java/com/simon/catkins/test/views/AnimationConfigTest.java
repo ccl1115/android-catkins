@@ -24,4 +24,28 @@ public class AnimationConfigTest extends AndroidTestCase {
         getContext().getResources().getDisplayMetrics().density + 0.5f);
     assertEquals(expected, AnimationConfig.getVelocityMedium(getContext()));
   }
+
+  public void testGetVelocityLarge() throws Exception {
+    final int expected = (int) (AnimationConfig.VELOCITY_LARGE *
+        getContext().getResources().getDisplayMetrics().density + 0.5f);
+    assertEquals(expected, AnimationConfig.getVelocityLarge(getContext()));
+  }
+
+  public void testGetTouchEventMoveThresholdSmall() throws Exception {
+    final int expected = (int) (AnimationConfig.TOUCH_EVENT_MOVE_THRESHOLD_SMALL *
+        getContext().getResources().getDisplayMetrics().density + 0.5f);
+    assertEquals(expected, AnimationConfig.getTouchEventMoveThresholdSmall(getContext()));
+  }
+
+  public void testGetTouchEventMoveThresholdMedium() throws Exception {
+    final int expected = (int) (AnimationConfig.TOUCH_EVENT_MOVE_THRESHOLD_MEDIUM *
+        getContext().getResources().getDisplayMetrics().density + 0.5f);
+    assertEquals(expected, AnimationConfig.getTouchEventMoveThresholdMedium(getContext()));
+  }
+
+  public void testGetTouchEventMoveThresholdLarge() throws Exception {
+    final int expected = (int) (AnimationConfig.TOUCH_EVENT_MOVE_THRESHOLD_LARGE *
+        getContext().getResources().getDisplayMetrics().density + 0.5f);
+    assertEquals(expected, AnimationConfig.getTouchEventMoveThresholdLarge(getContext()));
+  }
 }
