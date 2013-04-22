@@ -11,7 +11,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import com.simon.catkins.R;
-import com.simon.catkins.views.Facade;
+import com.simon.catkins.views.AnimationConfig;
 import com.simon.catkins.views.TransitionAnimator;
 
 /**
@@ -317,7 +317,7 @@ public interface Indicator {
         animatingPosition = mPosition;
 
         lastAnimationTime = SystemClock.uptimeMillis();
-        currentAnimatingTime = lastAnimationTime + Facade.ANIMATION_FRAME_DURATION;
+        currentAnimatingTime = lastAnimationTime + AnimationConfig.ANIMATION_FRAME_DURATION;
         handler.removeMessages(AnimationHandler.MSG_ANIMATE);
         handler.sendEmptyMessageAtTime(AnimationHandler.MSG_ANIMATE, currentAnimatingTime);
       }
@@ -329,12 +329,12 @@ public interface Indicator {
 
       private void compute() {
         final long now = SystemClock.uptimeMillis();
-        final float t = (now - lastAnimationTime) / Facade.ONE_SECOND_FLOAT;
+        final float t = (now - lastAnimationTime) / AnimationConfig.ONE_SECOND_FLOAT;
 
         animatingPosition += animatingVelocity * t;
 
         lastAnimationTime = now;
-        currentAnimatingTime = lastAnimationTime + Facade.ANIMATION_FRAME_DURATION;
+        currentAnimatingTime = lastAnimationTime + AnimationConfig.ANIMATION_FRAME_DURATION;
 
         if (animatingVelocity < 0) {
           if (animatingPosition < mTargetPosition) {

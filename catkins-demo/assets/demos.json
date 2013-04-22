@@ -33,5 +33,10 @@
         "name" : "ImageSurfaceView",
         "description" : "单张图片浏览控件，实现平移和滑动效果。",
         "activity" : "com.simon.catkins.demo.app.image.ImageSurfaceViewActivity"
+    },
+    {
+        "name" : "VerticalViewPager",
+        "description" : "垂直滑动的ViewPager",
+        "activity" : "com.simon.catkins.demo.app.VerticalViewPagerActivity"
     }
 ]

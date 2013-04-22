@@ -153,7 +153,7 @@ public class StackLayout extends ViewGroup {
     mAnimationHandler.removeMessages(MSG_EXIT_ANIMATION);
     long now = SystemClock.uptimeMillis();
     mAnimationLastTime = now;
-    mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
+    mCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
     mAnimating = true;
     mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(MSG_ENTER_ANIMATION),
         mCurrentAnimationTime);
@@ -214,7 +214,7 @@ public class StackLayout extends ViewGroup {
     mAnimationHandler.removeMessages(MSG_ENTER_ANIMATION);
     long now = SystemClock.uptimeMillis();
     mAnimationLastTime = now;
-    mCurrentAnimationTime = now + Facade.ANIMATION_FRAME_DURATION;
+    mCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
     mAnimating = true;
     mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(MSG_EXIT_ANIMATION),
         mCurrentAnimationTime);
@@ -435,7 +435,7 @@ public class StackLayout extends ViewGroup {
         mStopAnimatingAlpha = false;
         postRemoveView();
       } else {
-        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
+        mCurrentAnimationTime += AnimationConfig.ANIMATION_FRAME_DURATION;
         mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(
             MSG_EXIT_ANIMATION), mCurrentAnimationTime);
       }
@@ -464,7 +464,7 @@ public class StackLayout extends ViewGroup {
           mOnStackAnimationListener.onStackPushAnimationEnd();
         }
       } else {
-        mCurrentAnimationTime += Facade.ANIMATION_FRAME_DURATION;
+        mCurrentAnimationTime += AnimationConfig.ANIMATION_FRAME_DURATION;
         mAnimationHandler.sendMessageAtTime(mAnimationHandler.obtainMessage(
             MSG_ENTER_ANIMATION), mCurrentAnimationTime);
       }
@@ -480,7 +480,7 @@ public class StackLayout extends ViewGroup {
     final float v = mAnimatingTranslateVelocity;
     // compute position
     mAnimationPosition = p + (v * t);
-    mLeft = Facade.computeInterpolator(getMeasuredWidth(), mAnimationPosition, false);
+    mLeft = AnimationConfig.computeInterpolator(getMeasuredWidth(), mAnimationPosition, false);
 
     // compute shade
     if (!mStopAnimatingAlpha) {
@@ -501,7 +501,7 @@ public class StackLayout extends ViewGroup {
     final float v = mAnimatingTranslateVelocity;
     // compute position
     mAnimationPosition = p + (v * t);
-    mLeft = Facade.computeInterpolator(getMeasuredWidth(), mAnimationPosition, true);
+    mLeft = AnimationConfig.computeInterpolator(getMeasuredWidth(), mAnimationPosition, true);
 
     // compute shade
     if (!mStopAnimatingAlpha) {

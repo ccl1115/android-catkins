@@ -194,7 +194,7 @@ public class Flip3DLayout extends FrameLayout {
         animatingDepth = -(mWidth / 180f) * degree + mWidth;
       }
       lastAnimationTime = now;
-      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
       //Log.d(TAG, "@compute " + animatingDegree);
       if (animatingDegree >= 180) {
         animating = false;
@@ -227,7 +227,7 @@ public class Flip3DLayout extends FrameLayout {
         animatingDepth = -(mWidth / 180f) * degree + mWidth;
       }
       lastAnimationTime = now;
-      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
       if (animatingDegree <= -180) {
         animating = false;
         mDegree = 0;
@@ -254,7 +254,7 @@ public class Flip3DLayout extends FrameLayout {
       prepare();
       final long now = SystemClock.uptimeMillis();
       lastAnimationTime = now;
-      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
       mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_FLIP), currentAnimatingTime);
     }
 
@@ -266,7 +266,7 @@ public class Flip3DLayout extends FrameLayout {
       prepare();
       final long now = SystemClock.uptimeMillis();
       lastAnimationTime = now;
-      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
       mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_RFLIP), currentAnimatingTime);
     }
   }

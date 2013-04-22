@@ -10,11 +10,10 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.simon.catkins</groupId>
-    <artifactId>catkins-demo-it</artifactId>
+    <artifactId>catkins-it</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>apk</packaging>
-    <name>catkins-demo-it - Integration tests</name>
+    <name>catkins-it - Integration tests</name>
 
     <properties>
         <!--
@@ -40,12 +39,6 @@
             <version>1.0-SNAPSHOT</version>
             <classifier>${zipaligned-classifier}</classifier>
             <!--  classifier set according to the ran profile -->
-        </dependency>
-        <dependency>
-            <groupId>com.simon.catkins</groupId>
-            <artifactId>catkins-demo</artifactId>
-            <type>jar</type>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.simon.catkins</groupId>

@@ -13,7 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import com.simon.catkins.R;
-import com.simon.catkins.views.Facade;
+import com.simon.catkins.views.AnimationConfig;
 import com.simon.catkins.views.TransitionAnimator;
 import de.akquinet.android.androlog.Log;
 
@@ -85,7 +85,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     final float density = r.getDisplayMetrics().density;
 
     kMinVelocity = (int) (MIN_VELOCITY * density + 0.5f);
-    kVelocity = (int) (Facade.VELOCITY_SMALL * density + 0.5f);
+    kVelocity = (int) (AnimationConfig.VELOCITY_SMALL * density + 0.5f);
 
     TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RefresherView);
 
@@ -239,10 +239,10 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         }
       } else {
         mYOffset = (int)
-            (mBackPosition + animationDistance * (1 - Facade.sInterpolator.getInterpolation(
+            (mBackPosition + animationDistance * (1 - AnimationConfig.sInterpolator.getInterpolation(
                 animatingPosition / (float) animationDistance)));
         lastAnimationTime = now;
-        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+        currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
         mHandler.removeMessages(MSG_ANIMATE_BACK);
         mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BACK, currentAnimatingTime);
       }
@@ -266,9 +266,9 @@ public class RefresherView extends ViewGroup implements IRefreshable {
           refresh();
         }
       } else {
-        mYOffset = Facade.computeInterpolator(animationDistance, animatingPosition, false);
+        mYOffset = AnimationConfig.computeInterpolator(animationDistance, animatingPosition, false);
         lastAnimationTime = now;
-        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+        currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
         mHandler.removeMessages(MSG_ANIMATE_DOWN);
         mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_DOWN, currentAnimatingTime);
       }
@@ -281,7 +281,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       final long now = SystemClock.uptimeMillis();
       final OnRefreshListener onRefreshListener;
       lastAnimationTime = now;
-      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
       animating = true;
 
       switch (msg) {
@@ -589,7 +589,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
     public SideRefreshTransitionAnimator() {
       final float density = getResources().getDisplayMetrics().density;
-      moveThreshold = (int) (Facade.TOUCH_EVENT_MOVE_THRESHOLD_LARGE * density + 0.5);
+      moveThreshold = (int) (AnimationConfig.TOUCH_EVENT_MOVE_THRESHOLD_LARGE * density + 0.5);
     }
 
     @Override
@@ -783,7 +783,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       final long now = SystemClock.uptimeMillis();
 
       lastAnimationTime = now;
-      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
       animating = true;
       animationDistance = mThresholdHeight;
       animatingPosition = 0;
@@ -797,7 +797,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
       final long now = SystemClock.uptimeMillis();
 
       lastAnimationTime = now;
-      currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+      currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
       animating = true;
       animationDistance = mXOffset - mBackPosition;
       animatingPosition = 0;
@@ -823,9 +823,9 @@ public class RefresherView extends ViewGroup implements IRefreshable {
           refresh();
         }
       } else {
-        mXOffset = Facade.computeInterpolator(animationDistance, animatingPosition, false);
+        mXOffset = AnimationConfig.computeInterpolator(animationDistance, animatingPosition, false);
         lastAnimationTime = now;
-        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+        currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
         removeMessages(MSG_ANIMATE_DOWN);
         sendEmptyMessageAtTime(MSG_ANIMATE_DOWN, currentAnimatingTime);
       }
@@ -856,10 +856,10 @@ public class RefresherView extends ViewGroup implements IRefreshable {
         }
       } else {
         mXOffset = (int)
-            (mBackPosition + animationDistance * (1 - Facade.sInterpolator.getInterpolation(
+            (mBackPosition + animationDistance * (1 - AnimationConfig.sInterpolator.getInterpolation(
                 animatingPosition / animationDistance)));
         lastAnimationTime = now;
-        currentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+        currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
         removeMessages(MSG_ANIMATE_BACK);
         sendEmptyMessageAtTime(MSG_ANIMATE_BACK, currentAnimatingTime);
       }

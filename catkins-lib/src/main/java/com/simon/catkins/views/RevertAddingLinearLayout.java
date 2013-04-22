@@ -121,7 +121,7 @@ public class RevertAddingLinearLayout extends LinearLayout {
 
     public DefaultTransitionAnimation() {
       final float densitiy = getResources().getDisplayMetrics().density;
-      mProportionVelocity = densitiy * Facade.PROPORTION_VELOCITY_SMALL;
+      mProportionVelocity = densitiy * AnimationConfig.PROPORTION_VELOCITY_SMALL;
     }
 
     @Override
@@ -184,7 +184,7 @@ public class RevertAddingLinearLayout extends LinearLayout {
         case MSG_ADD_VIEW: {
           final long now = SystemClock.uptimeMillis();
           mLastAnimationTime = now;
-          mCurrentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+          mCurrentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
 
           mAnimatingProportion = 0f;
           mAnimating = true;
@@ -198,7 +198,7 @@ public class RevertAddingLinearLayout extends LinearLayout {
         case MSG_REMOVE_VIEW: {
           final long now = SystemClock.uptimeMillis();
           mLastAnimationTime = now;
-          mCurrentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+          mCurrentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
 
           mAnimatingProportion = 1f;
           mAnimating = true;
@@ -214,7 +214,7 @@ public class RevertAddingLinearLayout extends LinearLayout {
 
     private void computeAdding() {
       final long now = SystemClock.uptimeMillis();
-      final float t = (now - mLastAnimationTime) / Facade.ONE_SECOND_FLOAT;
+      final float t = (now - mLastAnimationTime) / AnimationConfig.ONE_SECOND_FLOAT;
 
       mAnimatingProportion += mAnimatingVelocity * t;
 
@@ -224,9 +224,9 @@ public class RevertAddingLinearLayout extends LinearLayout {
         mAnimating = false;
         mAddingIndex = -1;
       } else {
-        mInterpolatedPropotion = Facade.sInterpolator.getInterpolation(mAnimatingProportion);
+        mInterpolatedPropotion = AnimationConfig.sInterpolator.getInterpolation(mAnimatingProportion);
         mLastAnimationTime = now;
-        mCurrentAnimatingTime = now + Facade.ANIMATION_FRAME_DURATION;
+        mCurrentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
         mHandler.sendEmptyMessageAtTime(MSG_ADD_VIEW, mCurrentAnimatingTime);
       }
       invalidate();
@@ -234,7 +234,7 @@ public class RevertAddingLinearLayout extends LinearLayout {
 
     private void computeRemoving() {
       final long now = SystemClock.uptimeMillis();
-      final float t = (now - mLastAnimationTime) / Facade.ONE_SECOND_FLOAT;
+      final float t = (now - mLastAnimationTime) / AnimationConfig.ONE_SECOND_FLOAT;
 
       mAnimatingProportion += mAnimatingVelocity * t;
 
@@ -245,9 +245,9 @@ public class RevertAddingLinearLayout extends LinearLayout {
         postRemoveView(getChildAt(mRemovingIndex));
         mRemovingIndex = -1;
       } else {
-        mInterpolatedPropotion = Facade.sReverseInterpolator.getInterpolation(mAnimatingProportion);
+        mInterpolatedPropotion = AnimationConfig.sReverseInterpolator.getInterpolation(mAnimatingProportion);
         mLastAnimationTime = now;
-        mCurrentAnimatingTime += Facade.ANIMATION_FRAME_DURATION;
+        mCurrentAnimatingTime += AnimationConfig.ANIMATION_FRAME_DURATION;
         mHandler.sendEmptyMessageAtTime(MSG_REMOVE_VIEW, mCurrentAnimatingTime);
       }
       invalidate();

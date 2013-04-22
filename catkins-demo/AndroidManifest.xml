@@ -32,6 +32,7 @@
         <activity android:name=".app.refresher.RefresherViewFromXmlActivity"/>
 
         <activity android:name=".app.image.ImageSurfaceViewActivity"/>
+        <activity android:name=".app.VerticalViewPagerActivity"/>
     </application>
 
 </manifest>
