@@ -1,6 +1,8 @@
 bin
 target
 gen
+gen-external-*
+build
 out
 .idea
 *.iml

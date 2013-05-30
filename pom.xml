@@ -13,12 +13,11 @@
     <modules>
         <module>catkins-lib</module>
         <module>catkins-demo</module>
-        <module>catkins-demo-it</module>
+        <module>catkins-it</module>
     </modules>
 
     <properties>
         <platform.version>4.1.1.4</platform.version>
-        <android.sdk.path>/home/ccl/android-sdk-linux_x86</android.sdk.path>
     </properties>
 
     <dependencyManagement>
@@ -94,7 +93,7 @@
                     <groupId>com.jayway.maven.plugins.android.generation2
                     </groupId>
                     <artifactId>android-maven-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.6.0</version>
                     <inherited>true</inherited>
                     <configuration>
                         <androidManifestFile>${project.basedir}/AndroidManifest.xml

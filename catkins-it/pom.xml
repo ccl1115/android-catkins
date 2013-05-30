@@ -44,7 +44,6 @@
             <groupId>com.simon.catkins</groupId>
             <artifactId>catkins-lib</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
             <type>apklib</type>
         </dependency>
         <dependency>
