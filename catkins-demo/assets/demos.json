@@ -38,5 +38,10 @@
         "name" : "VerticalViewPager",
         "description" : "垂直滑动的ViewPager",
         "activity" : "com.simon.catkins.demo.app.VerticalViewPagerActivity"
+    },
+    {
+        "name" : "RevertAddingLinearLayout",
+        "description" : "具有插入和删除动画的LinearLayout",
+        "activity" : "com.simon.catkins.demo.app.RevertAddingLinearLayoutActivity"
     }
 ]

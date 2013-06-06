@@ -33,6 +33,7 @@
 
         <activity android:name=".app.image.ImageSurfaceViewActivity"/>
         <activity android:name=".app.VerticalViewPagerActivity"/>
+        <activity android:name=".app.RevertAddingLinearLayoutActivity"/>
     </application>
 
 </manifest>
