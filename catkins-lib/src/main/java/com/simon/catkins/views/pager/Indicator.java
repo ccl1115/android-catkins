@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import com.simon.catkins.R;
 import com.simon.catkins.views.AnimationConfig;
-import com.simon.catkins.views.TransitionAnimator;
+import com.simon.catkins.views.ViewGroupInjector;
 
 /**
  */
@@ -66,7 +66,7 @@ public interface Indicator {
     private Drawable mDrawable;
     private Drawable mSelector;
 
-    private TransitionAnimator mTransitionAnimator = new HorizontalTransitionAnimator();
+    private ViewGroupInjector mViewGroupInjector = new HorizontalViewGroupInjector();
 
     public IndicatorView(Context context) {
       this(context, null, 0);
@@ -99,7 +99,7 @@ public interface Indicator {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-      mTransitionAnimator.measure(widthMeasureSpec, heightMeasureSpec);
+      mViewGroupInjector.measure(widthMeasureSpec, heightMeasureSpec);
     }
 
 
@@ -107,7 +107,7 @@ public interface Indicator {
     protected void onDraw(Canvas canvas) {
       super.onDraw(canvas);
 
-      mTransitionAnimator.draw(canvas);
+      mViewGroupInjector.draw(canvas);
     }
 
     @Override
@@ -191,7 +191,7 @@ public interface Indicator {
     public void animatePre() {
     }
 
-    private class HorizontalTransitionAnimator implements TransitionAnimator {
+    private class HorizontalViewGroupInjector implements ViewGroupInjector {
       private final int kVelocity;
 
       private long lastAnimationTime;
@@ -202,7 +202,7 @@ public interface Indicator {
       private boolean animating;
       private AnimationHandler handler = new AnimationHandler();
 
-      HorizontalTransitionAnimator() {
+      HorizontalViewGroupInjector() {
         final float density = getResources().getDisplayMetrics().density;
         kVelocity = (int) (density * 1 + 0.5f);
       }

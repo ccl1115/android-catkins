@@ -28,7 +28,7 @@ public class RevertAddingLinearLayout extends LinearLayout {
 
   private Rect mIndexFrame = new Rect();
 
-  private final TransitionAnimator mAnimator;
+  private final ViewGroupInjector mAnimator;
 
   public RevertAddingLinearLayout(Context context) {
     this(context, null, 0);
@@ -93,7 +93,7 @@ public class RevertAddingLinearLayout extends LinearLayout {
     }
   }
 
-  private class DefaultTransitionAnimation implements TransitionAnimator {
+  private class DefaultTransitionAnimation implements ViewGroupInjector {
     private final float mProportionVelocity;
     private boolean mAnimating;
 

@@ -7,7 +7,7 @@ import android.graphics.Paint;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.view.*;
-import com.simon.catkins.views.TransitionAnimator;
+import com.simon.catkins.views.ViewGroupInjector;
 
 import static android.view.MotionEvent.*;
 
@@ -45,7 +45,7 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
   private VelocityTracker mVelocityTracker;
 
-  private final TransitionAnimator mTransitionAnimator = new DefaultTransactionAnimator();
+  private final ViewGroupInjector mViewGroupInjector = new DefaultTransactionAnimator();
 
   public ImageSurfaceView(Context context) {
     this(context, null, 0);
@@ -79,7 +79,7 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
   @Override
   public void surfaceRedrawNeeded(SurfaceHolder holder) {
     Canvas canvas = holder.lockCanvas();
-    mTransitionAnimator.draw(canvas);
+    mViewGroupInjector.draw(canvas);
     holder.unlockCanvasAndPost(canvas);
   }
 
@@ -89,12 +89,12 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    mTransitionAnimator.measure(widthMeasureSpec, heightMeasureSpec);
+    mViewGroupInjector.measure(widthMeasureSpec, heightMeasureSpec);
   }
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    return mTransitionAnimator.touchEvent(event);
+    return mViewGroupInjector.touchEvent(event);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class ImageSurfaceView extends SurfaceView implements SurfaceHolder.Callb
   public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
   }
 
-  private class DefaultTransactionAnimator implements TransitionAnimator {
+  private class DefaultTransactionAnimator implements ViewGroupInjector {
 
     @Override
     public void measure(int widthMeasureSpec, int heightMeasureSpec) {

@@ -61,7 +61,7 @@ public class VerticalViewPager extends AdapterView {
   private View mPView; // Previous page view
   private View mNView; // Next page view
 
-  private TransitionAnimator mTransitionAnimator;
+  private ViewGroupInjector mViewGroupInjector;
 
   private ArrayList<View> mScrapViews = Lists.newArrayList();
 
@@ -75,7 +75,7 @@ public class VerticalViewPager extends AdapterView {
 
   public VerticalViewPager(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
-    mTransitionAnimator = new ScaleTransitionAnimator();
+    mViewGroupInjector = new ScaleViewGroupInjector();
   }
 
   @Override
@@ -90,17 +90,17 @@ public class VerticalViewPager extends AdapterView {
 
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    mTransitionAnimator.layout(changed, l, t, r, b);
+    mViewGroupInjector.layout(changed, l, t, r, b);
   }
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    mTransitionAnimator.measure(widthMeasureSpec, heightMeasureSpec);
+    mViewGroupInjector.measure(widthMeasureSpec, heightMeasureSpec);
   }
 
   @Override
   protected void dispatchDraw(Canvas canvas) {
-    mTransitionAnimator.draw(canvas);
+    mViewGroupInjector.draw(canvas);
   }
 
   @Override
@@ -288,7 +288,7 @@ public class VerticalViewPager extends AdapterView {
     return new LayoutParams(mLayoutWidth, mLayoutHeight, scrappedFromPosition);
   }
 
-  private class ScaleTransitionAnimator implements TransitionAnimator {
+  private class ScaleViewGroupInjector implements ViewGroupInjector {
 
     public static final int MSG_ANIMATE_NEXT = 1000;
     public static final int MSG_ANIMATE_BACK = 1001;
@@ -324,7 +324,7 @@ public class VerticalViewPager extends AdapterView {
     };
 
 
-    private ScaleTransitionAnimator() {
+    private ScaleViewGroupInjector() {
       final float density = getResources().getDisplayMetrics().density;
 
       mMoveThreshold = (int) (density * AnimationConfig.TOUCH_EVENT_MOVE_THRESHOLD_SMALL + 0.5);

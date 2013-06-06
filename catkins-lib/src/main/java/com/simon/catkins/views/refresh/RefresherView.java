@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.simon.catkins.R;
 import com.simon.catkins.views.AnimationConfig;
-import com.simon.catkins.views.TransitionAnimator;
+import com.simon.catkins.views.ViewGroupInjector;
 import de.akquinet.android.androlog.Log;
 
 /**
@@ -63,7 +63,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
   private OnRefreshListener mOnRefreshListener;
   private RefreshAsyncTask mRefreshAsyncTask;
 
-  private TransitionAnimator mTransitionAnimator;
+  private ViewGroupInjector mViewGroupInjector;
 
   private State mState = State.idle;
 
@@ -101,11 +101,11 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
     String direction = ta.getString(R.styleable.RefresherView_direction);
     if (direction == null) {
-      mTransitionAnimator = new TopRefreshTransitionAnimator();
+      mViewGroupInjector = new TopRefreshViewGroupInjector();
     } else if (direction.equals(DIRECTION_SIDE)) {
-      mTransitionAnimator = new SideRefreshTransitionAnimator();
+      mViewGroupInjector = new SideRefreshViewGroupInjector();
     } else if (direction.equals(DIRECTION_TOP)) {
-      mTransitionAnimator = new TopRefreshTransitionAnimator();
+      mViewGroupInjector = new TopRefreshViewGroupInjector();
     }
 
     mRefresherContentId = ta.getResourceId(R.styleable.RefresherView_refresher_content, -1);
@@ -146,33 +146,33 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    mTransitionAnimator.measure(widthMeasureSpec, heightMeasureSpec);
+    mViewGroupInjector.measure(widthMeasureSpec, heightMeasureSpec);
   }
 
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    mTransitionAnimator.layout(changed, l, t, r, b);
+    mViewGroupInjector.layout(changed, l, t, r, b);
   }
 
   @Override
   @SuppressWarnings("all")
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    return mTransitionAnimator.dispatchTouchEvent(ev);
+    return mViewGroupInjector.dispatchTouchEvent(ev);
   }
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    return mTransitionAnimator.interceptionTouchEvent(ev);
+    return mViewGroupInjector.interceptionTouchEvent(ev);
   }
 
   @Override
   public final boolean onTouchEvent(final MotionEvent event) {
-    return mTransitionAnimator.touchEvent(event);
+    return mViewGroupInjector.touchEvent(event);
   }
 
   @Override
   protected void dispatchDraw(Canvas canvas) {
-    mTransitionAnimator.draw(canvas);
+    mViewGroupInjector.draw(canvas);
   }
 
   public void setOnRefreshListener(OnRefreshListener listener) {
@@ -205,7 +205,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
   @Override
   public void refreshShowingHeader() {
-    if (!mRefreshing) mTransitionAnimator.animate(MSG_ANIMATE_DOWN);
+    if (!mRefreshing) mViewGroupInjector.animate(MSG_ANIMATE_DOWN);
   }
 
   private class Animator {
@@ -401,11 +401,11 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     @Override
     protected void onPostExecute(final Void aVoid) {
       mBackPosition = 0;
-      mTransitionAnimator.animate(MSG_ANIMATE_BACK);
+      mViewGroupInjector.animate(MSG_ANIMATE_BACK);
     }
   }
 
-  private class TopRefreshTransitionAnimator implements TransitionAnimator {
+  private class TopRefreshViewGroupInjector implements ViewGroupInjector {
 
     @Override
     public void measure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -575,8 +575,8 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     }
   }
 
-  private class SideRefreshTransitionAnimator extends Handler implements TransitionAnimator {
-    private static final String TAG = "RefresherView$SideRefreshTransitionAnimator";
+  private class SideRefreshViewGroupInjector extends Handler implements ViewGroupInjector {
+    private static final String TAG = "RefresherView$SideRefreshViewGroupInjector";
 
     private final int moveThreshold;
 
@@ -587,7 +587,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
     private float animationDistance;
     private int animatingVelocity;
 
-    public SideRefreshTransitionAnimator() {
+    public SideRefreshViewGroupInjector() {
       final float density = getResources().getDisplayMetrics().density;
       moveThreshold = (int) (AnimationConfig.TOUCH_EVENT_MOVE_THRESHOLD_LARGE * density + 0.5);
     }
