@@ -5,4 +5,5 @@ gen-external-*
 build
 out
 .idea
+.sonar
 *.iml
