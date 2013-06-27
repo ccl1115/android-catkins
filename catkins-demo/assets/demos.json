@@ -40,6 +40,11 @@
         "activity" : "com.simon.catkins.demo.app.VerticalViewPagerActivity"
     },
     {
+        "name" : "PinnedHeaderListViewDemoActivity",
+        "description" : "Pinned header list view",
+        "activity" : "com.simon.catkins.demo.app.PinnedHeaderListViewDemoActivity"
+    },
+    {
         "name" : "RevertAddingLinearLayout",
         "description" : "具有插入和删除动画的LinearLayout",
         "activity" : "com.simon.catkins.demo.app.RevertAddingLinearLayoutActivity"
