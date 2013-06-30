@@ -6,7 +6,7 @@
 
     <uses-sdk
             android:targetSdkVersion="17"
-            android:minSdkVersion="8"/>
+            android:minSdkVersion="11"/>
 
     <application
             android:theme="@style/DefaultTheme"
