@@ -105,8 +105,6 @@ public interface Indicator {
 
     @Override
     protected void onDraw(Canvas canvas) {
-      super.onDraw(canvas);
-
       mViewGroupInjector.draw(canvas);
     }
 
@@ -189,6 +187,7 @@ public interface Indicator {
 
     @Override
     public void animatePre() {
+
     }
 
     private class HorizontalViewGroupInjector implements ViewGroupInjector {
@@ -218,8 +217,8 @@ public interface Indicator {
         }
 
         setWillNotDraw(false);
-        int measuredWidth = measureWidth(widthMeasureSpec);
-        int measuredHeight = measureHeight(heightMeasureSpec);
+        final int measuredWidth = measureWidth(widthMeasureSpec);
+        final int measuredHeight = measureHeight(heightMeasureSpec);
         setMeasuredDimension(measuredWidth, measuredHeight);
 
         // Maybe these codes should move to onLayout method.

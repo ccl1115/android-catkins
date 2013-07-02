@@ -6,7 +6,7 @@
 
     <uses-sdk
             android:targetSdkVersion="17"
-            android:minSdkVersion="11"/>
+            android:minSdkVersion="10"/>
 
     <application
             android:theme="@style/DefaultTheme"
@@ -35,6 +35,7 @@
         <activity android:name=".app.VerticalViewPagerActivity"/>
         <activity android:name=".app.RevertAddingLinearLayoutActivity"/>
         <activity android:name=".app.PinnedHeaderListViewDemoActivity"/>
+        <activity android:name=".app.IndicatorDemoActivity"/>
     </application>
 
 </manifest>
