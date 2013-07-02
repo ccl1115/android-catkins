@@ -24,3 +24,14 @@ catkins-demo
 =====
 
 A standard android project to demonstrate catkins usages.
+
+Custom views
+====
+
+This library provides some useful view components to help developers improve user experience.
+
+* Flip3DLayout
+* HorizontalTranslateLayout
+* PinnedHeaderListView
+* RefreshView
+* StackLayout
