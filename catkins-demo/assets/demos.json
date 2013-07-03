@@ -48,5 +48,10 @@
         "name" : "RevertAddingLinearLayout",
         "description" : "具有插入和删除动画的LinearLayout",
         "activity" : "com.simon.catkins.demo.app.RevertAddingLinearLayoutActivity"
+    },
+    {
+        "name" : "IndicatorDemoActivity",
+        "description" : "View pager with indicatorView",
+        "activity" : "com.simon.catkins.demo.app.IndicatorDemoActivity"
     }
 ]

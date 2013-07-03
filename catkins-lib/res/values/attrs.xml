@@ -19,7 +19,7 @@
               format="integer"/>
     </declare-styleable>
 
-    <declare-styleable name="Indicator">
+    <declare-styleable name="IndicatorView">
         <attr name="spacing"
               format="dimension"/>
         <attr name="drawable"
