@@ -21,7 +21,7 @@ import static com.simon.catkins.views.PinnedHeaderListView.PinnedHeaderListAdapt
 public class PinnedHeaderListViewDemoActivity extends Activity {
     private static final String TAG = "PinnedHeaderListViewDemoActivity";
     private static final String[] DATA = {
-            "pinned 100", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
+            "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
             "no pinned", "pinned 10", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
             "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
             "no pinned", "pinned 3", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",

@@ -131,20 +131,9 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
         final int nextViewType = adapter.getItemViewType(next);
         if (mWillDrawPinnedHeader) {
             if (nextViewType == mPinnedHeaderItemType) {
-                final int previousHeaderPosition = getPreviousHeaderPosition(next);
-                if (previousHeaderPosition == -1) {
-                    mWillDrawPinnedHeader = false;
-                } else if (previousHeaderPosition != mLastPreviousHeaderPosition) {
-                    adapter.updatePinnedHeaderView(mPinnedHeaderView, previousHeaderPosition);
-                    measurePinnedHeader(getMeasuredWidth(), getMeasuredHeight());
-                    mPinnedHeaderView.layout(0, 0, mPinnedHeaderWidth, mPinnedHeaderHeight);
-                    invalidate(0, 0, mPinnedHeaderWidth, mPinnedHeaderHeight);
-                    mLastPreviousHeaderPosition = previousHeaderPosition;
-                    mCurrentPinnedPosition = mLastPinnedPosition;
-                }
                 final View view = getChildAt(1);
                 if (view != null) {
-                    mPinnedHeaderOffsetY = mPinnedHeaderHeight - view.getTop();
+                    mPinnedHeaderOffsetY = Math.min(mPinnedHeaderHeight, mPinnedHeaderHeight - view.getTop());
                     invalidate(0, 0, mPinnedHeaderWidth, mPinnedHeaderHeight);
                 }
             } else if (firstViewType == mPinnedHeaderItemType && first != mCurrentPinnedPosition) {
@@ -154,10 +143,20 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
                 invalidate(0, 0, mPinnedHeaderWidth, mPinnedHeaderHeight);
                 mCurrentPinnedPosition = first;
                 mLastPreviousHeaderPosition = mCurrentPinnedPosition;
-            }
-            else {
+            } else {
                 mPinnedHeaderOffsetY = 0;
                 invalidate(0, 0, mPinnedHeaderWidth, mPinnedHeaderHeight);
+            }
+            final int previousHeaderPosition = getPreviousHeaderPosition(next);
+            if (previousHeaderPosition == -1) {
+                mWillDrawPinnedHeader = false;
+            } else if (previousHeaderPosition != mLastPreviousHeaderPosition) {
+                adapter.updatePinnedHeaderView(mPinnedHeaderView, previousHeaderPosition);
+                measurePinnedHeader(getMeasuredWidth(), getMeasuredHeight());
+                mPinnedHeaderView.layout(0, 0, mPinnedHeaderWidth, mPinnedHeaderHeight);
+                invalidate(0, 0, mPinnedHeaderWidth, mPinnedHeaderHeight);
+                mLastPreviousHeaderPosition = previousHeaderPosition;
+                mCurrentPinnedPosition = mLastPinnedPosition;
             }
         } else {
             if (firstViewType == mPinnedHeaderItemType) {
