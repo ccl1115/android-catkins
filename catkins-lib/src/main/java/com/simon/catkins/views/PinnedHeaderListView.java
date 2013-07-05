@@ -5,7 +5,6 @@ import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -33,6 +32,13 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
 
     private boolean mWillDrawPinnedHeader;
 
+    private DataSetObserver mObserver = new DataSetObserver() {
+        @Override
+        public void onChanged() {
+            mPinnedHeaderView.invalidate();
+        }
+    };
+
 
     public PinnedHeaderListView(Context context) {
         this(context, null, 0);
@@ -55,9 +61,19 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
         super.setAdapter(adapter);
         mPinnedHeaderItemType = getAdapter().getPinnedHeaderViewType();
         mPinnedHeaderView = getAdapter().getPinnedHeaderView();
+        getAdapter().registerDataSetObserver(mObserver);
         if (mPinnedHeaderView != null) {
             setFadingEdgeLength(0);
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (getAdapter() != null) {
+            getAdapter().unregisterDataSetObserver(mObserver);
+        }
+        mPinnedHeaderView = null;
     }
 
     private void measurePinnedHeader(int widthSize, int heightSize) {
@@ -120,7 +136,7 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
         }
         final PinnedHeaderListAdapter adapter = getAdapter();
         int first = getFirstVisiblePosition();
-        first = first > 0 ? first - 1 : first;
+//        first = first > 0 ? first - 1 : first;
         final int next = first + 1;
         final int firstViewType = adapter.getItemViewType(first);
         final int nextViewType = adapter.getItemViewType(next);
@@ -207,7 +223,7 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
         private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
         public boolean hasStableIds() {
-            return false;
+            return true;
         }
 
         public void registerDataSetObserver(DataSetObserver observer) {

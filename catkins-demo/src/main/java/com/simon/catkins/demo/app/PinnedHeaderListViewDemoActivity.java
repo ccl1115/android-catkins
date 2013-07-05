@@ -7,13 +7,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.simon.catkins.demo.R;
 import com.simon.catkins.views.PinnedHeaderListView;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static com.simon.catkins.views.PinnedHeaderListView.PinnedHeaderListAdapter;
 
 /**
@@ -32,11 +32,12 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
             "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
             "no pinned", "pinned 3999", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned"
     };
+    private PinnedHeaderListView listView;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        PinnedHeaderListView listView = new PinnedHeaderListView(this);
+        listView = new PinnedHeaderListView(this);
         listView.setAdapter(new TestAdapter());
         setContentView(listView);
     }
@@ -44,6 +45,8 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
     private class TestAdapter extends PinnedHeaderListAdapter {
         private static final int PINNED_TYPE = 1;
         private static final int NORMAL_TYPE = 0;
+
+        private int mLastPinnedPosition;
 
         @Override
         public int getPinnedHeaderViewType() {
@@ -65,11 +68,22 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
         public void updatePinnedHeaderView(View header, int position) {
             Log.d(TAG, "update header = " + position);
             ((TextView) header).setText(DATA[position]);
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
+            View view = listView.findViewWithTag(position);
+            if (view != null) {
+                view.findViewById(R.id.text).setVisibility(INVISIBLE);
+            }
+            mLastPinnedPosition = position;
+            final int count = getCount();
+            for (int i = position + 1; i < count; i++) {
+                if (getItemViewType(i) == getPinnedHeaderViewType()) {
+                    position = i;
+                    break;
+                }
+            }
+            view = listView.findViewWithTag(position);
+            if (view != null) {
+                view.findViewById(R.id.text).setVisibility(VISIBLE);
+            }
         }
 
         @Override
@@ -98,8 +112,12 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
                     convertView.setBackgroundColor(0xff333333);
                     convertView.findViewById(R.id.text).setBackgroundColor(0xffff0000);
                     ((TextView) convertView.findViewById(R.id.item)).setText("item count");
+                    if (mLastPinnedPosition < position) {
+                        convertView.findViewById(R.id.text).setVisibility(VISIBLE);
+                    }
                     break;
             }
+            convertView.setTag(position);
             return convertView;
         }
 
