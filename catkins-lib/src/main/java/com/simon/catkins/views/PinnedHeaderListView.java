@@ -13,6 +13,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 /**
+ * 上顶条目的ListView
  * @author Simon
  */
 public class PinnedHeaderListView extends ListView implements AbsListView.OnScrollListener {
@@ -57,13 +58,6 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
         if (mPinnedHeaderView != null) {
             setFadingEdgeLength(0);
         }
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        final int widthSize = widthMeasureSpec & ~(0x3 << 30);
-        final int heightSize = heightMeasureSpec & ~(0x3 << 30);
     }
 
     private void measurePinnedHeader(int widthSize, int heightSize) {
@@ -125,7 +119,8 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
             return;
         }
         final PinnedHeaderListAdapter adapter = getAdapter();
-        final int first = getFirstVisiblePosition();
+        int first = getFirstVisiblePosition();
+        first = first > 0 ? first - 1 : first;
         final int next = first + 1;
         final int firstViewType = adapter.getItemViewType(first);
         final int nextViewType = adapter.getItemViewType(next);
@@ -133,7 +128,7 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
             if (nextViewType == mPinnedHeaderItemType) {
                 final View view = getChildAt(1);
                 if (view != null) {
-                    mPinnedHeaderOffsetY = Math.min(mPinnedHeaderHeight, mPinnedHeaderHeight - view.getTop());
+                    mPinnedHeaderOffsetY = Math.min(mPinnedHeaderHeight, Math.max(0, mPinnedHeaderHeight - view.getTop()));
                     invalidate(0, 0, mPinnedHeaderWidth, mPinnedHeaderHeight);
                 }
             } else if (firstViewType == mPinnedHeaderItemType && first != mCurrentPinnedPosition) {
@@ -239,10 +234,23 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
             return true;
         }
 
+        /**
+         *
+         * @return 上顶控件类型
+         */
         public abstract int getPinnedHeaderViewType();
 
+        /**
+         *
+         * @return 上顶控件
+         */
         public abstract View getPinnedHeaderView();
 
+        /**
+         *
+         * @param header 上顶控件
+         * @param position 位置
+         */
         public abstract void updatePinnedHeaderView(View header, int position);
 
         public boolean isEmpty() {

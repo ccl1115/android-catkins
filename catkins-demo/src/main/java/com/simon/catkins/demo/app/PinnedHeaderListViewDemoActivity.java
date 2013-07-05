@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,7 +22,6 @@ import static com.simon.catkins.views.PinnedHeaderListView.PinnedHeaderListAdapt
 public class PinnedHeaderListViewDemoActivity extends Activity {
     private static final String TAG = "PinnedHeaderListViewDemoActivity";
     private static final String[] DATA = {
-            "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
             "no pinned", "pinned 10", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
             "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
             "no pinned", "pinned 3", "no pinned", "no pinned", "no pinned", "no pinned", "no pinned",
@@ -54,8 +54,9 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
         public View getPinnedHeaderView() {
             TextView view = new TextView(PinnedHeaderListViewDemoActivity.this);
             view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 100));
-            view.setBackgroundColor(0xffff0000);
+            view.setBackgroundColor(0x75ff0000);
             view.setText("pinned");
+            view.setTextColor(0x75ffffff);
             view.setGravity(Gravity.CENTER_VERTICAL);
             return view;
         }
@@ -63,7 +64,12 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
         @Override
         public void updatePinnedHeaderView(View header, int position) {
             Log.d(TAG, "update header = " + position);
-            ((TextView)header).setText(DATA[position]);
+            ((TextView) header).setText(DATA[position]);
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
         }
 
         @Override
@@ -91,7 +97,7 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
                 case PINNED_TYPE:
                     convertView.setBackgroundColor(0xff333333);
                     convertView.findViewById(R.id.text).setBackgroundColor(0xffff0000);
-                    ((TextView)convertView.findViewById(R.id.item)).setText("item count");
+                    ((TextView) convertView.findViewById(R.id.item)).setText("item count");
                     break;
             }
             return convertView;
