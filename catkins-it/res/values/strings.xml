@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello simon-android-demo-it!</string>
-    <string name="app_name">simon-android-demo-it - tests</string>
+    <string name="app_name">catkins-demo-it - tests</string>
 </resources>
