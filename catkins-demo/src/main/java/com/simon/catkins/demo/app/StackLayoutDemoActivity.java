@@ -4,18 +4,18 @@
 
 package com.simon.catkins.demo.app;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
-import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.demo.R;
 import com.simon.catkins.views.StackLayout;
 
 /**
  * @author bb.simon.yu@gmail.com
  */
-public class StackLayoutDemoActivity extends BaseActivity
+public class StackLayoutDemoActivity extends Activity
     implements View.OnClickListener {
 
   private static final String TAG = "StackLayoutDemoActivity";
@@ -28,7 +28,7 @@ public class StackLayoutDemoActivity extends BaseActivity
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    getTitleBar().setTitle(TAG);
+    getActionBar().setTitle(TAG);
     setContentView(R.layout.stack_layout);
 
     View view = findViewById(R.id.push);

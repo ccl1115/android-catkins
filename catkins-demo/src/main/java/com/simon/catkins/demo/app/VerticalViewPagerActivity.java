@@ -29,6 +29,8 @@ public class VerticalViewPagerActivity extends Activity {
 
     setContentView(R.layout.vertical_view_pager);
 
+    getActionBar().setTitle(TAG);
+
     VerticalViewPager verticalViewPager = (VerticalViewPager) findViewById(R.id.view_pager);
 
     verticalViewPager.setAdapter(new Adapter());

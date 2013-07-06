@@ -2,24 +2,24 @@ package com.simon.catkins.demo.app;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.demo.R;
 import com.simon.catkins.views.pager.IndicatorView;
 
 /**
  * @author Simon
  */
-public class IndicatorDemoActivity extends BaseActivity {
+public class IndicatorDemoActivity extends FragmentActivity {
     private static final String TAG = "IndicatorDemoActivity";
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getTitleBar().setTitle(TAG);
+        getActionBar().setTitle(TAG);
 
         setContentView(R.layout.indicator_demo);
 

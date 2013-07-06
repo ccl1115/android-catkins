@@ -6,10 +6,10 @@
 
     <uses-sdk
             android:targetSdkVersion="17"
-            android:minSdkVersion="10"/>
+            android:minSdkVersion="14"/>
 
     <application
-            android:theme="@style/DefaultTheme"
+            android:theme="@style/Theme.Base"
             android:icon="@drawable/icon"
             android:label="@string/app_name">
         <activity android:name=".app.HomeActivity">

@@ -40,6 +40,8 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
         listView = new PinnedHeaderListView(this);
         listView.setAdapter(new TestAdapter());
         setContentView(listView);
+
+        getActionBar().setTitle(TAG);
     }
 
     private class TestAdapter extends PinnedHeaderListAdapter {

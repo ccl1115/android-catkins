@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- File created by the Android Action Bar Style Generator
+
+     Copyright (C) 2011 The Android Open Source Project
+     Copyright (C) 2012 readyState Software Ltd
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+  
+          http://www.apache.org/licenses/LICENSE-2.0
+  
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources>
+
+    <style name="Theme.Base" parent="@android:style/Theme.Holo.Light">
+
+        <!-- ActionBar -->
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_base</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Base</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Base</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Base</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Base</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Base</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_base</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_base</item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Base</item>
+        
+        
+    </style>
+
+    <style name="ActionBar.Solid.Base" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:titleTextStyle">@style/TextAppearance.Base.Widget.ActionBar.Title</item>
+        <item name="android:background">@drawable/ab_solid_base</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_base</item>
+        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_base</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Base</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Base" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@drawable/ab_transparent_base</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Base</item>
+    </style>
+
+    <style name="PopupMenu.Base" parent="@android:style/Widget.Holo.Light.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_base</item>	
+    </style>
+
+    <style name="DropDownListView.Base" parent="@android:style/Widget.Holo.Light.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_base</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Base" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_base</item>
+    </style>
+
+    <style name="DropDownNav.Base" parent="@android:style/Widget.Holo.Light.Spinner">
+        <item name="android:background">@drawable/spinner_background_ab_base</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_base</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_base</item>
+    </style>
+    
+    <style name="ProgressBar.Base" parent="@android:style/Widget.Holo.Light.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_base</item>
+    </style>
+    
+    <style name="ActionButton.CloseMode.Base" parent="@android:style/Widget.Holo.Light.ActionButton.CloseMode">
+        <item name="android:background">@drawable/btn_cab_done_base</item>
+    </style>
+
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Base.Widget" parent="@android:style/Theme.Holo">
+        <item name="android:popupMenuStyle">@style/PopupMenu.Base</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Base</item>
+    </style>
+
+    <style name="TextAppearance.Base.Widget.ActionBar.Title" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/action_bar_title_text_color_base</item>
+    </style>
+
+</resources>

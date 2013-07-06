@@ -6,13 +6,13 @@ package com.simon.catkins.demo.app;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.demo.R;
 import com.simon.catkins.views.StackLayout;
 
@@ -23,7 +23,7 @@ import static android.widget.FrameLayout.LayoutParams;
 /**
  * @author bb.simon.yu@gmail.com
  */
-public class StackLayoutWithFragmentDemoActivity extends BaseActivity
+public class StackLayoutWithFragmentDemoActivity extends FragmentActivity
     implements View.OnClickListener {
 
   private static final String TAG = "StackLayoutWithFragmentDemoActivity";
@@ -34,7 +34,7 @@ public class StackLayoutWithFragmentDemoActivity extends BaseActivity
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    getTitleBar().setTitle(TAG);
+    getActionBar().setTitle(TAG);
     setContentView(R.layout.stack_layout);
 
     View view = findViewById(R.id.push);

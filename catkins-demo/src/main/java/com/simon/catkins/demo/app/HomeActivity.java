@@ -4,6 +4,7 @@
 
 package com.simon.catkins.demo.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -23,7 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends Activity {
 
   private static final String TAG = "HomeActivity";
 
@@ -35,11 +36,9 @@ public class HomeActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     Log.v(TAG, "@onCreate");
 
-    getTitleBar().setTitle(TAG);
-
     setContentView(R.layout.home);
 
-    ListView listView = (ListView) findViewById(R.id.content);
+    ListView listView = (ListView) findViewById(R.id.list);
 
     ObjectMapper mapper = new ObjectMapper();
     try {

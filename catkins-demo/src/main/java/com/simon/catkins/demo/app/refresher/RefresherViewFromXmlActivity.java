@@ -4,25 +4,24 @@
 
 package com.simon.catkins.demo.app.refresher;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import com.simon.catkins.app.BaseActivity;
 import com.simon.catkins.demo.R;
 import com.simon.catkins.views.refresh.IRefreshable;
 import com.simon.catkins.views.refresh.RefresherView;
 
 /**
  */
-public class RefresherViewFromXmlActivity extends BaseActivity {
+public class RefresherViewFromXmlActivity extends Activity {
   private static final String TAG = "RefresherViewFromXmlActivity";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    getTitleBar().setTitle(TAG);
     setContentView(R.layout.refresher_demo);
 
     final RefresherView refresherView = (RefresherView) findViewById(R.id.refresher);
