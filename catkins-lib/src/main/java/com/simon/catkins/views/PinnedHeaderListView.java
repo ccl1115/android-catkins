@@ -161,6 +161,7 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
             final int previousHeaderPosition = getPreviousHeaderPosition(next);
             if (previousHeaderPosition == -1) {
                 mWillDrawPinnedHeader = false;
+                adapter.updatePinnedHeaderView(null, -1);
             } else if (previousHeaderPosition != mLastPreviousHeaderPosition) {
                 adapter.updatePinnedHeaderView(mPinnedHeaderView, previousHeaderPosition);
                 measurePinnedHeader(getMeasuredWidth(), getMeasuredHeight());

@@ -67,12 +67,28 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
         @Override
         public void updatePinnedHeaderView(View header, int position) {
             Log.d(TAG, "update header = " + position);
+            if (position == -1) {
+                position = seekNextPinnedHeader(position);
+                final View view = listView.findViewWithTag(position);
+                if (view != null) {
+                    view.findViewById(R.id.text).setVisibility(VISIBLE);
+                }
+                return;
+            }
             ((TextView) header).setText(DATA[position]);
             View view = listView.findViewWithTag(position);
             if (view != null) {
                 view.findViewById(R.id.text).setVisibility(INVISIBLE);
             }
             mLastPinnedPosition = position;
+            position = seekNextPinnedHeader(position);
+            view = listView.findViewWithTag(position);
+            if (view != null) {
+                view.findViewById(R.id.text).setVisibility(VISIBLE);
+            }
+        }
+
+        private int seekNextPinnedHeader(int position) {
             final int count = getCount();
             for (int i = position + 1; i < count; i++) {
                 if (getItemViewType(i) == getPinnedHeaderViewType()) {
@@ -80,10 +96,7 @@ public class PinnedHeaderListViewDemoActivity extends Activity {
                     break;
                 }
             }
-            view = listView.findViewWithTag(position);
-            if (view != null) {
-                view.findViewById(R.id.text).setVisibility(VISIBLE);
-            }
+            return position;
         }
 
         @Override
