@@ -20,7 +20,7 @@ public class ImageSurfaceViewActivity extends Activity {
 
     ImageSurfaceView imageSurfaceView = new ImageSurfaceView(this);
 
-    imageSurfaceView.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+    imageSurfaceView.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.icon));
 
     setContentView(imageSurfaceView);
   }
