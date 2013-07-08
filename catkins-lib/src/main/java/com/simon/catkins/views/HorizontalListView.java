@@ -587,7 +587,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
             }
         } else {
             // Still in a fling so schedule the next frame
-            postOnAnimation(mDelayedLayout);
+            ViewCompat.postOnAnimation(this, mDelayedLayout);
         }
     }
 

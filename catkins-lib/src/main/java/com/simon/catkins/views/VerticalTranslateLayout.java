@@ -86,7 +86,6 @@ public class VerticalTranslateLayout extends FrameLayout {
 
     public VerticalTranslateLayout(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
-        Log.init(context);
         mHandler = new AnimationHandler();
         mAnimator = new Animator();
         mTracker = new Tracker();
@@ -109,8 +108,7 @@ public class VerticalTranslateLayout extends FrameLayout {
      * @param attrs the attributes set from xml
      */
     private void loadAttrs(AttributeSet attrs) {
-        TypedArray a =
-                getContext().obtainStyledAttributes(attrs, R.styleable.VerticalTranslateLayout);
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.VerticalTranslateLayout);
 
         mTopOffset = a.getDimension(R.styleable.VerticalTranslateLayout_top_offset, -1f);
         mBottomOffset = a.getDimension(R.styleable.VerticalTranslateLayout_bottom_offset, -1f);
@@ -393,11 +391,11 @@ public class VerticalTranslateLayout extends FrameLayout {
                 Log.d(TAG, "@interceptInterceptTouchEvent");
 
                 if (mPositionState == STATE_EXPAND) {
-                    if (y < mLastDownY - mTouchThreshold || y > mLastDownY + mTouchThreshold) {
+                    if (x < mLastDownX - mTouchThreshold || x > mLastDownX + mTouchThreshold) {
                         return false;
                     }
 
-                    if ((x < mLastDownX - mTouchThreshold || x > mLastDownX + mTouchThreshold)) {
+                    if ((y < mLastDownY - mTouchThreshold || y > mLastDownY + mTouchThreshold)) {
                         switch (mTrackDirection) {
                             case top:
                                 return mTracker.prepareTopTrack();
