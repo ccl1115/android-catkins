@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:catkins="http://schemas.android.com/apk/res/com.simon.catkins.demo"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <com.simon.catkins.views.VerticalTranslateLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            catkins:background="#ff932812"
+            catkins:track="top"
+            catkins:top_offset="150dp">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+                android:gravity="center"
+                android:clickable="true"
+                android:text="Also a vertical drawer to put components in."/>
+    </com.simon.catkins.views.VerticalTranslateLayout>
+
+    <com.simon.catkins.views.HorizontalTranslateLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            catkins:background="#ff392012"
+            catkins:left_offset="60dp"
+            catkins:right_offset="60dp"
+            catkins:track="horizontal">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+                android:gravity="center"
+                android:clickable="true"
+                android:text="First, we bring you a horizontal drawer."/>
+    </com.simon.catkins.views.HorizontalTranslateLayout>
+
+</FrameLayout>

@@ -3,6 +3,9 @@
   -->
 
 <resources>
+
+    <attr name="background" format="color"/>
+
     <declare-styleable name="FlipperLayout">
         <attr name="content" format="integer"/>
         <attr name="head" format="integer"/>
@@ -27,6 +30,15 @@
         <attr name="right_offset" format="dimension"/>
         <attr name="track" format="string"/>
         <attr name="tap_back_area" format="string"/>
+        <attr name="background"/>
+    </declare-styleable>
+
+    <declare-styleable name="VerticalTranslateLayout">
+        <attr name="top_offset" format="dimension"/>
+        <attr name="bottom_offset" format="dimension"/>
+        <attr name="track"/>
+        <attr name="tap_back_area"/>
+        <attr name="background"/>
     </declare-styleable>
 
     <declare-styleable name="RefresherView">
@@ -39,9 +51,9 @@
     </declare-styleable>
 
     <declare-styleable name="HorizontalListView">
-        <attr name="dividerWidth" format="dimension" />
-        <attr name="android:divider" />
-        <attr name="android:requiresFadingEdge" />
-        <attr name="android:fadingEdgeLength" />
+        <attr name="dividerWidth" format="dimension"/>
+        <attr name="android:divider"/>
+        <attr name="android:requiresFadingEdge"/>
+        <attr name="android:fadingEdgeLength"/>
     </declare-styleable>
 </resources>

@@ -2,7 +2,6 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:catkins="http://schemas.android.com/apk/res/com.simon.catkins.demo"
-             android:orientation="vertical"
              android:layout_width="fill_parent"
              android:layout_height="fill_parent">
 

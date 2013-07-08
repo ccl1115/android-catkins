@@ -136,7 +136,6 @@ public class PinnedHeaderListView extends ListView implements AbsListView.OnScro
         }
         final PinnedHeaderListAdapter adapter = getAdapter();
         int first = getFirstVisiblePosition();
-//        first = first > 0 ? first - 1 : first;
         final int next = first + 1;
         final int firstViewType = adapter.getItemViewType(first);
         final int nextViewType = adapter.getItemViewType(next);
