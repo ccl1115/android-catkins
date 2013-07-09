@@ -12,7 +12,9 @@
             catkins:background="#ff932812"
             catkins:track="bottom"
             catkins:topHeight="150dp"
-            catkins:bottomHeight="200dp">
+            catkins:bottomHeight="200dp"
+            catkins:topDivider="@drawable/top_drawer_shade"
+            catkins:topDividerHeight="5dp">
 
 
         <TextView

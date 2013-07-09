@@ -43,6 +43,10 @@
         <attr name="track"/>
         <attr name="tapBack"/>
         <attr name="background"/>
+        <attr name="topDivider" format="reference"/>
+        <attr name="bottomDivider" format="reference"/>
+        <attr name="topDividerHeight" format="dimension"/>
+        <attr name="bottomDividerHeight" format="dimension"/>
     </declare-styleable>
 
     <declare-styleable name="RefresherView">
