@@ -16,10 +16,11 @@ import android.widget.FrameLayout;
 
 import com.simon.catkins.R;
 
+import de.akquinet.android.androlog.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import de.akquinet.android.androlog.Log;
 
 /**
  * VerticalTranslateLayout
@@ -35,6 +36,7 @@ public class VerticalTranslateLayout extends FrameLayout {
     public static final String BOTTOM = "bottom";
     public static final String VERTICAL = "vertical";
     private static final String TAG = "VerticalTranslateLayout";
+
     private int mMeasuredWidth;
     private int mMeasuredHeight;
 
@@ -371,131 +373,115 @@ public class VerticalTranslateLayout extends FrameLayout {
             return false;
         }
 
-        ev.offsetLocation(0, -mTopTranslate);
         final int action = ev.getAction() & MotionEvent.ACTION_MASK;
         final int x = (int) ev.getX();
         final int y = (int) ev.getY();
 
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                mLastDownX = x;
-                mLastDownY = y;
+        if (mPositionState == STATE_EXPAND) {
+            switch (action) {
+                case MotionEvent.ACTION_DOWN: {
+                    mLastDownX = x;
+                    mLastDownY = y;
 
-                // 停止所有的动画
-                mHandler.removeMessages(MSG_ANIMATE_TOP);
-                mHandler.removeMessages(MSG_ANIMATE_TOP_OPEN);
-                mHandler.removeMessages(MSG_ANIMATE_BOTTOM);
-                mHandler.removeMessages(MSG_ANIMATE_BOTTOM_OPEN);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "@interceptInterceptTouchEvent");
-
-                if (mPositionState == STATE_EXPAND) {
-                    if (x < mLastDownX - mTouchThreshold || x > mLastDownX + mTouchThreshold) {
-                        return false;
-                    }
-
-                    if ((y < mLastDownY - mTouchThreshold || y > mLastDownY + mTouchThreshold)) {
-                        switch (mTrackDirection) {
-                            case top:
-                                return mTracker.prepareTopTrack();
-                            case bottom:
-                                return mTracker.prepareBottomTrack();
-                            case vertical:
-                                return mTracker.prepareVerticalTrack(y - mLastDownY);
-                            default:
-                                break;
-                        }
-                    }
-                    return false;
-                } else {
-                    switch (mTrackDirection) {
-                        case top:
-                            return mTracker.prepareTopTrack();
-                        case bottom:
-                            return mTracker.prepareBottomTrack();
-                        case vertical:
-                            return mTracker.prepareVerticalTrack(y - mLastDownY);
-                    }
+                    // 停止所有的动画
+                    mHandler.removeMessages(MSG_ANIMATE_TOP);
+                    mHandler.removeMessages(MSG_ANIMATE_TOP_OPEN);
+                    mHandler.removeMessages(MSG_ANIMATE_BOTTOM);
+                    mHandler.removeMessages(MSG_ANIMATE_BOTTOM_OPEN);
+                    break;
                 }
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP:
-                if (mLastDownY - mTouchThreshold < y && y < mLastDownY + mTouchThreshold) {
-                    if (mTopTapBack && mTopFrameForTap.contains(x, y)
-                            && mPositionState == STATE_COLLAPSE_TOP) {
-                        mAnimator.animateTopOpen(mAnimator.kVelocity);
-                    } else if (mBottomTapBack && mBottomFrameForTap.contains(x, y)
-                            && mPositionState == STATE_COLLAPSE_BOTTOM) {
-                        mAnimator.animateBottomOpen(-mAnimator.kVelocity);
-                    } else {
-                        return false;
-                    }
-                    return true;
-                }
-            default:
-                break;
+                case MotionEvent.ACTION_MOVE:
+                    Log.d(TAG, "@interceptInterceptTouchEvent");
+                    ev.offsetLocation(0, -mTopTranslate);
+                    return prepareTracking(x, y);
+                default:
+                    break;
+            }
+        } else {
+            // In collapsed position, intercept even directly.
+            // Because children should not receive any event when drawer collapsed.
+            Log.d(TAG, "Intercepted to onTouch()");
+            return true;
         }
         return false;
+    }
+
+    private boolean prepareTracking(int x, int y) {
+        // We don't intercept event instantly, for children like ListView want to hold the event chain.
+        // In most cases return true.
+        return !(x < mLastDownX - mTouchThreshold || x > mLastDownX + mTouchThreshold)
+                && (y < mLastDownY - mTouchThreshold || y > mLastDownY + mTouchThreshold)
+                && mTracker.prepareTracking(y - mLastDownY);
+
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         final int x = (int) ev.getX();
         final int y = (int) ev.getY();
-        Log.d(TAG, String.format("@interceptTouch x %d, y %d", x, y));
         final int action = ev.getAction() & MotionEvent.ACTION_MASK;
 
-        switch (action) {
-            case MotionEvent.ACTION_MOVE:
-                if (mTracker.tracking) {
-                    if (!mLastMoveXBeenSet) {
-                        if (mPositionState != STATE_EXPAND) {
-                            mLastMoveY = mLastDownX + mTopTranslate;
-                            mLastMoveYBeenSet = true;
-                        } else if (y > mLastDownY) {
-                            mLastMoveX = mLastDownX + mTouchThreshold;
-                            mLastMoveXBeenSet = true;
-                        } else {
-                            mLastMoveX = mLastDownX - mTouchThreshold;
-                            mLastMoveXBeenSet = true;
+        if (mPositionState == STATE_EXPAND) {
+            switch (action) {
+                case MotionEvent.ACTION_MOVE:
+                    if (mTracker.tracking) {
+                        if (!mLastMoveYBeenSet) {
+                            if (y > mLastDownY) {
+                                mLastMoveY = mLastDownY + mTouchThreshold;
+                                mLastMoveYBeenSet = true;
+                            } else {
+                                mLastMoveY = mLastDownY - mTouchThreshold;
+                                mLastMoveYBeenSet = true;
+                            }
                         }
-                    }
 
-                    mTracker.move(mLastMoveX - x);
-                    mLastMoveX = x;
-                    //ev.offsetLocation(mTopTranslate, 0);
-                    mTracker.velocityTracker.addMovement(ev);
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                Log.d(TAG, "@onTouchEvent up");
-                // 当不在展开的状态下的时候，我们要判断是否可以通过单击侧边区域做展开动画。
-                // 只有在侧边区域的点击才能进行计算。
-                mLastMoveXBeenSet = false;
-                if (mPositionState != STATE_EXPAND) {
-                    if (mTopTapBack && mPositionState == STATE_COLLAPSE_TOP
-                            && mTopFrameForTap.contains(x, y)) {
-                        mTracker.stopTracking();
-                        Log.d(TAG, "@onTouchEvent top open");
-                        mAnimator.animateTopOpen(mAnimator.kVelocity);
-                        return true;
-                    } else if (mBottomTapBack && mPositionState == STATE_COLLAPSE_BOTTOM
-                            && mBottomFrameForTap.contains(x, y)) {
-                        mTracker.stopTracking();
-                        Log.d(TAG, "@onTouchEvent bottom open");
-                        mAnimator.animateBottomOpen(-mAnimator.kVelocity);
-                        return true;
+                        mTracker.move(mLastMoveY - y);
+                        mLastMoveY = y;
+                        mTracker.velocityTracker.addMovement(ev);
                     }
-                }
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_UP:
+                    Log.d(TAG, "@onTouchEvent up");
+                    mLastMoveYBeenSet = false;
 
-                if (mTracker.tracking) {
-                    Log.d(TAG, "@onTouchEvent tracking");
-                    mTracker.stopTracking();
-                    mTracker.fling();
-                }
-                return true;
-            default:
-                return false;
+                    if (mTracker.tracking) {
+                        Log.d(TAG, "@onTouchEvent tracking");
+                        mTracker.stopTracking();
+                        mTracker.fling();
+                    }
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    if (((mPositionState == STATE_COLLAPSE_TOP) && mTopFrameForTap.contains(x, y))
+                            || ((mPositionState == STATE_COLLAPSE_BOTTOM) && mBottomFrameForTap.contains(x, y))) {
+                        if (!mTracker.tracking) {
+                            mLastMoveY = y;
+                            mTracker.prepareTracking(y);
+                        }
+                    } else {
+                        // Do not consume this event, dispatch to its siblings.
+                        return false;
+                    }
+                case MotionEvent.ACTION_MOVE:
+                    if (mTracker.tracking) {
+                        mTracker.move(mLastMoveY - y);
+                        mLastMoveY = y;
+                        mTracker.velocityTracker.addMovement(ev);
+                    }
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_UP:
+                    if (mTracker.tracking) {
+                        mTracker.stopTracking();
+                        mTracker.fling();
+                    }
+                    break;
+            }
         }
         return true;
     }
@@ -506,16 +492,13 @@ public class VerticalTranslateLayout extends FrameLayout {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
 
-        final int width = r - l;
-        final int height = b - t;
-
         if (changed) {
             if (mTopOffset != -1) {
-                mTopFrameForTap.set((int) (r - mTopOffset), t, r, b);
+                mTopFrameForTap.set(l, t, r, (int) (t + mTopOffset));
             }
 
             if (mBottomOffset != -1) {
-                mBottomFrameForTap.set(l, t, (int) (l + mBottomOffset), b);
+                mBottomFrameForTap.set(l, (int) (b - mBottomOffset), r, b);
             }
         }
 
@@ -553,11 +536,11 @@ public class VerticalTranslateLayout extends FrameLayout {
                 invalidate();
                 break;
             case STATE_COLLAPSE_TOP:
-                mTopTranslate = (int) (mTopOffset - getMeasuredWidth());
+                mTopTranslate = (int) (mTopOffset - mMeasuredHeight);
                 invalidate();
                 break;
             case STATE_COLLAPSE_BOTTOM:
-                mTopTranslate = (int) (getMeasuredWidth() - mBottomOffset);
+                mTopTranslate = (int) (mMeasuredHeight - mBottomOffset);
                 invalidate();
                 break;
         }
@@ -599,7 +582,6 @@ public class VerticalTranslateLayout extends FrameLayout {
         VelocityTracker velocityTracker;
 
         boolean tracking;
-        TrackDirection direction;
         final int velocityUnit;
         final int minVelocity;
 
@@ -609,43 +591,33 @@ public class VerticalTranslateLayout extends FrameLayout {
             minVelocity = (int) (MIN_VELOCITY * density + 0.5f);
         }
 
-        void prepareTracking() {
+        boolean prepareTracking(int start) {
+            switch (mTrackDirection) {
+                case top:
+                    if (mPositionState != STATE_EXPAND &&
+                            mPositionState != STATE_COLLAPSE_TOP) {
+                        return false;
+                    }
+                    break;
+                case bottom:
+                    if (mPositionState != STATE_EXPAND &&
+                            mPositionState != STATE_COLLAPSE_BOTTOM) {
+                        return false;
+                    }
+                    break;
+                case vertical:
+                    if (mOnVerticalTrackListener != null) {
+                        final OnVerticalTrackListener listener = mOnVerticalTrackListener;
+                        listener.onStartVerticalTrack(start);
+                    }
+            }
             velocityTracker = VelocityTracker.obtain();
             tracking = true;
+            return true;
         }
 
         void stopTracking() {
             tracking = false;
-        }
-
-        boolean prepareTopTrack() {
-            if (mPositionState != STATE_EXPAND &&
-                    mPositionState != STATE_COLLAPSE_TOP) {
-                return false;
-            }
-            prepareTracking();
-            direction = TrackDirection.top;
-            return true;
-        }
-
-        boolean prepareBottomTrack() {
-            if (mPositionState != STATE_EXPAND &&
-                    mPositionState != STATE_COLLAPSE_BOTTOM) {
-                return false;
-            }
-            prepareTracking();
-            direction = TrackDirection.bottom;
-            return true;
-        }
-
-        boolean prepareVerticalTrack(int d) {
-            prepareTracking();
-            direction = TrackDirection.vertical;
-            if (mOnVerticalTrackListener != null) {
-                final OnVerticalTrackListener listener = mOnVerticalTrackListener;
-                listener.onVerticalTrackListener(d);
-            }
-            return true;
         }
 
         void move(int yOffset) {
@@ -653,7 +625,7 @@ public class VerticalTranslateLayout extends FrameLayout {
                 return;
             }
             final int top = mTopTranslate - yOffset;
-            switch (direction) {
+            switch (mTrackDirection) {
                 case top:
                     Log.d(TAG, "@move top");
                     if (top > mTopOffset - mMeasuredHeight && top < 0) {
@@ -696,7 +668,7 @@ public class VerticalTranslateLayout extends FrameLayout {
                 yVelocity = Math.max(yVelocity, minVelocity);
             }
 
-            switch (direction) {
+            switch (mTrackDirection) {
                 case vertical:
                     verticalFling(yVelocity);
                     break;
@@ -735,10 +707,8 @@ public class VerticalTranslateLayout extends FrameLayout {
         private void topFling(float velocity) {
             Log.d(TAG, "@topFling");
             if (velocity < 0) {
-                Log.d(TAG, "@topFling animateTop " + velocity);
                 mAnimator.animateTop(velocity);
             } else {
-                Log.d(TAG, "@topFling animateTopOpen " + velocity);
                 mAnimator.animateTopOpen(velocity);
             }
         }
@@ -754,7 +724,7 @@ public class VerticalTranslateLayout extends FrameLayout {
     }
 
     private class Animator {
-        static final String TAG = "IAwesomeImpl$Animator";
+        static final String TAG = "Animator";
 
         static final int VELOCITY = 600;
         static final int MIN_VELOCITY = 300;
@@ -798,7 +768,6 @@ public class VerticalTranslateLayout extends FrameLayout {
                 offset();
             } else {
                 float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
-                Log.d(TAG, "@computeTopAnimation " + offset);
                 mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP, iCurrentAnimationTime);
@@ -993,6 +962,6 @@ public class VerticalTranslateLayout extends FrameLayout {
     }
 
     interface OnVerticalTrackListener {
-        void onVerticalTrackListener(int direction);
+        void onStartVerticalTrack(int direction);
     }
 }

@@ -21,6 +21,7 @@ import de.akquinet.android.androlog.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * HorizontalTranslateLayout
  * <p/>
@@ -36,6 +37,9 @@ public class HorizontalTranslateLayout extends FrameLayout {
     public static final String HORIZONTAL = "horizontal";
 
     private static final String TAG = "HorizontalTranslateLayout";
+
+    private int mMeasuredWidth;
+    private int mMeasuredHeight;
 
     private enum TrackDirection {left, right, horizontal, none}
 
@@ -67,7 +71,9 @@ public class HorizontalTranslateLayout extends FrameLayout {
     private int mLastDownX;
     private int mLastDownY;
     private int mLastMoveX;
+    private int mLastMoveY;
     private boolean mLastMoveXBeenSet;
+    private boolean mLastMoveYBeenSet;
 
     private final AnimationHandler mHandler;
     private final Animator mAnimator;
@@ -82,7 +88,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
     private OnHorizontalTrackListener mOnHorizontalTrackListener;
 
     public HorizontalTranslateLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        super(context, attrs, 0);
         mHandler = new AnimationHandler();
         mAnimator = new Animator();
         mTracker = new Tracker();
@@ -165,9 +171,9 @@ public class HorizontalTranslateLayout extends FrameLayout {
             return;
         }
         if (proportion < 0f) {
-            mLeftTranslate = (int) ((mLeftOffset - getMeasuredWidth()) * -proportion);
+            mLeftTranslate = (int) ((mLeftOffset - mMeasuredWidth) * -proportion);
         } else if (proportion > 0f) {
-            mLeftTranslate = (int) ((getMeasuredWidth() - mRightOffset) * proportion);
+            mLeftTranslate = (int) ((mMeasuredWidth - mRightOffset) * proportion);
         } else if (proportion == 0f) {
             mLeftTranslate = 0;
             mPositionState = STATE_EXPAND;
@@ -184,7 +190,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
     /**
      * The offset value when flip to top.
      *
-     * @return the mLeft offset
+     * @return the left offset
      */
     public int getLeftOffset() {
         return (int) mLeftOffset;
@@ -518,6 +524,10 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 "top offset should not be larger than the view's width";
         assert widthSize >= mRightOffset :
                 "bottom offset should not be larger than the view's width";
+
+        // cache dimension
+        mMeasuredWidth = getMeasuredWidth();
+        mMeasuredHeight = getMeasuredHeight();
     }
 
     /**
@@ -622,14 +632,14 @@ public class HorizontalTranslateLayout extends FrameLayout {
             final int left = mLeftTranslate - xOffset;
             switch (mTrackDirection) {
                 case left:
-                    Log.d(TAG, "@move top");
+                    Log.d(TAG, "@move left");
                     if (left > mLeftOffset - getMeasuredWidth() && left < 0) {
                         mLeftTranslate -= xOffset;
                         invalidate();
                     }
                     break;
                 case right:
-                    Log.d(TAG, "@move bottom");
+                    Log.d(TAG, "@move right");
                     if (left < getMeasuredWidth() - mRightOffset && left > 0) {
                         mLeftTranslate -= xOffset;
                         invalidate();
@@ -763,7 +773,6 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 offset();
             } else {
                 float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
-                Log.d(TAG, "@computeTopAnimation " + offset);
                 mLeftTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT, iCurrentAnimationTime);

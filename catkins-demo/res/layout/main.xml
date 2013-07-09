@@ -10,12 +10,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             catkins:background="#ff932812"
-            catkins:track="top"
+            catkins:track="bottom"
             catkins:top_offset="150dp"
             catkins:bottom_offset="30dp">
 
 
-        <Button
+        <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
