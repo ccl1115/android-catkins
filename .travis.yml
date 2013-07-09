@@ -7,8 +7,7 @@ before_install:
   - export ANDROID_HOME=`pwd`/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
   - echo y | android update sdk --filter 1,2,3,5,32,64 --no-ui --force -a
-  - echo no | android create avd --force -n test -t android-17 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
-before_script:
-  - ./wait-for-emulator
-script: mvn install -Pintegration-tests -Dandroid.device=test
+  - git clone https://github.com/ccl1115/maven-android-sdk-deployer.git maven-android-sdk-deployer
+  - cd maven-android-sdk-deployer
+  - mvn install -P 4.2,r4
+script: gradle build
