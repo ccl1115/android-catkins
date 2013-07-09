@@ -50,7 +50,9 @@ public class VerticalTranslateLayout extends FrameLayout {
     private final static int TAP_THRESHOLD = 35;
 
     private float mTopOffset;
+    private float mTopHeight;
     private float mBottomOffset;
+    private float mBottomHeight;
 
     private int mTopTranslate;
 
@@ -112,28 +114,30 @@ public class VerticalTranslateLayout extends FrameLayout {
     private void loadAttrs(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.VerticalTranslateLayout);
 
-        mTopOffset = a.getDimension(R.styleable.VerticalTranslateLayout_top_offset, -1f);
-        mBottomOffset = a.getDimension(R.styleable.VerticalTranslateLayout_bottom_offset, -1f);
+        mTopOffset = a.getDimension(R.styleable.VerticalTranslateLayout_topOffset, -1f);
+        mBottomOffset = a.getDimension(R.styleable.VerticalTranslateLayout_bottomOffset, -1f);
+        mTopHeight = a.getDimension(R.styleable.VerticalTranslateLayout_topHeight, -1f);
+        mBottomHeight = a.getDimension(R.styleable.VerticalTranslateLayout_bottomHeight, -1f);
 
         final String track = a.getString(R.styleable.VerticalTranslateLayout_track);
         if (track != null && track.length() > 0) {
-            if (mTopOffset != -1 && mBottomOffset != -1 && VERTICAL.equals(track)) {
+            if (canTop() && canBottom() && VERTICAL.equals(track)) {
                 Log.d(TAG, "@parseTrack vertical");
                 mTrackDirection = TrackDirection.vertical;
-            } else if ((mBottomOffset != -1) && BOTTOM.equals(track)) {
+            } else if (canBottom() && BOTTOM.equals(track)) {
                 Log.d(TAG, "@parseTrack bottom");
                 mTrackDirection = TrackDirection.bottom;
-            } else if ((mTopOffset != -1) && TOP.equals(track)) {
+            } else if (canTop() && TOP.equals(track)) {
                 Log.d(TAG, "@parseTrack top");
                 mTrackDirection = TrackDirection.top;
             } else {
                 mTrackDirection = TrackDirection.none;
-                Log.d(TAG, "@loadAttrs no direction");
+                Log.d(TAG, "@parseTrack no direction");
             }
         }
 
         final String tapBackArea =
-                a.getString(R.styleable.VerticalTranslateLayout_tap_back_area);
+                a.getString(R.styleable.VerticalTranslateLayout_tapBack);
         if (tapBackArea != null && tapBackArea.length() > 0) {
             final String[] taps = tapBackArea.split("\\|");
             for (String s : taps) {
@@ -240,68 +244,60 @@ public class VerticalTranslateLayout extends FrameLayout {
     }
 
     /**
-     * translate to top immediately, without animation.
+     * Collapse drawer to top
      */
-    public void top() {
-        mTopTranslate = (int) (mTopOffset - mMeasuredHeight);
-        mPositionState = STATE_COLLAPSE_TOP;
-        invalidate();
-    }
-
-    /**
-     * Flip bottom immediately, without animation.
-     */
-    public void bottom() {
-        mTopTranslate = (int) (mMeasuredHeight - mBottomOffset);
-        mPositionState = STATE_COLLAPSE_BOTTOM;
-        invalidate();
-    }
-
-    /**
-     * Open host view when flipped.
-     */
-    public void open() {
-        mTopTranslate = 0;
-        mPositionState = STATE_EXPAND;
-        invalidate();
-    }
-
-    /**
-     * Animation version of flipping
-     */
-    public void animateTop() {
+    public void collapseTop(boolean anim) {
         if (canTop()) {
-            mAnimator.animateTop(-mAnimator.kVelocity);
+            if (anim) {
+                mAnimator.animateTop(-mAnimator.kVelocity);
+            } else {
+                mTopTranslate = (int) (mTopOffset - mMeasuredHeight);
+                mPositionState = STATE_COLLAPSE_TOP;
+                invalidate();
+            }
         }
     }
 
     /**
-     * Animation version of flipping
+     * Collapse drawer to bottom.
      */
-    public void animateBottom() {
+    public void collapseBottom(boolean anim) {
         if (canBottom()) {
-            mAnimator.animateBottom(mAnimator.kVelocity);
+            if (anim) {
+                mAnimator.animateBottom(mAnimator.kVelocity);
+            } else {
+                mTopTranslate = (int) (mMeasuredHeight - mBottomOffset);
+                mPositionState = STATE_COLLAPSE_BOTTOM;
+                invalidate();
+            }
         }
     }
 
     /**
-     * Animation version of flipping
+     * Open drawer.
      */
-    public void animateOpen() {
-        switch (mPositionState) {
-            case STATE_COLLAPSE_TOP:
-                mAnimator.animateTopOpen(mAnimator.kVelocity);
-                break;
-            case STATE_COLLAPSE_BOTTOM:
-                mAnimator.animateBottomOpen(-mAnimator.kVelocity);
-                break;
-            default:
-                break;
+    public void expand(boolean anim) {
+        if (anim) {
+            switch (mPositionState) {
+                case STATE_COLLAPSE_TOP:
+                    mAnimator.animateTopOpen(mAnimator.kVelocity);
+                    break;
+                case STATE_COLLAPSE_BOTTOM:
+                    mAnimator.animateBottomOpen(-mAnimator.kVelocity);
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            mTopTranslate = 0;
+            mPositionState = STATE_EXPAND;
+            invalidate();
         }
     }
 
+
     /**
-     * Get flipping state
+     * Get position state
      *
      * @return the state
      */
@@ -338,11 +334,11 @@ public class VerticalTranslateLayout extends FrameLayout {
     }
 
     private boolean canTop() {
-        return mTopOffset != -1 && mPositionState == STATE_EXPAND;
+        return mTopOffset != -1 || mBottomHeight != -1;
     }
 
     private boolean canBottom() {
-        return mBottomOffset != -1 && mPositionState == STATE_EXPAND;
+        return mBottomOffset != -1 || mTopHeight != -1;
     }
 
     @Override
@@ -512,13 +508,19 @@ public class VerticalTranslateLayout extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        final int widthSize = widthMeasureSpec & ~(0x3 << 30);
+        final int heightSize = heightMeasureSpec & ~(0x3 << 30);
+
+        if (mTopHeight != -1) {
+            mTopOffset = heightSize - mBottomHeight;
+        }
+
+        if (mBottomHeight != -1) {
+            mBottomOffset = heightSize - mTopHeight;
+        }
 
         //check the offsets' sizes are not larger than the view's dimension
-        assert widthSize >= mTopOffset :
-                "top offset should not be larger than the view's width";
-        assert widthSize >= mBottomOffset :
-                "bottom offset should not be larger than the view's width";
+        assert heightSize >= mTopOffset : "top offset should not be larger than the view's width";
+        assert heightSize >= mBottomOffset : "bottom offset should not be larger than the view's width";
 
         // cache dimension
         mMeasuredWidth = getMeasuredWidth();

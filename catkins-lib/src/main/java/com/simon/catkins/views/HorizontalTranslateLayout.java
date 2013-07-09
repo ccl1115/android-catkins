@@ -114,8 +114,8 @@ public class HorizontalTranslateLayout extends FrameLayout {
         TypedArray a =
                 getContext().obtainStyledAttributes(attrs, R.styleable.HorizontalTranslateLayout);
 
-        mLeftOffset = a.getDimension(R.styleable.HorizontalTranslateLayout_left_offset, -1f);
-        mRightOffset = a.getDimension(R.styleable.HorizontalTranslateLayout_right_offset, -1f);
+        mLeftOffset = a.getDimension(R.styleable.HorizontalTranslateLayout_leftOffset, -1f);
+        mRightOffset = a.getDimension(R.styleable.HorizontalTranslateLayout_rightOffset, -1f);
 
         final String track = a.getString(R.styleable.HorizontalTranslateLayout_track);
         if (track != null && track.length() > 0) {
@@ -135,7 +135,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
         }
 
         final String tapBackArea =
-                a.getString(R.styleable.HorizontalTranslateLayout_tap_back_area);
+                a.getString(R.styleable.HorizontalTranslateLayout_tapBack);
         if (tapBackArea != null && tapBackArea.length() > 0) {
             final String[] taps = tapBackArea.split("\\|");
             for (String s : taps) {

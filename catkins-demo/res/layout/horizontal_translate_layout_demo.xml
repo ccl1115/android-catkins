@@ -9,9 +9,9 @@
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            catkins:left_offset="30dp"
-            catkins:right_offset="30dp"
-            catkins:tap_back_area="left|right"
+            catkins:leftOffset="30dp"
+            catkins:rightOffset="30dp"
+            catkins:tapBack="left|right"
             catkins:track="right">
 
         <TextView

@@ -11,8 +11,8 @@
             android:layout_height="match_parent"
             catkins:background="#ff932812"
             catkins:track="bottom"
-            catkins:top_offset="150dp"
-            catkins:bottom_offset="30dp">
+            catkins:topHeight="150dp"
+            catkins:bottomHeight="200dp">
 
 
         <TextView
@@ -27,8 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             catkins:background="#ff392012"
-            catkins:left_offset="60dp"
-            catkins:right_offset="60dp"
+            catkins:leftOffset="60dp"
+            catkins:rightOffset="60dp"
             catkins:track="horizontal">
 
         <TextView
