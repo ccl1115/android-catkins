@@ -12,3 +12,4 @@ before_install:
   - mvn install -P 4.2,r4
   - cd ..
 script: gradle build
+
