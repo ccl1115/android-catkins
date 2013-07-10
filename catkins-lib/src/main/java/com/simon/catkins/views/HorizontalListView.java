@@ -195,7 +195,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     private boolean mBlockTouchAction = false;
 
     /** Used to track if the parent vertically scrollable view has been told to DisallowInterceptTouchEvent */
-    private boolean mIsParentVerticiallyScrollableViewDisallowingInterceptTouchEvent = false;
+    private boolean mIsParentVerticallyScrollableViewDisallowingInterceptTouchEvent = false;
 
     /**
      * The listener that receives notifications when this view is clicked.
@@ -241,14 +241,14 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
      */
     private void requestParentListViewToNotInterceptTouchEvents(Boolean disallowIntercept) {
         // Prevent calling this more than once needlessly
-        if (mIsParentVerticiallyScrollableViewDisallowingInterceptTouchEvent != disallowIntercept) {
+        if (mIsParentVerticallyScrollableViewDisallowingInterceptTouchEvent != disallowIntercept) {
             View view = this;
 
             while (view.getParent() instanceof View) {
                 // If the parent is a ListView or ScrollView then disallow intercepting of touch events
                 if (view.getParent() instanceof ListView || view.getParent() instanceof ScrollView) {
                     view.getParent().requestDisallowInterceptTouchEvent(disallowIntercept);
-                    mIsParentVerticiallyScrollableViewDisallowingInterceptTouchEvent = disallowIntercept;
+                    mIsParentVerticallyScrollableViewDisallowingInterceptTouchEvent = disallowIntercept;
                     return;
                 }
 
@@ -587,7 +587,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
             }
         } else {
             // Still in a fling so schedule the next frame
-            postOnAnimation(mDelayedLayout);
+            ViewCompat.postOnAnimation(this, mDelayedLayout);
         }
     }
 

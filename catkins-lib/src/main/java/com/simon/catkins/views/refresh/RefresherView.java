@@ -77,7 +77,6 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
   public RefresherView(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
-    Log.init(context);
     mAnimator = new Animator();
     mHandler = new AnimatorHandler();
 

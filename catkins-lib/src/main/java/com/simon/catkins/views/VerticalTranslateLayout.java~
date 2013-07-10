@@ -533,12 +533,12 @@ public class VerticalTranslateLayout extends FrameLayout {
 
             if (mTopDividerHeight != 0) {
                 Log.d(TAG, "has top divider");
-                mTopDivider.setBounds(0, -mTopDividerHeight, mMeasuredWidth, 0);
+                mTopDivider.setBounds(0, -mTopDividerHeight, 0, 0);
             }
 
             if (mBottomDividerHeight != 0) {
                 Log.d(TAG, "has bottom divider");
-                mBottomDivider.setBounds(0, b, mMeasuredWidth, b + mBottomDividerHeight);
+                mBottomDivider.setBounds(0, b, 0, b + mBottomDividerHeight);
             }
         }
 
