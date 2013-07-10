@@ -20,6 +20,9 @@
 <resources>
 
     <style name="Theme.Base" parent="@android:style/Theme.Holo.Light">
+        <item name="android:textAppearance">@style/TextAppearance.Base</item>
+
+        <item name="android:textViewStyle">@style/Widget.Base.TextView</item>
 
         <!-- ActionBar -->
         <item name="android:actionBarItemBackground">@drawable/selectable_background_base</item>
@@ -84,4 +87,11 @@
         <item name="android:textColor">@color/action_bar_title_text_color_base</item>
     </style>
 
+    <style name="TextAppearance.Base" parent="@android:style/TextAppearance.Holo">
+        <item name="android:textColor">@color/text_color_base</item>
+    </style>
+
+    <style name="Widget.Base.TextView" parent="@android:style/Widget.Holo.Light.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Base</item>
+    </style>
 </resources>

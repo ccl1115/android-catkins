@@ -12,16 +12,7 @@
             android:theme="@style/Theme.Base"
             android:icon="@drawable/icon"
             android:label="@string/app_name">
-        <activity android:name=".app.HomeActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-
         <activity android:name=".app.FlipperLayoutDemoActivity"/>
-
-        <activity android:name=".app.Flip3DLayoutDemoActivity"/>
 
         <activity android:name=".app.StackLayoutDemoActivity"/>
 
@@ -36,6 +27,12 @@
         <activity android:name=".app.RevertAddingLinearLayoutActivity"/>
         <activity android:name=".app.PinnedHeaderListViewDemoActivity"/>
         <activity android:name=".app.IndicatorDemoActivity"/>
+        <activity android:name=".app.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -313,7 +313,7 @@ public final class DiskLruCache implements Closeable {
             throw new IllegalArgumentException("valueCount <= 0");
         }
 
-        // prefer to pick up where we left off
+        // prefer to pick up where we top off
         DiskLruCache cache = new DiskLruCache(directory, appVersion, valueCount, maxSize);
         if (cache.journalFile.exists()) {
             try {

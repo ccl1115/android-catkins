@@ -66,30 +66,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.google.android</groupId>
+            <groupId>android</groupId>
             <artifactId>android</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>support-v4</artifactId>
+            <groupId>android.support</groupId>
+            <artifactId>compatibility-v4</artifactId>
         </dependency>
         <dependency>
             <groupId>de.akquinet.android.androlog</groupId>
             <artifactId>androlog</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.simon.catkins</groupId>
             <artifactId>catkins-lib</artifactId>

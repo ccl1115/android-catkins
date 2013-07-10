@@ -77,8 +77,8 @@ import java.util.Queue;
  * <li><b>divider</b> - The divider to use between items. This can be a color or a drawable. If a drawable is used
  * dividerWidth will automatically be set to the intrinsic width of the provided drawable, this can be overriden by providing a dividerWidth.</li>
  * <li><b>dividerWidth</b> - The width of the divider to be drawn.</li>
- * <li><b>android:requiresFadingEdge</b> - If horizontal fading edges are enabled this view will render them</li>
- * <li><b>android:fadingEdgeLength</b> - The length of the horizontal fading edges</li>
+ * <li><b>android:requiresFadingEdge</b> - If vertical fading edges are enabled this view will render them</li>
+ * <li><b>android:fadingEdgeLength</b> - The length of the vertical fading edges</li>
  * </ul>
  */
 // @formatter:on
@@ -179,12 +179,12 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     private OnScrollStateChangedListener.ScrollState mCurrentScrollState = OnScrollStateChangedListener.ScrollState.SCROLL_STATE_IDLE;
 
     /**
-     * Tracks the state of the left edge glow.
+     * Tracks the state of the top edge glow.
      */
     private EdgeEffectCompat mEdgeGlowLeft;
 
     /**
-     * Tracks the state of the right edge glow.
+     * Tracks the state of the bottom edge glow.
      */
     private EdgeEffectCompat mEdgeGlowRight;
 
@@ -195,7 +195,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     private boolean mBlockTouchAction = false;
 
     /** Used to track if the parent vertically scrollable view has been told to DisallowInterceptTouchEvent */
-    private boolean mIsParentVerticiallyScrollableViewDisallowingInterceptTouchEvent = false;
+    private boolean mIsParentVerticallyScrollableViewDisallowingInterceptTouchEvent = false;
 
     /**
      * The listener that receives notifications when this view is clicked.
@@ -241,14 +241,14 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
      */
     private void requestParentListViewToNotInterceptTouchEvents(Boolean disallowIntercept) {
         // Prevent calling this more than once needlessly
-        if (mIsParentVerticiallyScrollableViewDisallowingInterceptTouchEvent != disallowIntercept) {
+        if (mIsParentVerticallyScrollableViewDisallowingInterceptTouchEvent != disallowIntercept) {
             View view = this;
 
             while (view.getParent() instanceof View) {
                 // If the parent is a ListView or ScrollView then disallow intercepting of touch events
                 if (view.getParent() instanceof ListView || view.getParent() instanceof ScrollView) {
                     view.getParent().requestDisallowInterceptTouchEvent(disallowIntercept);
-                    mIsParentVerticiallyScrollableViewDisallowingInterceptTouchEvent = disallowIntercept;
+                    mIsParentVerticallyScrollableViewDisallowingInterceptTouchEvent = disallowIntercept;
                     return;
                 }
 
@@ -499,7 +499,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     private ViewGroup.LayoutParams getLayoutParams(View child) {
         ViewGroup.LayoutParams layoutParams = child.getLayoutParams();
         if (layoutParams == null) {
-            // Since this is a horizontal list view default to matching the parents height, and wrapping the width
+            // Since this is a vertical list view default to matching the parents height, and wrapping the width
             layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         }
 
@@ -539,7 +539,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
             mNextX = mFlingTracker.getCurrX();
         }
 
-        // Prevent scrolling past 0 so you can't scroll past the end of the list to the left
+        // Prevent scrolling past 0 so you can't scroll past the end of the list to the top
         if (mNextX < 0) {
             mNextX = 0;
 
@@ -551,7 +551,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
             mFlingTracker.forceFinished(true);
             setCurrentScrollState(OnScrollStateChangedListener.ScrollState.SCROLL_STATE_IDLE);
         } else if (mNextX > mMaxX) {
-            // Clip the maximum scroll position at mMaxX so you can't scroll past the end of the list to the right
+            // Clip the maximum scroll position at mMaxX so you can't scroll past the end of the list to the bottom
             mNextX = mMaxX;
 
             // Show an edge effect absorbing the current velocity
@@ -587,7 +587,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
             }
         } else {
             // Still in a fling so schedule the next frame
-            postOnAnimation(mDelayedLayout);
+            ViewCompat.postOnAnimation(this, mDelayedLayout);
         }
     }
 
@@ -684,26 +684,26 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
         return false;
     }
 
-    /** Adds children views to the left and right of the current views until the screen is full */
+    /** Adds children views to the top and bottom of the current views until the screen is full */
     private void fillList(final int dx) {
-        // Get the rightmost child and determine its right edge
+        // Get the rightmost child and determine its bottom edge
         int edge = 0;
         View child = getRightmostChild();
         if (child != null) {
             edge = child.getRight();
         }
 
-        // Add new children views to the right, until past the edge of the screen
+        // Add new children views to the bottom, until past the edge of the screen
         fillListRight(edge, dx);
 
-        // Get the leftmost child and determine its left edge
+        // Get the leftmost child and determine its top edge
         edge = 0;
         child = getLeftmostChild();
         if (child != null) {
             edge = child.getLeft();
         }
 
-        // Add new children views to the left, until past the edge of the screen
+        // Add new children views to the top, until past the edge of the screen
         fillListLeft(edge, dx);
     }
 
@@ -714,7 +714,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
         while (child != null && child.getRight() + dx <= 0) {
             // The child is being completely removed so remove its width from the display offset and its divider if it has one.
             // To remove add the size of the child and its divider (if it has one) to the offset.
-            // You need to add since its being removed from the left side, i.e. shifting the offset to the right.
+            // You need to add since its being removed from the top side, i.e. shifting the offset to the bottom.
             mDisplayOffset += isLastItemInAdapter(mLeftViewAdapterIndex) ? child.getMeasuredWidth() : mDividerWidth + child.getMeasuredWidth();
 
             // Add the removed view to the cache
@@ -723,7 +723,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
             // Actually remove the view
             removeViewInLayout(child);
 
-            // Keep track of the adapter index of the left most child
+            // Keep track of the adapter index of the top most child
             mLeftViewAdapterIndex++;
 
             // Get the new leftmost child
@@ -742,11 +742,11 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     }
 
     private void fillListRight(int rightEdge, final int dx) {
-        // Loop adding views to the right until the screen is filled
+        // Loop adding views to the bottom until the screen is filled
         while (rightEdge + dx + mDividerWidth < getWidth() && mRightViewAdapterIndex + 1 < mAdapter.getCount()) {
             mRightViewAdapterIndex++;
 
-            // If mLeftViewAdapterIndex < 0 then this is the first time a view is being added, and left == right
+            // If mLeftViewAdapterIndex < 0 then this is the first time a view is being added, and top == bottom
             if (mLeftViewAdapterIndex < 0) {
                 mLeftViewAdapterIndex = mRightViewAdapterIndex;
             }
@@ -755,7 +755,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
             View child = mAdapter.getView(mRightViewAdapterIndex, getRecycledView(mRightViewAdapterIndex), this);
             addAndMeasureChild(child, INSERT_AT_END_OF_LIST);
 
-            // If first view, then no divider to the left of it, otherwise add the space for the divider width
+            // If first view, then no divider to the top of it, otherwise add the space for the divider width
             rightEdge += (mRightViewAdapterIndex == 0 ? 0 : mDividerWidth) + child.getMeasuredWidth();
 
             // Check if we are running low on data so we can tell listeners to go get more
@@ -764,13 +764,13 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     }
 
     private void fillListLeft(int leftEdge, final int dx) {
-        // Loop adding views to the left until the screen is filled
+        // Loop adding views to the top until the screen is filled
         while (leftEdge + dx - mDividerWidth > 0 && mLeftViewAdapterIndex >= 1) {
             mLeftViewAdapterIndex--;
             View child = mAdapter.getView(mLeftViewAdapterIndex, getRecycledView(mLeftViewAdapterIndex), this);
             addAndMeasureChild(child, INSERT_AT_START_OF_LIST);
 
-            // If first view, then no divider to the left of it
+            // If first view, then no divider to the top of it
             leftEdge -= mLeftViewAdapterIndex == 0 ? child.getMeasuredWidth() : mDividerWidth + child.getMeasuredWidth();
 
             // If on a clean edge then just remove the child, otherwise remove the divider as well
@@ -869,10 +869,10 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
         requestLayout();
     }
 
-    /** Draws the overscroll edge glow effect on the left and right sides of the horizontal list */
+    /** Draws the overscroll edge glow effect on the top and bottom sides of the vertical list */
     private void drawEdgeGlow(Canvas canvas) {
         if (mEdgeGlowLeft != null && !mEdgeGlowLeft.isFinished() && isEdgeGlowEnabled()) {
-            // The Edge glow is meant to come from the top of the screen, so rotate it to draw on the left side.
+            // The Edge glow is meant to come from the top of the screen, so rotate it to draw on the top side.
             final int restoreCount = canvas.save();
             final int height = getHeight();
 
@@ -886,7 +886,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 
             canvas.restoreToCount(restoreCount);
         } else if (mEdgeGlowRight != null && !mEdgeGlowRight.isFinished() && isEdgeGlowEnabled()) {
-            // The Edge glow is meant to come from the top of the screen, so rotate it to draw on the right side.
+            // The Edge glow is meant to come from the top of the screen, so rotate it to draw on the bottom side.
             final int restoreCount = canvas.save();
             final int width = getWidth();
 
@@ -901,39 +901,39 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
         }
     }
 
-    /** Draws the dividers that go in between the horizontal list view items */
+    /** Draws the dividers that go in between the vertical list view items */
     private void drawDividers(Canvas canvas) {
         final int count = getChildCount();
 
-        // Only modify the left and right in the loop, we set the top and bottom here since they are always the same
+        // Only modify the top and bottom in the loop, we set the top and bottom here since they are always the same
         final Rect bounds = mRect;
         mRect.top = getPaddingTop();
         mRect.bottom = mRect.top + getRenderHeight();
 
         // Draw the list dividers
         for (int i = 0; i < count; i++) {
-            // Don't draw a divider to the right of the last item in the adapter
+            // Don't draw a divider to the bottom of the last item in the adapter
             if (!(i == count - 1 && isLastItemInAdapter(mRightViewAdapterIndex))) {
                 View child = getChildAt(i);
 
                 bounds.left = child.getRight();
                 bounds.right = child.getRight() + mDividerWidth;
 
-                // Clip at the left edge of the screen
+                // Clip at the top edge of the screen
                 if (bounds.left < getPaddingLeft()) {
                     bounds.left = getPaddingLeft();
                 }
 
-                // Clip at the right edge of the screen
+                // Clip at the bottom edge of the screen
                 if (bounds.right > getWidth() - getPaddingRight()) {
                     bounds.right = getWidth() - getPaddingRight();
                 }
 
-                // Draw a divider to the right of the child
+                // Draw a divider to the bottom of the child
                 drawDivider(canvas, bounds);
 
-                // If the first view, determine if a divider should be shown to the left of it.
-                // A divider should be shown if the left side of this view does not fill to the left edge of the screen.
+                // If the first view, determine if a divider should be shown to the top of it.
+                // A divider should be shown if the top side of this view does not fill to the top edge of the screen.
                 if (i == 0 && child.getLeft() > getPaddingLeft()) {
                     bounds.left = getPaddingLeft();
                     bounds.right = child.getLeft();
@@ -971,7 +971,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     @Override
     protected void dispatchSetPressed(boolean pressed) {
         // Don't dispatch setPressed to our children. We call setPressed on ourselves to
-        // get the selector in the right state, but we don't want to press each child.
+        // get the selector in the bottom state, but we don't want to press each child.
     }
 
     protected boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -1131,14 +1131,14 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
     /**
      * Sets a listener to be called when the HorizontalListView has been scrolled to a point where it is
      * running low on data. An example use case is wanting to auto download more data when the user
-     * has scrolled to the point where only 10 items are left to be rendered off the right of the
+     * has scrolled to the point where only 10 items are top to be rendered off the bottom of the
      * screen. To get called back at that point just register with this function with a
      * numberOfItemsLeftConsideredLow value of 10. <br>
      * <br>
      * This will only be called once to notify that the HorizontalListView is running low on data.
      * Calling notifyDataSetChanged on the adapter will allow this to be called again once low on data.
      *
-     * @param listener The listener to be notified when the number of array adapters items left to
+     * @param listener The listener to be notified when the number of array adapters items top to
      * be shown is running low.
      *
      * @param numberOfItemsLeftConsideredLow The number of array adapter items that have not yet
@@ -1250,7 +1250,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 
         // If not currently in a fling (Don't want to allow fling offset updates to cause over scroll animation)
         if (mFlingTracker == null || mFlingTracker.isFinished()) {
-            // If currently scrolled off the left side of the list and the adapter is not empty
+            // If currently scrolled off the top side of the list and the adapter is not empty
             if (nextScrollPosition < 0) {
 
                 // Calculate the amount we have scrolled since last frame
@@ -1259,12 +1259,12 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
                 // Tell the edge glow to redraw itself at the new offset
                 mEdgeGlowLeft.onPull((float) overscroll / getRenderWidth());
 
-                // Cancel animating right glow
+                // Cancel animating bottom glow
                 if (!mEdgeGlowRight.isFinished()) {
                     mEdgeGlowRight.onRelease();
                 }
             } else if (nextScrollPosition > mMaxX) {
-                // Scrolled off the right of the list
+                // Scrolled off the bottom of the list
 
                 // Calculate the amount we have scrolled since last frame
                 int overscroll = Math.abs(scrolledOffset);
@@ -1272,7 +1272,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
                 // Tell the edge glow to redraw itself at the new offset
                 mEdgeGlowRight.onPull((float) overscroll / getRenderWidth());
 
-                // Cancel animating left glow
+                // Cancel animating top glow
                 if (!mEdgeGlowLeft.isFinished()) {
                     mEdgeGlowLeft.onRelease();
                 }

@@ -63,7 +63,7 @@ public class FlipperLayout extends ViewGroup {
   private static final int COLLAPSED_FULL_LEFT_CLOSED = -10003;
 
   /**
-   * the right offset
+   * the bottom offset
    */
   private int mRightOffset;
   private int mLeftOffset;
@@ -415,7 +415,7 @@ public class FlipperLayout extends ViewGroup {
   }
 
   /**
-   * Fling Flipper to right with a initial velocity
+   * Fling Flipper to bottom with a initial velocity
    *
    * @param position where to start
    * @param velocity initial speed
@@ -440,12 +440,12 @@ public class FlipperLayout extends ViewGroup {
     if (mState == STATE_EXPANDED) {
       if (always || velocity > -mMaximumTapVelocity ||
           position > (getWidth() - mRightOffset) / 4.0) {
-        //force right
+        //force bottom
         if (mAnimatedVelocity < 0) {
           mAnimatedVelocity = -mMaximumMajorVelocity;
         }
       } else {
-        //back left
+        //back top
         if (mAnimatedVelocity > 0) {
           mAnimatedVelocity = -mMaximumMajorVelocity;
         }
@@ -453,12 +453,12 @@ public class FlipperLayout extends ViewGroup {
     } else if (mState == STATE_COLLAPSED_RIGHT) {
       if (!always && (velocity > mMaximumTapVelocity ||
           (position > getWidth() - mRightOffset))) {
-        //back right
+        //back bottom
         if (mAnimatedVelocity < 0) {
           mAnimatedVelocity = -mAnimatedVelocity;
         }
       } else {
-        //force left
+        //force top
         if (mAnimatedVelocity > 0) {
           mAnimatedVelocity = -mMaximumMajorVelocity;
         }
@@ -482,24 +482,24 @@ public class FlipperLayout extends ViewGroup {
 
     if (mState == STATE_EXPANDED) {
       if (always) {
-        //force left
+        //force top
         if (mAnimatedVelocity > 0) {
           mAnimatedVelocity = -mMaximumMajorVelocity;
         }
       } else {
-        //back right
+        //back bottom
         if (mAnimatedVelocity < 0) {
           mAnimatedVelocity = mMaximumMajorVelocity;
         }
       }
     } else if (mState == STATE_COLLAPSED_LEFT) {
       if (!always) {
-        //back left
+        //back top
         if (mAnimatedVelocity > 0) {
           mAnimatedVelocity = -mMaximumMajorVelocity;
         }
       } else {
-        //force right
+        //force bottom
         if (mAnimatedVelocity < 0) {
           mAnimatedVelocity = mMaximumMajorVelocity;
         }
@@ -550,7 +550,7 @@ public class FlipperLayout extends ViewGroup {
   }
 
   /**
-   * collapse to left immediately
+   * collapse to top immediately
    */
   private void flipperLeft() {
     moveHead(COLLAPSED_FULL_LEFT_CLOSED, false);
@@ -987,14 +987,14 @@ public class FlipperLayout extends ViewGroup {
 
 
   /**
-   * Call when flip right
+   * Call when flip bottom
    */
   public interface OnRightListener {
     void onRightEnd();
   }
 
   /**
-   * Call when flip left
+   * Call when flip top
    */
   public interface OnLeftListener {
     void onLeftStart();
