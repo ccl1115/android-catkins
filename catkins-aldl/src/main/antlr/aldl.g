@@ -61,42 +61,6 @@ FQN_CLASS
 	:	(ID '.')* ID
 	;
 
-BASE_LAYOUT_TYPE
-	:	'linear'
-	|	'frame'
-	|	'relative'
-	|	'table'
-	|	'pager'
-	|	'grid'
-	;
-	
-BASE_WIDGET_TYPE
-	:	'text'
-	|	'image'
-	|	'button'
-	|	'radio'
-	|	'check'
-	|	'switch'
-	|	'toggle'
-	|	'progress'
-	|	'seek'
-	|	'rating'
-	|	'spinner'
-	|	'web'
-	|	'edit'
-	;
-	
-BASE_CONTAINER_TYPE
-	:	'list'
-	|	'expanable-list'
-	|	'grid-view'
-	|	'tabhost'
-	|	'scroll'
-	|	'hscroll'
-	;
-	
-LAYOUT_TYPE
-	:	BASE_LAYOUT_TYPE
-	|	BASE_WIDGET_TYPE
-	|	BASE_CONTAINER_TYPE
-	;
+STATEMENT
+    :   FQN_CLASS '=' EXPR
+
