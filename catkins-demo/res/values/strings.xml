@@ -5,4 +5,6 @@
     <string name="refresher_pull_down_to_refresh">下拉刷新</string>
     <string name="refresher_release_to_refresh">松开刷新</string>
     <string name="refresher_refreshing">刷新中</string>
+    <string name="demo_1_1">First, we bring you a horizontal drawer.</string>
+    <string name="demo_1_2">Also a vertical drawer to put components in.</string>
 </resources>

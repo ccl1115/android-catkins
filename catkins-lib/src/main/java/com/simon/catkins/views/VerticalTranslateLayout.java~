@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -23,49 +24,50 @@ import java.util.List;
 
 
 /**
- * HorizontalTranslateLayout
+ * VerticalTranslateLayout
  * <p/>
  * <b>This layout doesn't support using drawable as background. Only color supported</b>
  */
-public class HorizontalTranslateLayout extends FrameLayout {
-    public static final int STATE_COLLAPSE_LEFT = 10000;
-    public static final int STATE_COLLAPSE_RIGHT = 10001;
+public class VerticalTranslateLayout extends FrameLayout {
+    public static final int STATE_COLLAPSE_TOP = 10000;
+    public static final int STATE_COLLAPSE_BOTTOM = 10001;
     public static final int STATE_EXPAND = 10004;
 
-    public static final String LEFT = "left";
-    public static final String RIGHT = "right";
-    public static final String HORIZONTAL = "horizontal";
-
-    private static final String TAG = "HorizontalTranslateLayout";
+    public static final String TOP = "top";
+    public static final String BOTTOM = "bottom";
+    public static final String VERTICAL = "vertical";
+    private static final String TAG = "VerticalTranslateLayout";
 
     private int mMeasuredWidth;
     private int mMeasuredHeight;
 
-    private enum TrackDirection {left, right, horizontal, none}
+    private enum TrackDirection {top, bottom, vertical, none}
 
-    private final static int MSG_ANIMATE_LEFT = -100;
-    private final static int MSG_ANIMATE_RIGHT = -101;
-    private final static int MSG_ANIMATE_LEFT_OPEN = -104;
-    private final static int MSG_ANIMATE_RIGHT_OPEN = -105;
+    private final static int MSG_ANIMATE_TOP = -100;
+    private final static int MSG_ANIMATE_BOTTOM = -101;
+    private final static int MSG_ANIMATE_TOP_OPEN = -104;
+    private final static int MSG_ANIMATE_BOTTOM_OPEN = -105;
 
     private final static int TAP_THRESHOLD = 35;
 
-    private float mLeftOffset;
-    private float mRightOffset;
+    private float mTopOffset;
+    private float mTopHeight;
+    private float mBottomOffset;
+    private float mBottomHeight;
 
-    private int mLeftTranslate;
+    private int mTopTranslate;
 
     private final int mTouchThreshold;
 
-    private boolean mLeftTapBack;
-    private boolean mRightTapBack;
+    private boolean mTopTapBack;
+    private boolean mBottomTapBack;
 
     private TrackDirection mTrackDirection;
 
     private int mPositionState;
 
-    private final Rect mLeftFrameForTap = new Rect();
-    private final Rect mRightFrameForTap = new Rect();
+    private final Rect mTopFrameForTap = new Rect();
+    private final Rect mBottomFrameForTap = new Rect();
     private final Paint mBackgroundPaint;
 
     private int mLastDownX;
@@ -79,15 +81,20 @@ public class HorizontalTranslateLayout extends FrameLayout {
     private final Animator mAnimator;
     private final Tracker mTracker;
 
-    private OnLeftAnimationListener mOnLeftAnimationListener;
-    private OnRightAnimationListener mOnRightAnimationListener;
+    private Drawable mTopDivider;
+    private Drawable mBottomDivider;
+    private int mTopDividerHeight;
+    private int mBottomDividerHeight;
+
+    private OnTopAnimationListener mOnTopAnimationListener;
+    private OnBottomAnimationListener mOnBottomAnimationListener;
     private final List<OnOpenAnimationListener> mOnOpenAnimationListener =
             new ArrayList<OnOpenAnimationListener>();
-    private OnLeftTrackListener mOnLeftTrackListener;
-    private OnRightTrackListener mOnRightTrackListener;
-    private OnHorizontalTrackListener mOnHorizontalTrackListener;
+    private OnTopTrackListener mOnTopTrackListener;
+    private OnBottomTrackListener mOnBottomTrackListener;
+    private OnVerticalTrackListener mOnVerticalTrackListener;
 
-    public HorizontalTranslateLayout(Context context, AttributeSet attrs) {
+    public VerticalTranslateLayout(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
         mHandler = new AnimationHandler();
         mAnimator = new Animator();
@@ -111,46 +118,68 @@ public class HorizontalTranslateLayout extends FrameLayout {
      * @param attrs the attributes set from xml
      */
     private void loadAttrs(AttributeSet attrs) {
-        TypedArray a =
-                getContext().obtainStyledAttributes(attrs, R.styleable.HorizontalTranslateLayout);
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.VerticalTranslateLayout);
 
-        mLeftOffset = a.getDimension(R.styleable.HorizontalTranslateLayout_leftOffset, -1f);
-        mRightOffset = a.getDimension(R.styleable.HorizontalTranslateLayout_rightOffset, -1f);
+        mTopOffset = a.getDimensionPixelSize(R.styleable.VerticalTranslateLayout_topOffset, -1);
+        mBottomOffset = a.getDimensionPixelSize(R.styleable.VerticalTranslateLayout_bottomOffset, -1);
+        mTopHeight = a.getDimensionPixelSize(R.styleable.VerticalTranslateLayout_topHeight, -1);
+        mBottomHeight = a.getDimensionPixelSize(R.styleable.VerticalTranslateLayout_bottomHeight, -1);
 
-        final String track = a.getString(R.styleable.HorizontalTranslateLayout_track);
+
+        final String track = a.getString(R.styleable.VerticalTranslateLayout_track);
         if (track != null && track.length() > 0) {
-            if (mLeftOffset != -1 && mRightOffset != -1 && HORIZONTAL.equals(track)) {
-                Log.d(TAG, "@parseTrack horizontal");
-                mTrackDirection = TrackDirection.horizontal;
-            } else if ((mRightOffset != -1) && RIGHT.equals(track)) {
-                Log.d(TAG, "@parseTrack right");
-                mTrackDirection = TrackDirection.right;
-            } else if ((mLeftOffset != -1) && LEFT.equals(track)) {
-                Log.d(TAG, "@parseTrack left");
-                mTrackDirection = TrackDirection.left;
+            if (canTop() && canBottom() && VERTICAL.equals(track)) {
+                Log.d(TAG, "@parseTrack vertical");
+                mTrackDirection = TrackDirection.vertical;
+            } else if (canBottom() && BOTTOM.equals(track)) {
+                Log.d(TAG, "@parseTrack bottom");
+                mTrackDirection = TrackDirection.bottom;
+            } else if (canTop() && TOP.equals(track)) {
+                Log.d(TAG, "@parseTrack top");
+                mTrackDirection = TrackDirection.top;
             } else {
                 mTrackDirection = TrackDirection.none;
-                Log.d(TAG, "@loadAttrs no direction");
+                Log.d(TAG, "@parseTrack no direction");
             }
         }
 
         final String tapBackArea =
-                a.getString(R.styleable.HorizontalTranslateLayout_tapBack);
+                a.getString(R.styleable.VerticalTranslateLayout_tapBack);
         if (tapBackArea != null && tapBackArea.length() > 0) {
             final String[] taps = tapBackArea.split("\\|");
             for (String s : taps) {
                 Log.d(TAG, "@loadAttrs tap area " + s);
-                if (LEFT.equals(s) && mLeftOffset != -1) {
-                    mLeftTapBack = true;
-                } else if (RIGHT.equals(s) && mRightOffset != -1) {
-                    mRightTapBack = true;
+                if (TOP.equals(s) && mTopOffset != -1) {
+                    mTopTapBack = true;
+                } else if (BOTTOM.equals(s) && mBottomOffset != -1) {
+                    mBottomTapBack = true;
                 } else {
                     Log.d(TAG, "@loadAttrs tap_back_area value illegal");
                 }
             }
         }
 
-        mBackgroundPaint.setColor(a.getColor(R.styleable.HorizontalTranslateLayout_background, 0));
+        mBackgroundPaint.setColor(a.getColor(R.styleable.VerticalTranslateLayout_background, 0));
+
+        mTopDivider = a.getDrawable(R.styleable.VerticalTranslateLayout_topDivider);
+        if (mTopDivider != null) {
+            mTopDividerHeight = a.getDimensionPixelSize(R.styleable.VerticalTranslateLayout_topDividerHeight, 0);
+            if (mTopDividerHeight == 0) {
+                Log.d(TAG, "has height divider but height no set.");
+                mTopDividerHeight = mTopDivider.getIntrinsicHeight();
+		Log.d(TAG, "height set to intrinsic height = " + mTopDividerHeight);
+            }
+        }
+
+        mBottomDivider = a.getDrawable(R.styleable.VerticalTranslateLayout_bottomDivider);
+        if (mBottomDivider != null) {
+            mBottomDividerHeight = a.getDimensionPixelSize(R.styleable.VerticalTranslateLayout_bottomDividerHeight, 0);
+            if (mBottomDividerHeight == 0) {
+                Log.d(TAG, "has height divider but height no set.");
+                mBottomDividerHeight = mBottomDivider.getIntrinsicHeight();
+		Log.d(TAG, "height set to intrinsic height = " + mBottomDividerHeight);
+            }
+        }
 
         a.recycle();
 
@@ -171,18 +200,18 @@ public class HorizontalTranslateLayout extends FrameLayout {
             return;
         }
         if (proportion < 0f) {
-            mLeftTranslate = (int) ((mLeftOffset - mMeasuredWidth) * -proportion);
+            mTopTranslate = (int) ((mTopOffset - mMeasuredHeight) * -proportion);
         } else if (proportion > 0f) {
-            mLeftTranslate = (int) ((mMeasuredWidth - mRightOffset) * proportion);
+            mTopTranslate = (int) ((mMeasuredHeight - mBottomOffset) * proportion);
         } else if (proportion == 0f) {
-            mLeftTranslate = 0;
+            mTopTranslate = 0;
             mPositionState = STATE_EXPAND;
         } else if (proportion == -1f) {
-            mLeftOffset = mLeftOffset - getMeasuredWidth();
-            mPositionState = STATE_COLLAPSE_LEFT;
+            mTopOffset = mTopOffset - mMeasuredHeight;
+            mPositionState = STATE_COLLAPSE_TOP;
         } else if (proportion == 1f) {
-            mLeftOffset = getMeasuredWidth() - mRightOffset;
-            mPositionState = STATE_COLLAPSE_RIGHT;
+            mTopOffset = mMeasuredHeight - mBottomOffset;
+            mPositionState = STATE_COLLAPSE_BOTTOM;
         }
         invalidate();
     }
@@ -190,37 +219,37 @@ public class HorizontalTranslateLayout extends FrameLayout {
     /**
      * The offset value when flip to top.
      *
-     * @return the left offset
+     * @return the top offset
      */
-    public int getLeftOffset() {
-        return (int) mLeftOffset;
+    public int getTopOffset() {
+        return (int) mTopOffset;
     }
 
     /**
      * The offset value when flip to bottom.
      *
-     * @return the mTop offset
+     * @return the bottom offset
      */
-    public int getRightOffset() {
-        return (int) mRightOffset;
+    public int getBottomOffset() {
+        return (int) mBottomOffset;
     }
 
     /**
-     * tap top offset area to flip back.
+     * tap top offset area to translate back.
      *
      * @return true if allow tap back
      */
-    public boolean isLeftTapBack() {
-        return mLeftTapBack;
+    public boolean isTopTapBack() {
+        return mTopTapBack;
     }
 
     /**
-     * tap bottom offset area to flip back.
+     * tap bottom offset area to translate back.
      *
      * @return true if allow tap back
      */
-    public boolean isRightTapBack() {
-        return mRightTapBack;
+    public boolean isBottomTapBack() {
+        return mBottomTapBack;
     }
 
     /**
@@ -228,8 +257,8 @@ public class HorizontalTranslateLayout extends FrameLayout {
      *
      * @param tapBack tap back
      */
-    public void setLeftTapBack(boolean tapBack) {
-        mLeftTapBack = tapBack;
+    public void setTopTapBack(boolean tapBack) {
+        mTopTapBack = tapBack;
     }
 
     /**
@@ -237,73 +266,65 @@ public class HorizontalTranslateLayout extends FrameLayout {
      *
      * @param tapBack tap back
      */
-    public void setRightTapBack(boolean tapBack) {
-        mRightTapBack = tapBack;
+    public void setBottomTapBack(boolean tapBack) {
+        mBottomTapBack = tapBack;
     }
 
     /**
-     * Flip top immediately, without animation.
+     * Collapse drawer to top
      */
-    public void left() {
-        mLeftTranslate = (int) (mLeftOffset - getMeasuredWidth());
-        mPositionState = STATE_COLLAPSE_LEFT;
-        invalidate();
-    }
-
-    /**
-     * Flip bottom immediately, without animation.
-     */
-    public void right() {
-        mLeftTranslate = (int) (getMeasuredWidth() - mRightOffset);
-        mPositionState = STATE_COLLAPSE_RIGHT;
-        invalidate();
-    }
-
-    /**
-     * Open host view when flipped.
-     */
-    public void open() {
-        mLeftTranslate = 0;
-        mPositionState = STATE_EXPAND;
-        invalidate();
-    }
-
-    /**
-     * Animation version of flipping
-     */
-    public void animateLeft() {
-        if (canLeft()) {
-            mAnimator.animateLeft(-mAnimator.kVelocity);
+    public void collapseTop(boolean anim) {
+        if (canTop()) {
+            if (anim) {
+                mAnimator.animateTop(-mAnimator.kVelocity);
+            } else {
+                mTopTranslate = (int) (mTopOffset - mMeasuredHeight);
+                mPositionState = STATE_COLLAPSE_TOP;
+                invalidate();
+            }
         }
     }
 
     /**
-     * Animation version of flipping
+     * Collapse drawer to bottom.
      */
-    public void animateRight() {
-        if (canRight()) {
-            mAnimator.animateRight(mAnimator.kVelocity);
+    public void collapseBottom(boolean anim) {
+        if (canBottom()) {
+            if (anim) {
+                mAnimator.animateBottom(mAnimator.kVelocity);
+            } else {
+                mTopTranslate = (int) (mMeasuredHeight - mBottomOffset);
+                mPositionState = STATE_COLLAPSE_BOTTOM;
+                invalidate();
+            }
         }
     }
 
     /**
-     * Animation version of flipping
+     * Open drawer.
      */
-    public void animateOpen() {
-        switch (mPositionState) {
-            case STATE_COLLAPSE_LEFT:
-                mAnimator.animateLeftOpen(mAnimator.kVelocity);
-                break;
-            case STATE_COLLAPSE_RIGHT:
-                mAnimator.animateRightOpen(-mAnimator.kVelocity);
-                break;
-            default:
-                break;
+    public void expand(boolean anim) {
+        if (anim) {
+            switch (mPositionState) {
+                case STATE_COLLAPSE_TOP:
+                    mAnimator.animateTopOpen(mAnimator.kVelocity);
+                    break;
+                case STATE_COLLAPSE_BOTTOM:
+                    mAnimator.animateBottomOpen(-mAnimator.kVelocity);
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            mTopTranslate = 0;
+            mPositionState = STATE_EXPAND;
+            invalidate();
         }
     }
 
+
     /**
-     * Get flipping state
+     * Get position state
      *
      * @return the state
      */
@@ -311,12 +332,12 @@ public class HorizontalTranslateLayout extends FrameLayout {
         return mPositionState;
     }
 
-    public void setLeftAnimationListener(OnLeftAnimationListener listener) {
-        mOnLeftAnimationListener = listener;
+    public void setTopAnimationListener(OnTopAnimationListener listener) {
+        mOnTopAnimationListener = listener;
     }
 
-    public void setRightAnimationListener(OnRightAnimationListener listener) {
-        mOnRightAnimationListener = listener;
+    public void setBottomAnimationListener(OnBottomAnimationListener listener) {
+        mOnBottomAnimationListener = listener;
     }
 
     public void addOpenAnimationListener(OnOpenAnimationListener listener) {
@@ -327,41 +348,48 @@ public class HorizontalTranslateLayout extends FrameLayout {
         mOnOpenAnimationListener.remove(listener);
     }
 
-    public void setLeftTrackListener(OnLeftTrackListener listener) {
-        mOnLeftTrackListener = listener;
+    public void setTopTrackListener(OnTopTrackListener listener) {
+        mOnTopTrackListener = listener;
     }
 
-    public void setRightTrackListener(OnRightTrackListener listener) {
-        mOnRightTrackListener = listener;
+    public void setBottomTrackListener(OnBottomTrackListener listener) {
+        mOnBottomTrackListener = listener;
     }
 
-    public void setHorizontalTrackListener(OnHorizontalTrackListener listener) {
-        mOnHorizontalTrackListener = listener;
+    public void setVerticalTrackListener(OnVerticalTrackListener listener) {
+        mOnVerticalTrackListener = listener;
     }
 
-    private boolean canLeft() {
-        return mLeftOffset != -1 && mPositionState == STATE_EXPAND;
+    private boolean canTop() {
+        return mTopOffset != -1 || mBottomHeight != -1;
     }
 
-    private boolean canRight() {
-        return mRightOffset != -1 && mPositionState == STATE_EXPAND;
+    private boolean canBottom() {
+        return mBottomOffset != -1 || mTopHeight != -1;
     }
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
         canvas.save();
-        canvas.translate(mLeftTranslate, 0);
-        Log.d(TAG, "@dispatchDraw " + mLeftTranslate);
+        canvas.translate(0, mTopTranslate);
+
+        // draw dividers if set.
+        if (mTopDividerHeight != 0) {
+            mTopDivider.draw(canvas);
+        }
+        if (mBottomDividerHeight != 0) {
+            mBottomDivider.draw(canvas);
+        }
 
         // draw background here
-        canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), mBackgroundPaint);
+        canvas.drawRect(0, 0, mMeasuredWidth, mMeasuredHeight, mBackgroundPaint);
 
         super.dispatchDraw(canvas);
         canvas.restore();
     }
 
-    public int getLeftTranslate() {
-        return mLeftTranslate;
+    public int getTopTranslate() {
+        return mTopTranslate;
     }
 
     public boolean isAnimating() {
@@ -386,15 +414,15 @@ public class HorizontalTranslateLayout extends FrameLayout {
                     mLastDownY = y;
 
                     // 停止所有的动画
-                    mHandler.removeMessages(MSG_ANIMATE_LEFT);
-                    mHandler.removeMessages(MSG_ANIMATE_LEFT_OPEN);
-                    mHandler.removeMessages(MSG_ANIMATE_RIGHT);
-                    mHandler.removeMessages(MSG_ANIMATE_RIGHT_OPEN);
+                    mHandler.removeMessages(MSG_ANIMATE_TOP);
+                    mHandler.removeMessages(MSG_ANIMATE_TOP_OPEN);
+                    mHandler.removeMessages(MSG_ANIMATE_BOTTOM);
+                    mHandler.removeMessages(MSG_ANIMATE_BOTTOM_OPEN);
                     break;
                 }
                 case MotionEvent.ACTION_MOVE:
                     Log.d(TAG, "@interceptInterceptTouchEvent");
-                    ev.offsetLocation(-mLeftTranslate, 0);
+                    ev.offsetLocation(0, -mTopTranslate);
                     return prepareTracking(x, y);
                 default:
                     break;
@@ -411,9 +439,9 @@ public class HorizontalTranslateLayout extends FrameLayout {
     private boolean prepareTracking(int x, int y) {
         // We don't intercept event instantly, for children like ListView want to hold the event chain.
         // In most cases return true.
-        return !(y < mLastDownY - mTouchThreshold || y > mLastDownY + mTouchThreshold)
-                && (x < mLastDownX - mTouchThreshold || x > mLastDownX + mTouchThreshold)
-                && mTracker.prepareTracking(x - mLastDownX);
+        return !(x < mLastDownX - mTouchThreshold || x > mLastDownX + mTouchThreshold)
+                && (y < mLastDownY - mTouchThreshold || y > mLastDownY + mTouchThreshold)
+                && mTracker.prepareTracking(y - mLastDownY);
 
     }
 
@@ -427,25 +455,25 @@ public class HorizontalTranslateLayout extends FrameLayout {
             switch (action) {
                 case MotionEvent.ACTION_MOVE:
                     if (mTracker.tracking) {
-                        if (!mLastMoveXBeenSet) {
-                            if (x > mLastDownX) {
-                                mLastMoveX = mLastDownX + mTouchThreshold;
-                                mLastMoveXBeenSet = true;
+                        if (!mLastMoveYBeenSet) {
+                            if (y > mLastDownY) {
+                                mLastMoveY = mLastDownY + mTouchThreshold;
+                                mLastMoveYBeenSet = true;
                             } else {
-                                mLastMoveX = mLastDownX - mTouchThreshold;
-                                mLastMoveXBeenSet = true;
+                                mLastMoveY = mLastDownY - mTouchThreshold;
+                                mLastMoveYBeenSet = true;
                             }
                         }
 
-                        mTracker.move(mLastMoveX - x);
-                        mLastMoveX = x;
+                        mTracker.move(mLastMoveY - y);
+                        mLastMoveY = y;
                         mTracker.velocityTracker.addMovement(ev);
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
                     Log.d(TAG, "@onTouchEvent up");
-                    mLastMoveXBeenSet = false;
+                    mLastMoveYBeenSet = false;
 
                     if (mTracker.tracking) {
                         Log.d(TAG, "@onTouchEvent tracking");
@@ -457,16 +485,13 @@ public class HorizontalTranslateLayout extends FrameLayout {
                     return false;
             }
         } else {
-            Log.d(TAG, String.format("collapse x=%d, y=%d", x, y));
-            Log.d(TAG, "left tap back frame = " + mLeftFrameForTap);
-            Log.d(TAG, "right tap back frame = " + mRightFrameForTap);
             switch (action) {
                 case MotionEvent.ACTION_DOWN:
-                    if (((mPositionState == STATE_COLLAPSE_LEFT) && mLeftFrameForTap.contains(x, y))
-                            || ((mPositionState == STATE_COLLAPSE_RIGHT) && mRightFrameForTap.contains(x, y))) {
+                    if (((mPositionState == STATE_COLLAPSE_TOP) && mTopFrameForTap.contains(x, y))
+                            || ((mPositionState == STATE_COLLAPSE_BOTTOM) && mBottomFrameForTap.contains(x, y))) {
                         if (!mTracker.tracking) {
-                            mLastMoveX = x;
-                            mTracker.prepareTracking(x);
+                            mLastMoveY = y;
+                            mTracker.prepareTracking(y);
                         }
                     } else {
                         // Do not consume this event, dispatch to its siblings.
@@ -474,8 +499,8 @@ public class HorizontalTranslateLayout extends FrameLayout {
                     }
                 case MotionEvent.ACTION_MOVE:
                     if (mTracker.tracking) {
-                        mTracker.move(mLastMoveX - x);
-                        mLastMoveX = x;
+                        mTracker.move(mLastMoveY - y);
+                        mLastMoveY = y;
                         mTracker.velocityTracker.addMovement(ev);
                     }
                     break;
@@ -498,12 +523,22 @@ public class HorizontalTranslateLayout extends FrameLayout {
         super.onLayout(changed, l, t, r, b);
 
         if (changed) {
-            if (mLeftOffset != -1) {
-                mLeftFrameForTap.set(l, t, (int) (l + mLeftOffset), b);
+            if (mTopOffset != -1) {
+                mTopFrameForTap.set(l, t, r, (int) (t + mTopOffset));
             }
 
-            if (mRightOffset != -1) {
-                mRightFrameForTap.set((int) (r - mRightOffset), t, r, b);
+            if (mBottomOffset != -1) {
+                mBottomFrameForTap.set(l, (int) (b - mBottomOffset), r, b);
+            }
+
+            if (mTopDividerHeight != 0) {
+                Log.d(TAG, "has top divider");
+                mTopDivider.setBounds(0, -mTopDividerHeight, 0, 0);
+            }
+
+            if (mBottomDividerHeight != 0) {
+                Log.d(TAG, "has bottom divider");
+                mBottomDivider.setBounds(0, b, 0, b + mBottomDividerHeight);
             }
         }
 
@@ -517,13 +552,19 @@ public class HorizontalTranslateLayout extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        final int widthSize = widthMeasureSpec & ~(0x3 << 30);
+        final int heightSize = heightMeasureSpec & ~(0x3 << 30);
+
+        if (mTopHeight != -1) {
+            mTopOffset = heightSize - mBottomHeight;
+        }
+
+        if (mBottomHeight != -1) {
+            mBottomOffset = heightSize - mTopHeight;
+        }
 
         //check the offsets' sizes are not larger than the view's dimension
-        assert widthSize >= mLeftOffset :
-                "top offset should not be larger than the view's width";
-        assert widthSize >= mRightOffset :
-                "bottom offset should not be larger than the view's width";
+        assert heightSize >= mTopOffset : "top offset should not be larger than the view's width";
+        assert heightSize >= mBottomOffset : "bottom offset should not be larger than the view's width";
 
         // cache dimension
         mMeasuredWidth = getMeasuredWidth();
@@ -537,15 +578,15 @@ public class HorizontalTranslateLayout extends FrameLayout {
     private void offset() {
         switch (mPositionState) {
             case STATE_EXPAND:
-                mLeftTranslate = 0;
+                mTopTranslate = 0;
                 invalidate();
                 break;
-            case STATE_COLLAPSE_LEFT:
-                mLeftTranslate = (int) (mLeftOffset - getMeasuredWidth());
+            case STATE_COLLAPSE_TOP:
+                mTopTranslate = (int) (mTopOffset - mMeasuredHeight);
                 invalidate();
                 break;
-            case STATE_COLLAPSE_RIGHT:
-                mLeftTranslate = (int) (getMeasuredWidth() - mRightOffset);
+            case STATE_COLLAPSE_BOTTOM:
+                mTopTranslate = (int) (mMeasuredHeight - mBottomOffset);
                 invalidate();
                 break;
         }
@@ -559,17 +600,17 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 return;
             }
             switch (msg.what) {
-                case MSG_ANIMATE_LEFT:
-                    mAnimator.computeLeftAnimation();
+                case MSG_ANIMATE_TOP:
+                    mAnimator.computeTopAnimation();
                     break;
-                case MSG_ANIMATE_RIGHT:
-                    mAnimator.computeRightAnimation();
+                case MSG_ANIMATE_BOTTOM:
+                    mAnimator.computeBottomAnimation();
                     break;
-                case MSG_ANIMATE_LEFT_OPEN:
-                    mAnimator.computeLeftOpenAnimation();
+                case MSG_ANIMATE_TOP_OPEN:
+                    mAnimator.computeTopOpenAnimation();
                     break;
-                case MSG_ANIMATE_RIGHT_OPEN:
-                    mAnimator.computeRightOpenAnimation();
+                case MSG_ANIMATE_BOTTOM_OPEN:
+                    mAnimator.computeBottomOpenAnimation();
                     break;
                 default:
                     break;
@@ -598,22 +639,22 @@ public class HorizontalTranslateLayout extends FrameLayout {
 
         boolean prepareTracking(int start) {
             switch (mTrackDirection) {
-                case left:
+                case top:
                     if (mPositionState != STATE_EXPAND &&
-                            mPositionState != STATE_COLLAPSE_LEFT) {
+                            mPositionState != STATE_COLLAPSE_TOP) {
                         return false;
                     }
                     break;
-                case right:
+                case bottom:
                     if (mPositionState != STATE_EXPAND &&
-                            mPositionState != STATE_COLLAPSE_RIGHT) {
+                            mPositionState != STATE_COLLAPSE_BOTTOM) {
                         return false;
                     }
                     break;
-                case horizontal:
-                    if (mOnHorizontalTrackListener != null) {
-                        final OnHorizontalTrackListener listener = mOnHorizontalTrackListener;
-                        listener.onStartHorizontalTrack(start);
+                case vertical:
+                    if (mOnVerticalTrackListener != null) {
+                        final OnVerticalTrackListener listener = mOnVerticalTrackListener;
+                        listener.onStartVerticalTrack(start);
                     }
             }
             velocityTracker = VelocityTracker.obtain();
@@ -625,31 +666,31 @@ public class HorizontalTranslateLayout extends FrameLayout {
             tracking = false;
         }
 
-        void move(int xOffset) {
+        void move(int yOffset) {
             if (!tracking) {
                 return;
             }
-            final int left = mLeftTranslate - xOffset;
+            final int top = mTopTranslate - yOffset;
             switch (mTrackDirection) {
-                case left:
-                    Log.d(TAG, "@move left");
-                    if (left > mLeftOffset - getMeasuredWidth() && left < 0) {
-                        mLeftTranslate -= xOffset;
+                case top:
+                    Log.d(TAG, "@move top");
+                    if (top > mTopOffset - mMeasuredHeight && top < 0) {
+                        mTopTranslate -= yOffset;
                         invalidate();
                     }
                     break;
-                case right:
-                    Log.d(TAG, "@move right");
-                    if (left < getMeasuredWidth() - mRightOffset && left > 0) {
-                        mLeftTranslate -= xOffset;
+                case bottom:
+                    Log.d(TAG, "@move bottom");
+                    if (top < mMeasuredHeight - mBottomOffset && top > 0) {
+                        mTopTranslate -= yOffset;
                         invalidate();
                     }
                     break;
-                case horizontal:
-                    Log.d(TAG, "@move horizontal");
-                    if (left >= mLeftOffset - getMeasuredWidth()
-                            && left <= getMeasuredWidth() - mRightOffset) {
-                        mLeftTranslate -= xOffset;
+                case vertical:
+                    Log.d(TAG, "@move vertical");
+                    if (top >= mTopOffset - mMeasuredHeight
+                            && top <= mMeasuredHeight - mBottomOffset) {
+                        mTopTranslate -= yOffset;
                         invalidate();
                     }
                     break;
@@ -663,25 +704,25 @@ public class HorizontalTranslateLayout extends FrameLayout {
          */
         private void fling() {
             velocityTracker.computeCurrentVelocity(velocityUnit);
-            float xVelocity = velocityTracker.getXVelocity();
+            float yVelocity = velocityTracker.getYVelocity();
 
-            Log.d(TAG, "@fling x " + xVelocity);
+            Log.d(TAG, "@fling y " + yVelocity);
 
-            if (xVelocity < 0) {
-                xVelocity = Math.min(xVelocity, -minVelocity);
+            if (yVelocity < 0) {
+                yVelocity = Math.min(yVelocity, -minVelocity);
             } else {
-                xVelocity = Math.max(xVelocity, minVelocity);
+                yVelocity = Math.max(yVelocity, minVelocity);
             }
 
             switch (mTrackDirection) {
-                case horizontal:
-                    horizontalFling(xVelocity);
+                case vertical:
+                    verticalFling(yVelocity);
                     break;
-                case left:
-                    leftFling(xVelocity);
+                case top:
+                    topFling(yVelocity);
                     break;
-                case right:
-                    rightFling(xVelocity);
+                case bottom:
+                    bottomFling(yVelocity);
                     break;
                 default:
                     break;
@@ -691,39 +732,39 @@ public class HorizontalTranslateLayout extends FrameLayout {
             velocityTracker = null;
         }
 
-        private void horizontalFling(float velocity) {
-            Log.d(TAG, "@horizontalFling");
-            final int left = mLeftTranslate;
-            if (left <= 0 && left >= mLeftOffset - getMeasuredWidth()) {
+        private void verticalFling(float velocity) {
+            Log.d(TAG, "@verticalFling");
+            final int top = mTopTranslate;
+            if (top <= 0 && top >= mTopOffset - mMeasuredHeight) {
                 if (velocity < 0) {
-                    mAnimator.animateLeft(velocity);
+                    mAnimator.animateTop(velocity);
                 } else {
-                    mAnimator.animateLeftOpen(velocity);
+                    mAnimator.animateTopOpen(velocity);
                 }
-            } else if (left >= 0 && left <= getMeasuredWidth() - mRightOffset) {
+            } else if (top >= 0 && top <= mMeasuredHeight - mBottomOffset) {
                 if (velocity < 0) {
-                    mAnimator.animateRightOpen(velocity);
+                    mAnimator.animateBottomOpen(velocity);
                 } else {
-                    mAnimator.animateRight(velocity);
+                    mAnimator.animateBottom(velocity);
                 }
             }
         }
 
-        private void leftFling(float velocity) {
-            Log.d(TAG, "@leftFling");
+        private void topFling(float velocity) {
+            Log.d(TAG, "@topFling");
             if (velocity < 0) {
-                mAnimator.animateLeft(velocity);
+                mAnimator.animateTop(velocity);
             } else {
-                mAnimator.animateLeftOpen(velocity);
+                mAnimator.animateTopOpen(velocity);
             }
         }
 
-        private void rightFling(float velocity) {
-            Log.d(TAG, "@rightFling");
+        private void bottomFling(float velocity) {
+            Log.d(TAG, "@bottomFling");
             if (velocity < 0) {
-                mAnimator.animateRightOpen(velocity);
+                mAnimator.animateBottomOpen(velocity);
             } else {
-                mAnimator.animateRight(velocity);
+                mAnimator.animateBottom(velocity);
             }
         }
     }
@@ -761,43 +802,43 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iCurrentAnimationTime += AnimationConfig.ANIMATION_FRAME_DURATION;
         }
 
-        void computeLeftAnimation() {
+        void computeTopAnimation() {
             compute();
             if (iAnimatingPosition <= iAnimationDistance) {
-                final OnLeftAnimationListener listener = mOnLeftAnimationListener;
+                final OnTopAnimationListener listener = mOnTopAnimationListener;
                 if (listener != null) {
-                    listener.onLeftAnimationEnd();
+                    listener.onTopAnimationEnd();
                 }
                 iAnimating = false;
-                mPositionState = STATE_COLLAPSE_LEFT;
+                mPositionState = STATE_COLLAPSE_TOP;
                 offset();
             } else {
                 float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
-                mLeftTranslate = (int) (offset + iAnimationStart);
+                mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
-                mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT, iCurrentAnimationTime);
+                mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP, iCurrentAnimationTime);
             }
         }
 
-        void computeRightAnimation() {
+        void computeBottomAnimation() {
             compute();
             if (iAnimatingPosition >= iAnimationDistance) {
-                final OnRightAnimationListener listener = mOnRightAnimationListener;
+                final OnBottomAnimationListener listener = mOnBottomAnimationListener;
                 if (listener != null) {
-                    listener.onRightAnimationEnd();
+                    listener.onBottomAnimationEnd();
                 }
                 iAnimating = false;
-                mPositionState = STATE_COLLAPSE_RIGHT;
+                mPositionState = STATE_COLLAPSE_BOTTOM;
                 offset();
             } else {
                 float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
-                mLeftTranslate = (int) (offset + iAnimationStart);
+                mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
-                mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT, iCurrentAnimationTime);
+                mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM, iCurrentAnimationTime);
             }
         }
 
-        void computeLeftOpenAnimation() {
+        void computeTopOpenAnimation() {
             compute();
             if (iAnimatingPosition >= iAnimationDistance) {
                 for (final OnOpenAnimationListener listener : mOnOpenAnimationListener) {
@@ -810,13 +851,13 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 offset();
             } else {
                 float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
-                mLeftTranslate = (int) (offset + iAnimationStart);
+                mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
-                mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT_OPEN, iCurrentAnimationTime);
+                mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP_OPEN, iCurrentAnimationTime);
             }
         }
 
-        void computeRightOpenAnimation() {
+        void computeBottomOpenAnimation() {
             compute();
             if (iAnimatingPosition <= iAnimationDistance) {
                 for (final OnOpenAnimationListener listener : mOnOpenAnimationListener) {
@@ -829,13 +870,13 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 offset();
             } else {
                 float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
-                mLeftTranslate = (int) (offset + iAnimationStart);
+                mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
-                mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT_OPEN, iCurrentAnimationTime);
+                mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM_OPEN, iCurrentAnimationTime);
             }
         }
 
-        void animateLeftOpen(float velocity) {
+        void animateTopOpen(float velocity) {
             for (final OnOpenAnimationListener listener : mOnOpenAnimationListener) {
                 if (listener != null) {
                     listener.onOpenAnimationStart();
@@ -847,15 +888,15 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
-            iAnimationDistance = 0 - mLeftTranslate;
-            iAnimationStart = mLeftTranslate;
-            mHandler.removeMessages(MSG_ANIMATE_LEFT_OPEN);
+            iAnimationDistance = 0 - mTopTranslate;
+            iAnimationStart = mTopTranslate;
+            mHandler.removeMessages(MSG_ANIMATE_TOP_OPEN);
             Log.d(TAG, "@animateTopOpen " + iAnimationDistance);
             Log.d(TAG, "@animateTopOpen " + velocity);
-            mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT_OPEN, iCurrentAnimationTime);
+            mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP_OPEN, iCurrentAnimationTime);
         }
 
-        void animateRightOpen(float velocity) {
+        void animateBottomOpen(float velocity) {
             for (final OnOpenAnimationListener listener : mOnOpenAnimationListener) {
                 if (listener != null) {
                     listener.onOpenAnimationStart();
@@ -867,16 +908,16 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
-            iAnimationDistance = 0 - mLeftTranslate;
-            iAnimationStart = mLeftTranslate;
+            iAnimationDistance = 0 - mTopTranslate;
+            iAnimationStart = mTopTranslate;
             Log.d(TAG, "@animateBottomOpen " + iAnimationDistance);
             Log.d(TAG, "@animateBottomOpen " + velocity);
-            mHandler.removeMessages(MSG_ANIMATE_RIGHT_OPEN);
-            mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT_OPEN, iCurrentAnimationTime);
+            mHandler.removeMessages(MSG_ANIMATE_BOTTOM_OPEN);
+            mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM_OPEN, iCurrentAnimationTime);
         }
 
-        void animateLeft(float velocity) {
-            final OnLeftAnimationListener listener = mOnLeftAnimationListener;
+        void animateTop(float velocity) {
+            final OnTopAnimationListener listener = mOnTopAnimationListener;
             if (listener != null) {
                 listener.onLeftAnimationStart();
             }
@@ -886,16 +927,16 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
-            iAnimationDistance = -getMeasuredWidth() + mLeftOffset - mLeftTranslate;
-            iAnimationStart = mLeftTranslate;
+            iAnimationDistance = -mMeasuredHeight + mTopOffset - mTopTranslate;
+            iAnimationStart = mTopTranslate;
             Log.d(TAG, "@animateTop " + iAnimationDistance);
             Log.d(TAG, "@animateTop " + velocity);
-            mHandler.removeMessages(MSG_ANIMATE_LEFT);
-            mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT, iCurrentAnimationTime);
+            mHandler.removeMessages(MSG_ANIMATE_TOP);
+            mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP, iCurrentAnimationTime);
         }
 
-        void animateRight(float velocity) {
-            final OnRightAnimationListener listener = mOnRightAnimationListener;
+        void animateBottom(float velocity) {
+            final OnBottomAnimationListener listener = mOnBottomAnimationListener;
             if (listener != null) {
                 listener.onRightAnimationStart();
             }
@@ -905,21 +946,21 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
-            iAnimationDistance = (getMeasuredWidth() - mRightOffset) - mLeftTranslate;
-            iAnimationStart = mLeftTranslate;
+            iAnimationDistance = (mMeasuredHeight - mBottomOffset) - mTopTranslate;
+            iAnimationStart = mTopTranslate;
             Log.d(TAG, "@animateBottom " + iAnimationDistance);
             Log.d(TAG, "@animateBottom " + velocity);
-            mHandler.removeMessages(MSG_ANIMATE_RIGHT);
-            mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT, iCurrentAnimationTime);
+            mHandler.removeMessages(MSG_ANIMATE_BOTTOM);
+            mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM, iCurrentAnimationTime);
         }
     }
 
     public void dump() {
-        Log.d(TAG, "@dump top offset " + mLeftOffset);
-        Log.d(TAG, "@dump bottom offset " + mRightOffset);
+        Log.d(TAG, "@dump top offset " + mTopOffset);
+        Log.d(TAG, "@dump bottom offset " + mBottomOffset);
         Log.d(TAG, "@dump track " + mTrackDirection);
-        Log.d(TAG, "@dump top tap " + mLeftTapBack);
-        Log.d(TAG, "@dump bottom tap " + mRightOffset);
+        Log.d(TAG, "@dump top tap " + mTopTapBack);
+        Log.d(TAG, "@dump bottom tap " + mBottomOffset);
     }
 
     interface OnOpenAnimationListener {
@@ -934,7 +975,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
         void onOpenAnimationEnd();
     }
 
-    interface OnLeftAnimationListener {
+    interface OnTopAnimationListener {
         /**
          * fire when top animation starts.
          */
@@ -943,10 +984,10 @@ public class HorizontalTranslateLayout extends FrameLayout {
         /**
          * fire when top animation ends.
          */
-        void onLeftAnimationEnd();
+        void onTopAnimationEnd();
     }
 
-    interface OnRightAnimationListener {
+    interface OnBottomAnimationListener {
         /**
          * fire when bottom animation starts.
          */
@@ -955,18 +996,18 @@ public class HorizontalTranslateLayout extends FrameLayout {
         /**
          * fire when bottom animation ends.
          */
-        void onRightAnimationEnd();
+        void onBottomAnimationEnd();
     }
 
-    interface OnLeftTrackListener {
-        void onLeftTrackStart();
+    interface OnTopTrackListener {
+        void onTopTrackStart();
     }
 
-    interface OnRightTrackListener {
-        void onRightTrackStart();
+    interface OnBottomTrackListener {
+        void onBottomTrackStart();
     }
 
-    interface OnHorizontalTrackListener {
-        void onStartHorizontalTrack(int direction);
+    interface OnVerticalTrackListener {
+        void onStartVerticalTrack(int direction);
     }
 }
