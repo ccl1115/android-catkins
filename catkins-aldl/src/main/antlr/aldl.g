@@ -55,7 +55,48 @@ fragment
 UNICODE_ESC
     :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
+   
+ 
+FQN_CLASS
+	:	(ID '.')* ID
+	;
+
+BASE_LAYOUT_TYPE
+	:	'linear'
+	|	'frame'
+	|	'relative'
+	|	'table'
+	|	'pager'
+	|	'grid'
+	;
 	
-COLOR
-    :    '#' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-    ;
+BASE_WIDGET_TYPE
+	:	'text'
+	|	'image'
+	|	'button'
+	|	'radio'
+	|	'check'
+	|	'switch'
+	|	'toggle'
+	|	'progress'
+	|	'seek'
+	|	'rating'
+	|	'spinner'
+	|	'web'
+	|	'edit'
+	;
+	
+BASE_CONTAINER_TYPE
+	:	'list'
+	|	'expanable-list'
+	|	'grid-view'
+	|	'tabhost'
+	|	'scroll'
+	|	'hscroll'
+	;
+	
+LAYOUT_TYPE
+	:	BASE_LAYOUT_TYPE
+	|	BASE_WIDGET_TYPE
+	|	BASE_CONTAINER_TYPE
+	;

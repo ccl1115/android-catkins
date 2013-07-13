@@ -9,3 +9,5 @@ out
 *.iml
 .DS_store
 test-key.keystore
+.gradle
+
