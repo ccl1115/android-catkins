@@ -5,39 +5,65 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
-
-    <com.simon.catkins.views.VerticalTranslateLayout
+    <com.simon.catkins.views.Flip3DLayout
+            android:id="@+id/flip"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            catkins:background="#ff932812"
-            catkins:track="bottom"
-            catkins:topHeight="150dp"
-            catkins:bottomHeight="200dp"
-            catkins:topDivider="@drawable/top_drawer_shade"
-            catkins:topDividerHeight="5dp">
+            catkins:from="@+id/from"
+            catkins:to="@+id/to">
 
-
-        <TextView
+        <FrameLayout
+                android:id="@+id/from"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:clickable="true"
-                android:text="@string/demo_1_2"/>
-    </com.simon.catkins.views.VerticalTranslateLayout>
+                android:layout_height="match_parent">
 
-    <com.simon.catkins.views.HorizontalTranslateLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            catkins:background="#ff392012"
-            catkins:leftOffset="60dp"
-            catkins:rightOffset="60dp"
-            catkins:track="horizontal">
+            <com.simon.catkins.views.VerticalTranslateLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    catkins:background="#ff932812"
+                    catkins:track="bottom"
+                    catkins:topHeight="150dp"
+                    catkins:bottomHeight="200dp"
+                    catkins:topDivider="@drawable/top_drawer_shade"
+                    catkins:topDividerHeight="5dp">
 
-        <TextView
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:text="@string/demo_1_2"/>
+            </com.simon.catkins.views.VerticalTranslateLayout>
+
+            <com.simon.catkins.views.HorizontalTranslateLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    catkins:background="#ff392012"
+                    catkins:leftOffset="60dp"
+                    catkins:rightOffset="60dp"
+                    catkins:track="horizontal">
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:text="@string/demo_1_1"/>
+            </com.simon.catkins.views.HorizontalTranslateLayout>
+
+
+        </FrameLayout>
+
+        <FrameLayout
+                android:id="@+id/to"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:clickable="true"
-                android:text="@string/demo_1_1"/>
-    </com.simon.catkins.views.HorizontalTranslateLayout>
+                android:layout_height="match_parent">
+
+        </FrameLayout>
+
+
+    </com.simon.catkins.views.Flip3DLayout>
+
+
 </FrameLayout>

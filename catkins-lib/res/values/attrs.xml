@@ -15,6 +15,7 @@
     <declare-styleable name="Flip3DLayout">
         <attr name="from" format="integer"/>
         <attr name="to" format="integer"/>
+        <attr name="trackable" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="IndicatorView">

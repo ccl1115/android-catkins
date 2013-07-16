@@ -262,7 +262,7 @@ public class IndicatorView extends View {
         public void draw(Canvas canvas) {
             final int savedCount = canvas.save();
             for (int i = 0; i < mCount; i++) {
-                canvas.translate((mDrawable.getIntrinsicWidth() + mSpacing) * i, 0);
+                canvas.translate(mDrawable.getIntrinsicWidth() + mSpacing, 0);
                 mDrawable.draw(canvas);
             }
             canvas.restoreToCount(savedCount);
