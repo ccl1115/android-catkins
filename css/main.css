@@ -20,7 +20,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-size: 100%; }
+  font-size: 100%;
+}
 
 h1 { margin-bottom: 1em; }
 p { margin: 1em 0; }
@@ -68,14 +69,24 @@ ul.posts span {
   line-height: 1.5em;
 }
 
+.site .header {
+  border-bottom: 4px solid #eee;
+  margin-bottom: 3em;
+}
+
 .site .header a {
   font-weight: bold;
   text-decoration: none;
 }
 
+.site .header span {
+  font-size: 0.7em;
+}
+
 .site .header h1.title {
+  font-size: 2em;
   display: inline-block;
-  margin-bottom: 2em;
+  margin-bottom: 1em;
 }
 
 .site .header h1.title a {
@@ -126,6 +137,25 @@ ul.posts span {
   border: 0;
 }
 
+.site h1 {
+  text-align: center;
+  border-bottom: 1px solid #111;
+  font-size: 1.2em;
+}
+
+.site ul {
+  margin-left: 2em;
+  margin-bottom: 1em;
+  clear: both;
+  overflow: hidden;
+}
+
+.site ul li {
+  float: left;
+  padding-right: 2em;
+  margin-left: 1.5em;
+}
+
 /*****************************************************************************/
 /*
 /* Posts
@@ -133,6 +163,7 @@ ul.posts span {
 /*****************************************************************************/
 
 /* standard */
+
 .post pre {
   border: 1px solid #ddd;
   background-color: #eef;

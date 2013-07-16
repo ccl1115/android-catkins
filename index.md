@@ -8,20 +8,21 @@ But now it's under heavy development and has many features to accomplish.
 
 
 Sub projects
-======
+============
 
 catkins-lib
-=====
+-----------
 
 The library project you need to include to your android project if you want use catkins.
 
 catkins-it
-=====
+----------
+
 The instrumentation test project. It actually tests catkins-demo project, because Android test framework cannot test a
 library project.
 
 catkins-demo
-=====
+------------
 
 A standard android project to demonstrate catkins usages.
 
@@ -33,7 +34,7 @@ We use Maven to for project management. For how to build and test android projec
 If you don't get familiar with Maven or even don't know what Maven is, here it's [documentation](http://maven.apache.org).
 
 Custom views
-======
+============
 
 This library provides some useful view components to help developers improve user experience.
 
@@ -47,7 +48,7 @@ This library provides some useful view components to help developers improve use
 
 
 Licenses
-======
+========
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
