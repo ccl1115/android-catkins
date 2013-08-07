@@ -11,3 +11,4 @@ out
 test-key.keystore
 .gradle
 *.swp
+gradle-app.setting
