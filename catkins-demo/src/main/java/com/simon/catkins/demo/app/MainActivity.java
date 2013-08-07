@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.simon.catkins.demo.R;
 import com.simon.catkins.views.Flip3DLayout;
 import com.simon.catkins.views.ViewHolderInjector;
 
 import de.akquinet.android.androlog.Log;
+
+import static com.simon.catkins.views.ViewHolderInjector.ViewId;
 
 /**
  * @author Simon
@@ -25,6 +28,19 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
 
         mHolder = ViewHolderInjector.mapping(ViewHolder.class, findViewById(android.R.id.content));
+        mHolder.mRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.radio_vertical:
+                        mHolder.mFlipper.setTransition(Flip3DLayout.TRANSITION_HORIZONTAL);
+                        break;
+                    case R.id.radio_horizontal:
+                        mHolder.mFlipper.setTransition(Flip3DLayout.TRANSITION_VERTICAL);
+                        break;
+                }
+            }
+        });
     }
 
     @Override
@@ -47,7 +63,16 @@ public class MainActivity extends Activity {
     }
 
     public static class ViewHolder {
-        @ViewHolderInjector.ViewId(R.id.flip)
+        @ViewId(R.id.flip)
         public Flip3DLayout mFlipper;
+
+        @ViewId(R.id.group)
+        public RadioGroup mRadioGroup;
+
+        @ViewId(R.id.radio_vertical)
+        public RadioButton mRadioVertical;
+
+        @ViewId(R.id.radio_horizontal)
+        public RadioButton mRadioHorizontal;
     }
 }
