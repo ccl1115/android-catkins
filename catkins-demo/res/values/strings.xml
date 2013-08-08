@@ -7,4 +7,9 @@
     <string name="refresher_refreshing">刷新中</string>
     <string name="demo_1_1">First, we bring you a horizontal drawer.</string>
     <string name="demo_1_2">Also a vertical drawer to put components in.</string>
+    <string name="demo_1_3">You can choose a transition of flipping</string>
+    <string name="demo_vertical_flip">Vertical flip</string>
+    <string name="demo_horizontal_flip">Horizontal flip</string>
+    <string name="collapse_to_left">Collapse to left</string>
+    <string name="collapse_to_right">Collapse to right</string>
 </resources>

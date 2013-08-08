@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -32,12 +33,13 @@ public class Flip3DLayout extends FrameLayout {
     private static final int MSG_HORIZONTAL = 0x00;
     private static final int MSG_VERTICAL = 0xF0;
 
+    private static final int DIRECTION_MASK = 0x0F;
+    private static final int TRANSITION_MASK = 0xF0;
+
     public static final int TRANSITION_VERTICAL = 0x1;
     public static final int TRANSITION_HORIZONTAL = 0x2;
 
     private static final int DEPTH_CONSTANT = 120; // dips
-    public static final int DIRECTION_MASK = 0x0F;
-    public static final int TRANSITION_MASK = 0xF0;
 
     private int mDepthConstant;
 
@@ -123,8 +125,8 @@ public class Flip3DLayout extends FrameLayout {
 
     private int mMSGOrientation = MSG_VERTICAL;
 
-    public void setTransition(int orientation) {
-        if (orientation == TRANSITION_VERTICAL) {
+    public void setTransition(int transition) {
+        if (transition == TRANSITION_VERTICAL) {
             mMSGOrientation = MSG_VERTICAL;
         } else {
             mMSGOrientation = MSG_HORIZONTAL;
@@ -157,9 +159,9 @@ public class Flip3DLayout extends FrameLayout {
 
 
     private class FlipInjector implements ViewGroupInjector {
-        static final int VELOCITY = 240; // degree/s
+        private static final int VELOCITY = 360; // degree/s
 
-        final int velocity; // degree/s
+        private final int velocity; // degree/s
 
         boolean animating;
 
@@ -178,8 +180,8 @@ public class Flip3DLayout extends FrameLayout {
         private final AnimatorHandler mHandler;
 
         // All variants for animation calculation
-        long lastAnimationTime;
-        long currentAnimatingTime;
+        private long lastAnimationTime;
+        private long currentAnimatingTime;
         float animatingDegree;
         float animatingDegreeInterpolated;
         float animatingDepth;
@@ -237,7 +239,7 @@ public class Flip3DLayout extends FrameLayout {
             }
             lastAnimationTime = now;
             currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
-            if (animatingDegree >= 180) {
+            if (animatingDegree>= 180) {
                 animating = false;
                 mDegree = 180;
                 mDepth = 0;
@@ -250,7 +252,7 @@ public class Flip3DLayout extends FrameLayout {
             } else {
                 mDegree = (int) (animatingDegreeInterpolated + 0.5f);
                 mDepth = (int) animatingDepth;
-                mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_FLIP), currentAnimatingTime);
+                mHandler.sendEmptyMessageAtTime(MSG_ANIMATION_FLIP, currentAnimatingTime);
             }
             invalidate();
         }
@@ -271,7 +273,7 @@ public class Flip3DLayout extends FrameLayout {
             currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
             if (animatingDegree <= -180) {
                 animating = false;
-                mDegree = 0;
+                mDegree = -180;
                 mDepth = 0;
                 mState = STATE_INITIAL;
 
@@ -281,8 +283,9 @@ public class Flip3DLayout extends FrameLayout {
                 }
             } else {
                 mDegree = (int) (animatingDegreeInterpolated - 0.5f);
+                Log.d(TAG, "degree = " + mDegree);
                 mDepth = (int) animatingDepth;
-                mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_RFLIP), currentAnimatingTime);
+                mHandler.sendEmptyMessageAtTime(MSG_ANIMATION_RFLIP, currentAnimatingTime);
             }
             invalidate();
         }
@@ -333,8 +336,8 @@ public class Flip3DLayout extends FrameLayout {
                 mCamera.translate(0, 0, mDepth);
                 canvas.save();
                 if (mDegree >= 0 && mDegree <= 90) {
-                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateY(mDegree);
-                    else if (mTransition == MSG_VERTICAL) mCamera.rotateX(mDegree);
+                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateX(mDegree);
+                    else if (mTransition == MSG_VERTICAL) mCamera.rotateY(mDegree);
                     mCamera.getMatrix(mMatrix);
                     mMatrix.preTranslate(-mCenterX, -mCenterY);
                     mMatrix.postTranslate(mCenterX, mCenterY);
@@ -345,8 +348,8 @@ public class Flip3DLayout extends FrameLayout {
                         drawChild(canvas, mFrom, drawingTime);
                     }
                 } else if (mDegree > 90 && mDegree <= 180) {
-                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateY(mDegree - 180);
-                    else if (mTransition == MSG_VERTICAL) mCamera.rotateX(mDegree - 180);
+                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateX(mDegree - 180);
+                    else if (mTransition == MSG_VERTICAL) mCamera.rotateY(mDegree - 180);
                     mCamera.getMatrix(mMatrix);
                     mMatrix.postTranslate(mCenterX, mCenterY);
                     mMatrix.preTranslate(-mCenterX, -mCenterY);
@@ -357,8 +360,8 @@ public class Flip3DLayout extends FrameLayout {
                         drawChild(canvas, mTo, drawingTime);
                     }
                 } else if (mDegree >= -90 && mDegree <= 0) {
-                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateY(mDegree);
-                    else if (mTransition == MSG_VERTICAL) mCamera.rotateX(mDegree);
+                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateX(mDegree);
+                    else if (mTransition == MSG_VERTICAL) mCamera.rotateY(mDegree);
                     mCamera.getMatrix(mMatrix);
                     mMatrix.preTranslate(-mCenterX, -mCenterY);
                     mMatrix.postTranslate(mCenterX, mCenterY);
@@ -369,8 +372,8 @@ public class Flip3DLayout extends FrameLayout {
                         drawChild(canvas, mTo, drawingTime);
                     }
                 } else if (mDegree >= -180 && mDegree < 90) {
-                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateY(mDegree + 180);
-                    else if (mTransition == MSG_VERTICAL) mCamera.rotateX(mDegree + 180);
+                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateX(mDegree + 180);
+                    else if (mTransition == MSG_VERTICAL) mCamera.rotateY(mDegree + 180);
                     mCamera.getMatrix(mMatrix);
                     mMatrix.preTranslate(-mCenterX, -mCenterY);
                     mMatrix.postTranslate(mCenterX, mCenterY);

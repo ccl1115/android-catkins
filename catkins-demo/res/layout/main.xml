@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:catkins="http://schemas.android.com/apk/res/com.simon.catkins.demo"
+             xmlns:catkins="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
@@ -34,9 +34,11 @@
                         android:gravity="center"
                         android:clickable="true"
                         android:text="@string/demo_1_2"/>
+
             </com.simon.catkins.views.VerticalTranslateLayout>
 
             <com.simon.catkins.views.HorizontalTranslateLayout
+                    android:id="@+id/horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     catkins:background="#ff392012"
@@ -50,6 +52,20 @@
                         android:gravity="center"
                         android:clickable="true"
                         android:text="@string/demo_1_1"/>
+
+                <Button
+                        android:id="@+id/button_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|left"
+                        android:text="@string/collapse_to_left"/>
+
+                <Button
+                        android:id="@+id/button_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|right"
+                        android:text="@string/collapse_to_right"/>
             </com.simon.catkins.views.HorizontalTranslateLayout>
 
 
@@ -61,32 +77,36 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:background="#ff23d520">
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
 
-                <TextView
+            <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="You can choose a transition of flipping"/>
+                    android:layout_gravity="center"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/demo_1_3"/>
 
                 <RadioGroup
                         android:id="@+id/group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
-                    <RadioButton
-                        android:id="@+id/radio_vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vertical flip"/>
 
                     <RadioButton
-                        android:id="@+id/radio_horizontal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Horizontal flip"/>
+                            android:id="@+id/radio_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/demo_vertical_flip"/>
+
+                    <RadioButton
+                            android:id="@+id/radio_horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/demo_horizontal_flip"/>
                 </RadioGroup>
 
 

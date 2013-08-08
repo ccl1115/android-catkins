@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.simon.catkins.demo.R;
 import com.simon.catkins.views.Flip3DLayout;
+import com.simon.catkins.views.HorizontalTranslateLayout;
 import com.simon.catkins.views.ViewHolderInjector;
 
 import de.akquinet.android.androlog.Log;
@@ -18,7 +21,7 @@ import static com.simon.catkins.views.ViewHolderInjector.ViewId;
 /**
  * @author Simon
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private ViewHolder mHolder;
 
@@ -41,6 +44,8 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        mHolder.mButtonLeft.setOnClickListener(this);
+        mHolder.mButtonRight.setOnClickListener(this);
     }
 
     @Override
@@ -62,6 +67,19 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    @Override
+    public void onClick(View view) {
+        final int id = view.getId();
+        switch (id) {
+            case R.id.button_left:
+                mHolder.mHorizontalLayout.animateLeft();
+                break;
+            case R.id.button_right:
+                mHolder.mHorizontalLayout.animateRight();
+                break;
+        }
+    }
+
     public static class ViewHolder {
         @ViewId(R.id.flip)
         public Flip3DLayout mFlipper;
@@ -74,5 +92,14 @@ public class MainActivity extends Activity {
 
         @ViewId(R.id.radio_horizontal)
         public RadioButton mRadioHorizontal;
+
+        @ViewId(R.id.button_left)
+        public Button mButtonLeft;
+
+        @ViewId(R.id.button_right)
+        public Button mButtonRight;
+
+        @ViewId(R.id.horizontal)
+        public HorizontalTranslateLayout mHorizontalLayout;
     }
 }
