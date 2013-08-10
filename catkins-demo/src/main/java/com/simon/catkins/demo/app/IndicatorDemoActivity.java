@@ -10,13 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.simon.catkins.demo.R;
-import com.simon.catkins.views.pager.IndicatorView;
+import com.simon.catkins.views.IndicatorView;
 
 /**
  * @author Simon
  */
 public class IndicatorDemoActivity extends FragmentActivity {
     private static final String TAG = "IndicatorDemoActivity";
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActionBar().setTitle(TAG);

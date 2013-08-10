@@ -16,10 +16,10 @@ import android.widget.FrameLayout;
 
 import com.simon.catkins.R;
 
-import de.akquinet.android.androlog.Log;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import de.akquinet.android.androlog.Log;
 
 
 /**
@@ -758,7 +758,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
             final float t = (now - iLastAnimationTime) / 1000f;
             iAnimatingPosition += iAnimatingVelocity * t;
             iLastAnimationTime = now;
-            iCurrentAnimationTime += AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime += ViewConfig.ANIMATION_FRAME_DURATION;
         }
 
         void computeLeftAnimation() {
@@ -772,7 +772,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 mPositionState = STATE_COLLAPSE_LEFT;
                 offset();
             } else {
-                float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
+                float offset = ViewConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
                 mLeftTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT, iCurrentAnimationTime);
@@ -790,7 +790,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 mPositionState = STATE_COLLAPSE_RIGHT;
                 offset();
             } else {
-                float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
+                float offset = ViewConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
                 mLeftTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT, iCurrentAnimationTime);
@@ -809,7 +809,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 mPositionState = STATE_EXPAND;
                 offset();
             } else {
-                float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
+                float offset = ViewConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
                 mLeftTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_LEFT_OPEN, iCurrentAnimationTime);
@@ -828,7 +828,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
                 mPositionState = STATE_EXPAND;
                 offset();
             } else {
-                float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
+                float offset = ViewConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
                 mLeftTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_RIGHT_OPEN, iCurrentAnimationTime);
@@ -844,7 +844,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iAnimating = true;
             final long now = SystemClock.uptimeMillis();
             iLastAnimationTime = now;
-            iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
             iAnimationDistance = 0 - mLeftTranslate;
@@ -864,7 +864,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iAnimating = true;
             final long now = SystemClock.uptimeMillis();
             iLastAnimationTime = now;
-            iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
             iAnimationDistance = 0 - mLeftTranslate;
@@ -883,7 +883,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iAnimating = true;
             final long now = SystemClock.uptimeMillis();
             iLastAnimationTime = now;
-            iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
             iAnimationDistance = -getMeasuredWidth() + mLeftOffset - mLeftTranslate;
@@ -902,7 +902,7 @@ public class HorizontalTranslateLayout extends FrameLayout {
             iAnimating = true;
             final long now = SystemClock.uptimeMillis();
             iLastAnimationTime = now;
-            iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
             iAnimationDistance = (getMeasuredWidth() - mRightOffset) - mLeftTranslate;

@@ -17,10 +17,10 @@ import android.widget.FrameLayout;
 
 import com.simon.catkins.R;
 
-import de.akquinet.android.androlog.Log;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import de.akquinet.android.androlog.Log;
 
 
 /**
@@ -167,7 +167,7 @@ public class VerticalTranslateLayout extends FrameLayout {
             if (mTopDividerHeight == 0) {
                 Log.d(TAG, "has height divider but height no set.");
                 mTopDividerHeight = mTopDivider.getIntrinsicHeight();
-		Log.d(TAG, "height set to intrinsic height = " + mTopDividerHeight);
+                Log.d(TAG, "height set to intrinsic height = " + mTopDividerHeight);
             }
         }
 
@@ -177,7 +177,7 @@ public class VerticalTranslateLayout extends FrameLayout {
             if (mBottomDividerHeight == 0) {
                 Log.d(TAG, "has height divider but height no set.");
                 mBottomDividerHeight = mBottomDivider.getIntrinsicHeight();
-		Log.d(TAG, "height set to intrinsic height = " + mBottomDividerHeight);
+                Log.d(TAG, "height set to intrinsic height = " + mBottomDividerHeight);
             }
         }
 
@@ -619,7 +619,7 @@ public class VerticalTranslateLayout extends FrameLayout {
     }
 
     /**
-     * Tracker can handle the dragging of the view.
+     * MotionEventTracker can handle the dragging of the view.
      */
     private class Tracker {
         static final int VELOCITY_UNIT = 200;
@@ -799,7 +799,7 @@ public class VerticalTranslateLayout extends FrameLayout {
             final float t = (now - iLastAnimationTime) / 1000f;
             iAnimatingPosition += iAnimatingVelocity * t;
             iLastAnimationTime = now;
-            iCurrentAnimationTime += AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime += ViewConfig.ANIMATION_FRAME_DURATION;
         }
 
         void computeTopAnimation() {
@@ -813,7 +813,7 @@ public class VerticalTranslateLayout extends FrameLayout {
                 mPositionState = STATE_COLLAPSE_TOP;
                 offset();
             } else {
-                float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
+                float offset = ViewConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
                 mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP, iCurrentAnimationTime);
@@ -831,7 +831,7 @@ public class VerticalTranslateLayout extends FrameLayout {
                 mPositionState = STATE_COLLAPSE_BOTTOM;
                 offset();
             } else {
-                float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
+                float offset = ViewConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
                 mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM, iCurrentAnimationTime);
@@ -850,7 +850,7 @@ public class VerticalTranslateLayout extends FrameLayout {
                 mPositionState = STATE_EXPAND;
                 offset();
             } else {
-                float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
+                float offset = ViewConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
                 mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_TOP_OPEN, iCurrentAnimationTime);
@@ -869,7 +869,7 @@ public class VerticalTranslateLayout extends FrameLayout {
                 mPositionState = STATE_EXPAND;
                 offset();
             } else {
-                float offset = AnimationConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
+                float offset = ViewConfig.computeInterpolator(iAnimationDistance, iAnimatingPosition, false);
                 mTopTranslate = (int) (offset + iAnimationStart);
                 invalidate();
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATE_BOTTOM_OPEN, iCurrentAnimationTime);
@@ -885,7 +885,7 @@ public class VerticalTranslateLayout extends FrameLayout {
             iAnimating = true;
             final long now = SystemClock.uptimeMillis();
             iLastAnimationTime = now;
-            iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
             iAnimationDistance = 0 - mTopTranslate;
@@ -905,7 +905,7 @@ public class VerticalTranslateLayout extends FrameLayout {
             iAnimating = true;
             final long now = SystemClock.uptimeMillis();
             iLastAnimationTime = now;
-            iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
             iAnimationDistance = 0 - mTopTranslate;
@@ -924,7 +924,7 @@ public class VerticalTranslateLayout extends FrameLayout {
             iAnimating = true;
             final long now = SystemClock.uptimeMillis();
             iLastAnimationTime = now;
-            iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
             iAnimationDistance = -mMeasuredHeight + mTopOffset - mTopTranslate;
@@ -943,7 +943,7 @@ public class VerticalTranslateLayout extends FrameLayout {
             iAnimating = true;
             final long now = SystemClock.uptimeMillis();
             iLastAnimationTime = now;
-            iCurrentAnimationTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            iCurrentAnimationTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             iAnimatingVelocity = velocity;
             iAnimatingPosition = 0;
             iAnimationDistance = (mMeasuredHeight - mBottomOffset) - mTopTranslate;

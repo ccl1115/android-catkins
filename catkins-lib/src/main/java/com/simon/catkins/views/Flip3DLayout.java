@@ -230,7 +230,7 @@ public class Flip3DLayout extends FrameLayout {
             final float t = (now - lastAnimationTime) / 1000f;
             animatingDegree += animatingVelocity * t;
             animatingDegreeInterpolated =
-                    180f * AnimationConfig.sInterpolator.getInterpolation(animatingDegree / 180f);
+                    180f * ViewConfig.sInterpolator.getInterpolation(animatingDegree / 180f);
             final float degree = Math.abs(animatingDegreeInterpolated);
             if (degree > 0 && degree <= 90) {
                 animatingDepth = mWidth / 180f * degree;
@@ -238,7 +238,7 @@ public class Flip3DLayout extends FrameLayout {
                 animatingDepth = -(mWidth / 180f) * degree + mWidth;
             }
             lastAnimationTime = now;
-            currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            currentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             if (animatingDegree>= 180) {
                 animating = false;
                 mDegree = 180;
@@ -262,7 +262,7 @@ public class Flip3DLayout extends FrameLayout {
             final float t = (now - lastAnimationTime) / 1000f;
             animatingDegree += animatingVelocity * t;
             animatingDegreeInterpolated =
-                    -180f * AnimationConfig.sInterpolator.getInterpolation(animatingDegree / -180f);
+                    -180f * ViewConfig.sInterpolator.getInterpolation(animatingDegree / -180f);
             final float degree = Math.abs(animatingDegreeInterpolated);
             if (degree > 0 && degree <= 90) {
                 animatingDepth = mWidth / 180f * degree;
@@ -270,7 +270,7 @@ public class Flip3DLayout extends FrameLayout {
                 animatingDepth = -(mWidth / 180f) * degree + mWidth;
             }
             lastAnimationTime = now;
-            currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            currentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             if (animatingDegree <= -180) {
                 animating = false;
                 mDegree = -180;
@@ -298,7 +298,7 @@ public class Flip3DLayout extends FrameLayout {
             prepare();
             final long now = SystemClock.uptimeMillis();
             lastAnimationTime = now;
-            currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            currentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_FLIP), currentAnimatingTime);
         }
 
@@ -310,7 +310,7 @@ public class Flip3DLayout extends FrameLayout {
             prepare();
             final long now = SystemClock.uptimeMillis();
             lastAnimationTime = now;
-            currentAnimatingTime = now + AnimationConfig.ANIMATION_FRAME_DURATION;
+            currentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_RFLIP), currentAnimatingTime);
         }
 
