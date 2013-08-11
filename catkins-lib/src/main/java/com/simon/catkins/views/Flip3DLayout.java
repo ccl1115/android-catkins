@@ -94,7 +94,7 @@ public class Flip3DLayout extends FrameLayout {
         final float density = getResources().getDisplayMetrics().density;
         mDepthConstant = (int) (DEPTH_CONSTANT * density + 0.5f);
 
-        mInjector = new FlipInjector();
+        mInjector = new FlipInjector(context);
     }
 
     @Override
@@ -147,6 +147,16 @@ public class Flip3DLayout extends FrameLayout {
         mInjector.measure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        return mInjector.interceptionTouchEvent(event);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return mInjector.touchEvent(event);
+    }
+
     public int getState() {
         return mState;
     }
@@ -158,7 +168,7 @@ public class Flip3DLayout extends FrameLayout {
     }
 
 
-    private class FlipInjector implements ViewGroupInjector {
+    private class FlipInjector implements ViewGroupInjector, MotionEventTracker.OnMoveListener {
         private static final int VELOCITY = 360; // degree/s
 
         private final int velocity; // degree/s
@@ -178,6 +188,7 @@ public class Flip3DLayout extends FrameLayout {
         private final Matrix mMatrix;
 
         private final AnimatorHandler mHandler;
+        private final MotionEventTracker mTracker;
 
         // All variants for animation calculation
         private long lastAnimationTime;
@@ -202,13 +213,14 @@ public class Flip3DLayout extends FrameLayout {
         }
 
 
-        FlipInjector() {
+        FlipInjector(Context context) {
             velocity = VELOCITY;
 
             mMatrix = new Matrix();
             mCamera = new Camera();
 
             mHandler = new AnimatorHandler();
+            mTracker = new MotionEventTracker(context, this);
         }
 
         private void prepare() {
@@ -402,12 +414,20 @@ public class Flip3DLayout extends FrameLayout {
 
         @Override
         public boolean interceptionTouchEvent(MotionEvent event) {
-            return false;
+            return mTracker.onInterceptTouchEvent(event);
         }
 
         @Override
         public boolean touchEvent(MotionEvent event) {
-            return false;
+            return mTracker.onTouchEvent(event);
+        }
+
+        @Override
+        public boolean onMove(MotionEventTracker tracker, int dx, int dy, float vx, float vy) {
+            Log.d(TAG, "moved from last dx = " + dx + " dy = " + dy);
+            Log.d(TAG, "moved totally x = " + tracker.getMovedX() + " y = " + tracker.getMovedY());
+            Log.d(TAG, "x velocity = " + vx + " y velocity = " + vy);
+            return true;
         }
 
         @Override
@@ -432,6 +452,7 @@ public class Flip3DLayout extends FrameLayout {
         public boolean isAnimating() {
             return animating;
         }
+
     }
 
 }

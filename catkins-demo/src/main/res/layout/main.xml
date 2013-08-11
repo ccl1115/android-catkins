@@ -110,6 +110,11 @@
                 </RadioGroup>
 
 
+
+                <com.simon.catkins.demo.views.RoundCornerView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="#FFFF0000"/>
             </LinearLayout>
         </FrameLayout>
 

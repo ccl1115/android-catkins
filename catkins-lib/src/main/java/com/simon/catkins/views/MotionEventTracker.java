@@ -2,8 +2,10 @@ package com.simon.catkins.views;
 
 import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+
 
 /**
  * To handle touch event movement.
@@ -11,6 +13,7 @@ import android.view.VelocityTracker;
  * @author Simon Yu
  */
 class MotionEventTracker {
+    private static final String TAG = "MotionEventTracker";
 
     private int mLastDownX;
     private int mLastDownY;
@@ -29,6 +32,8 @@ class MotionEventTracker {
 
     private final int mMaxVelocity;
 
+    private boolean mTracking;
+
     public MotionEventTracker(Context context, OnMoveListener listener) {
         mScaledMoveSlop = ViewConfig.getTouchEventMoveSlopMedium(context);
         mOnMoveListener = listener;
@@ -37,6 +42,7 @@ class MotionEventTracker {
     }
 
     public boolean onInterceptTouchEvent(MotionEvent event) {
+        Log.d(TAG, "@onInterceptTouchEvent");
         final int action = MotionEventCompat.getActionMasked(event);
         final int x = (int) MotionEventCompat.getX(event, 0);
         final int y = (int) MotionEventCompat.getY(event, 0);
@@ -51,6 +57,8 @@ class MotionEventTracker {
                         || y - mLastDownY > mScaledMoveSlop) {
                     mLastDownX = x;
                     mLastDownY = y;
+                    mLastMoveX = x;
+                    mLastMoveY = y;
                     return true;
                 }
                 break;
@@ -63,6 +71,7 @@ class MotionEventTracker {
     }
 
     public boolean onTouchEvent(MotionEvent event) {
+        Log.d(TAG, "@onTouchEvent");
         final int action = MotionEventCompat.getActionMasked(event);
         final int x = (int) MotionEventCompat.getX(event, 0);
         final int y = (int) MotionEventCompat.getY(event, 0);
@@ -102,6 +111,10 @@ class MotionEventTracker {
 
     public int getScaledMoveSlop() {
         return mScaledMoveSlop;
+    }
+
+    public boolean isTracking() {
+        return mTracking;
     }
 
     public interface OnMoveListener {
