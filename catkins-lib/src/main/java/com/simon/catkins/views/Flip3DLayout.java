@@ -168,12 +168,14 @@ public class Flip3DLayout extends FrameLayout {
     }
 
 
-    private class FlipInjector implements ViewGroupInjector, MotionEventTracker.OnMoveListener {
+    private class FlipInjector implements ViewGroupInjector, MotionEventTracker.OnTrackListener {
         private static final int VELOCITY = 360; // degree/s
 
         private final int velocity; // degree/s
 
-        boolean animating;
+        private boolean mAnimating;
+
+        private boolean mTracking;
 
         // All variants for canvas drawing
         private int mDegree;
@@ -191,12 +193,12 @@ public class Flip3DLayout extends FrameLayout {
         private final MotionEventTracker mTracker;
 
         // All variants for animation calculation
-        private long lastAnimationTime;
-        private long currentAnimatingTime;
-        float animatingDegree;
-        float animatingDegreeInterpolated;
-        float animatingDepth;
-        float animatingVelocity; // degree/s
+        private long mLastAnimationTime;
+        private long mCurrentAnimatingTime;
+        float mAnimatingDegree;
+        float mAnimatingDegreeInterpolated;
+        float mAnimatingDepth;
+        float mAnimatingVelocity; // degree/s
 
         private class AnimatorHandler extends Handler {
             @Override
@@ -239,20 +241,20 @@ public class Flip3DLayout extends FrameLayout {
 
         private void computeFlip() {
             final long now = SystemClock.uptimeMillis();
-            final float t = (now - lastAnimationTime) / 1000f;
-            animatingDegree += animatingVelocity * t;
-            animatingDegreeInterpolated =
-                    180f * ViewConfig.sInterpolator.getInterpolation(animatingDegree / 180f);
-            final float degree = Math.abs(animatingDegreeInterpolated);
+            final float t = (now - mLastAnimationTime) / 1000f;
+            mAnimatingDegree += mAnimatingVelocity * t;
+            mAnimatingDegreeInterpolated =
+                    180f * ViewConfig.sInterpolator.getInterpolation(mAnimatingDegree / 180f);
+            final float degree = Math.abs(mAnimatingDegreeInterpolated);
             if (degree > 0 && degree <= 90) {
-                animatingDepth = mWidth / 180f * degree;
+                mAnimatingDepth = mWidth / 180f * degree;
             } else {
-                animatingDepth = -(mWidth / 180f) * degree + mWidth;
+                mAnimatingDepth = -(mWidth / 180f) * degree + mWidth;
             }
-            lastAnimationTime = now;
-            currentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
-            if (animatingDegree>= 180) {
-                animating = false;
+            mLastAnimationTime = now;
+            mCurrentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
+            if (mAnimatingDegree >= 180) {
+                mAnimating = false;
                 mDegree = 180;
                 mDepth = 0;
                 mState = STATE_FLIPPED;
@@ -262,29 +264,29 @@ public class Flip3DLayout extends FrameLayout {
                     listener.onFlipAnimationEnd();
                 }
             } else {
-                mDegree = (int) (animatingDegreeInterpolated + 0.5f);
-                mDepth = (int) animatingDepth;
-                mHandler.sendEmptyMessageAtTime(MSG_ANIMATION_FLIP, currentAnimatingTime);
+                mDegree = (int) (mAnimatingDegreeInterpolated + 0.5f);
+                mDepth = (int) mAnimatingDepth;
+                mHandler.sendEmptyMessageAtTime(MSG_ANIMATION_FLIP, mCurrentAnimatingTime);
             }
             invalidate();
         }
 
         private void computeRFlip() {
             final long now = SystemClock.uptimeMillis();
-            final float t = (now - lastAnimationTime) / 1000f;
-            animatingDegree += animatingVelocity * t;
-            animatingDegreeInterpolated =
-                    -180f * ViewConfig.sInterpolator.getInterpolation(animatingDegree / -180f);
-            final float degree = Math.abs(animatingDegreeInterpolated);
+            final float t = (now - mLastAnimationTime) / 1000f;
+            mAnimatingDegree += mAnimatingVelocity * t;
+            mAnimatingDegreeInterpolated =
+                    -180f * ViewConfig.sInterpolator.getInterpolation(mAnimatingDegree / -180f);
+            final float degree = Math.abs(mAnimatingDegreeInterpolated);
             if (degree > 0 && degree <= 90) {
-                animatingDepth = mWidth / 180f * degree;
+                mAnimatingDepth = mWidth / 180f * degree;
             } else {
-                animatingDepth = -(mWidth / 180f) * degree + mWidth;
+                mAnimatingDepth = -(mWidth / 180f) * degree + mWidth;
             }
-            lastAnimationTime = now;
-            currentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
-            if (animatingDegree <= -180) {
-                animating = false;
+            mLastAnimationTime = now;
+            mCurrentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
+            if (mAnimatingDegree <= -180) {
+                mAnimating = false;
                 mDegree = -180;
                 mDepth = 0;
                 mState = STATE_INITIAL;
@@ -294,36 +296,36 @@ public class Flip3DLayout extends FrameLayout {
                     listener.onFlipBackAnimationEnd();
                 }
             } else {
-                mDegree = (int) (animatingDegreeInterpolated - 0.5f);
+                mDegree = (int) (mAnimatingDegreeInterpolated - 0.5f);
                 Log.d(TAG, "degree = " + mDegree);
-                mDepth = (int) animatingDepth;
-                mHandler.sendEmptyMessageAtTime(MSG_ANIMATION_RFLIP, currentAnimatingTime);
+                mDepth = (int) mAnimatingDepth;
+                mHandler.sendEmptyMessageAtTime(MSG_ANIMATION_RFLIP, mCurrentAnimatingTime);
             }
             invalidate();
         }
 
         private void animateFlip() {
-            animating = true;
-            animatingVelocity = velocity;
-            animatingDegree = 0;
-            animatingDepth = 0;
+            mAnimating = true;
+            mAnimatingVelocity = velocity;
+            mAnimatingDegree = 0;
+            mAnimatingDepth = 0;
             prepare();
             final long now = SystemClock.uptimeMillis();
-            lastAnimationTime = now;
-            currentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
-            mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_FLIP), currentAnimatingTime);
+            mLastAnimationTime = now;
+            mCurrentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
+            mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_FLIP), mCurrentAnimatingTime);
         }
 
         private void animateRFlip() {
-            animating = true;
-            animatingVelocity = -velocity;
-            animatingDegree = 0;
-            animatingDepth = 0;
+            mAnimating = true;
+            mAnimatingVelocity = -velocity;
+            mAnimatingDegree = 0;
+            mAnimatingDepth = 0;
             prepare();
             final long now = SystemClock.uptimeMillis();
-            lastAnimationTime = now;
-            currentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
-            mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_RFLIP), currentAnimatingTime);
+            mLastAnimationTime = now;
+            mCurrentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
+            mHandler.sendMessageAtTime(mHandler.obtainMessage(MSG_ANIMATION_RFLIP), mCurrentAnimatingTime);
         }
 
         @Override
@@ -343,7 +345,7 @@ public class Flip3DLayout extends FrameLayout {
         @Override
         public void draw(Canvas canvas) {
             final long drawingTime = getDrawingTime();
-            if (animating) {
+            if (mAnimating || mTracking) {
                 mCamera.save();
                 mCamera.translate(0, 0, mDepth);
                 canvas.save();
@@ -427,7 +429,22 @@ public class Flip3DLayout extends FrameLayout {
             Log.d(TAG, "moved from last dx = " + dx + " dy = " + dy);
             Log.d(TAG, "moved totally x = " + tracker.getMovedX() + " y = " + tracker.getMovedY());
             Log.d(TAG, "x velocity = " + vx + " y velocity = " + vy);
+            mDegree = dx;
+            invalidate();
             return true;
+        }
+
+        @Override
+        public boolean onStartTracking(MotionEventTracker tracker, int direction) {
+            Log.d(TAG, "direction = " + direction);
+            mTracking = true;
+            return true;
+        }
+
+        @Override
+        public boolean onStopTracking(MotionEventTracker tracker) {
+            mTracking = false;
+            return false;
         }
 
         @Override
@@ -436,12 +453,12 @@ public class Flip3DLayout extends FrameLayout {
             mTransition = msg & TRANSITION_MASK;
             switch(direction) {
                 case MSG_ANIMATION_FLIP:
-                    if (!animating && mState != STATE_FLIPPED) {
+                    if (!mAnimating && mState != STATE_FLIPPED) {
                         animateFlip();
                     }
                     break;
                 case MSG_ANIMATION_RFLIP:
-                    if (!animating && mState != STATE_INITIAL) {
+                    if (!mAnimating && mState != STATE_INITIAL) {
                         animateRFlip();
                     }
                     break;
@@ -450,7 +467,7 @@ public class Flip3DLayout extends FrameLayout {
 
         @Override
         public boolean isAnimating() {
-            return animating;
+            return mAnimating;
         }
 
     }

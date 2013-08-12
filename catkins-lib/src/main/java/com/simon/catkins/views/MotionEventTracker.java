@@ -15,6 +15,11 @@ import android.view.VelocityTracker;
 class MotionEventTracker {
     private static final String TAG = "MotionEventTracker";
 
+    public static final int DIRECTION_LEFT = 0x1;
+    public static final int DIRECTION_TOP = 0x2;
+    public static final int DIRECTION_RIGHT = 0x4;
+    public static final int DIRECTION_BOTTOM = 0x8;
+
     private int mLastDownX;
     private int mLastDownY;
 
@@ -24,7 +29,7 @@ class MotionEventTracker {
     private int mMovedX;
     private int mMovedY;
 
-    private final OnMoveListener mOnMoveListener;
+    private final OnTrackListener mOnTrackListener;
 
     private final int mScaledMoveSlop;
 
@@ -34,9 +39,11 @@ class MotionEventTracker {
 
     private boolean mTracking;
 
-    public MotionEventTracker(Context context, OnMoveListener listener) {
+    private int mTrackingDirection;
+
+    public MotionEventTracker(Context context, OnTrackListener listener) {
         mScaledMoveSlop = ViewConfig.getTouchEventMoveSlopMedium(context);
-        mOnMoveListener = listener;
+        mOnTrackListener = listener;
         mMaxVelocity = ViewConfig.getVelocityLarge(context);
 
     }
@@ -53,8 +60,29 @@ class MotionEventTracker {
                 initVelocityTracker();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (x - mLastDownX > mScaledMoveSlop
-                        || y - mLastDownY > mScaledMoveSlop) {
+                if (x - mLastDownX > mScaledMoveSlop) {
+                    mTrackingDirection = DIRECTION_RIGHT;
+                    mLastDownX = x;
+                    mLastDownY = y;
+                    mLastMoveX = x;
+                    mLastMoveY = y;
+                    return true;
+                } else if (x - mLastDownX < -mScaledMoveSlop) {
+                    mTrackingDirection = DIRECTION_LEFT;
+                    mLastDownX = x;
+                    mLastDownY = y;
+                    mLastMoveX = x;
+                    mLastMoveY = y;
+                    return true;
+                } else if (y - mLastDownY > mScaledMoveSlop) {
+                    mTrackingDirection = DIRECTION_BOTTOM;
+                    mLastDownX = x;
+                    mLastDownY = y;
+                    mLastMoveX = x;
+                    mLastMoveY = y;
+                    return true;
+                } else if (y - mLastDownY < -mScaledMoveSlop) {
+                    mTrackingDirection = DIRECTION_TOP;
                     mLastDownX = x;
                     mLastDownY = y;
                     mLastMoveX = x;
@@ -83,6 +111,10 @@ class MotionEventTracker {
                 initVelocityTracker();
                 break;
             case MotionEvent.ACTION_MOVE:
+                if (!mTracking) {
+                    mTracking = true;
+                    mOnTrackListener.onStartTracking(this, mTrackingDirection);
+                }
                 final int dx = x - mLastMoveX;
                 final int dy = y - mLastMoveY;
                 mLastMoveX = x;
@@ -90,9 +122,14 @@ class MotionEventTracker {
                 mMovedX = x - mLastDownX;
                 mMovedY = y - mLastDownY;
                 mVelocityTracker.addMovement(event);
-                return mOnMoveListener.onMove(this, dx, dy,
+                return mOnTrackListener.onMove(this, dx, dy,
                         mVelocityTracker.getXVelocity(), mVelocityTracker.getYVelocity());
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if (mTracking) {
+                    mTracking = false;
+                    mOnTrackListener.onStopTracking(this);
+                }
                 recycleVelocityTracker();
                 break;
         }
@@ -117,8 +154,12 @@ class MotionEventTracker {
         return mTracking;
     }
 
-    public interface OnMoveListener {
+    public interface OnTrackListener {
         public boolean onMove(MotionEventTracker tracker, int dx, int dy, float vx, float vy);
+
+        public boolean onStartTracking(MotionEventTracker tracker, int direction);
+
+        public boolean onStopTracking(MotionEventTracker tracker);
     }
 
     private void initVelocityTracker() {
