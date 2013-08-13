@@ -30,8 +30,8 @@ public class Flip3DLayout extends FrameLayout {
     private static final int MSG_ANIMATION_FLIP = 0x00;
     private static final int MSG_ANIMATION_RFLIP = 0x0F;
 
-    private static final int MSG_HORIZONTAL = 0x00;
-    private static final int MSG_VERTICAL = 0xF0;
+    private static final int MSG_VERTICAL = 0x00;
+    private static final int MSG_HORIZONTAL = 0xF0;
 
     private static final int DIRECTION_MASK = 0x0F;
     private static final int TRANSITION_MASK = 0xF0;
@@ -94,7 +94,7 @@ public class Flip3DLayout extends FrameLayout {
         final float density = getResources().getDisplayMetrics().density;
         mDepthConstant = (int) (DEPTH_CONSTANT * density + 0.5f);
 
-        mInjector = new FlipInjector(context);
+        mInjector = new FlipInjector();
     }
 
     @Override
@@ -123,13 +123,13 @@ public class Flip3DLayout extends FrameLayout {
         mInjector.animate(MSG_ANIMATION_RFLIP | mMSGOrientation);
     }
 
-    private int mMSGOrientation = MSG_VERTICAL;
+    private int mMSGOrientation = MSG_HORIZONTAL;
 
     public void setTransition(int transition) {
         if (transition == TRANSITION_VERTICAL) {
-            mMSGOrientation = MSG_VERTICAL;
-        } else {
             mMSGOrientation = MSG_HORIZONTAL;
+        } else {
+            mMSGOrientation = MSG_VERTICAL;
         }
     }
 
@@ -169,7 +169,7 @@ public class Flip3DLayout extends FrameLayout {
 
 
     private class FlipInjector implements ViewGroupInjector, MotionEventTracker.OnTrackListener {
-        private static final int VELOCITY = 360; // degree/s
+        private static final int VELOCITY = 120; // degree/s
 
         private final int velocity; // degree/s
 
@@ -215,14 +215,14 @@ public class Flip3DLayout extends FrameLayout {
         }
 
 
-        FlipInjector(Context context) {
+        public FlipInjector() {
             velocity = VELOCITY;
 
             mMatrix = new Matrix();
             mCamera = new Camera();
 
             mHandler = new AnimatorHandler();
-            mTracker = new MotionEventTracker(context, this);
+            mTracker = new MotionEventTracker(getContext(), this);
         }
 
         private void prepare() {
@@ -255,7 +255,7 @@ public class Flip3DLayout extends FrameLayout {
             mCurrentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             if (mAnimatingDegree >= 180) {
                 mAnimating = false;
-                mDegree = 180;
+                mDegree = 0;
                 mDepth = 0;
                 mState = STATE_FLIPPED;
 
@@ -287,7 +287,7 @@ public class Flip3DLayout extends FrameLayout {
             mCurrentAnimatingTime = now + ViewConfig.ANIMATION_FRAME_DURATION;
             if (mAnimatingDegree <= -180) {
                 mAnimating = false;
-                mDegree = -180;
+                mDegree = 0;
                 mDepth = 0;
                 mState = STATE_INITIAL;
 
@@ -297,7 +297,6 @@ public class Flip3DLayout extends FrameLayout {
                 }
             } else {
                 mDegree = (int) (mAnimatingDegreeInterpolated - 0.5f);
-                Log.d(TAG, "degree = " + mDegree);
                 mDepth = (int) mAnimatingDepth;
                 mHandler.sendEmptyMessageAtTime(MSG_ANIMATION_RFLIP, mCurrentAnimatingTime);
             }
@@ -307,8 +306,8 @@ public class Flip3DLayout extends FrameLayout {
         private void animateFlip() {
             mAnimating = true;
             mAnimatingVelocity = velocity;
-            mAnimatingDegree = 0;
-            mAnimatingDepth = 0;
+            mAnimatingDegree = mDegree;
+            mAnimatingDepth = mDepth;
             prepare();
             final long now = SystemClock.uptimeMillis();
             mLastAnimationTime = now;
@@ -319,8 +318,8 @@ public class Flip3DLayout extends FrameLayout {
         private void animateRFlip() {
             mAnimating = true;
             mAnimatingVelocity = -velocity;
-            mAnimatingDegree = 0;
-            mAnimatingDepth = 0;
+            mAnimatingDegree = mDegree;
+            mAnimatingDepth = mDepth;
             prepare();
             final long now = SystemClock.uptimeMillis();
             mLastAnimationTime = now;
@@ -337,8 +336,8 @@ public class Flip3DLayout extends FrameLayout {
         public void measure(int widthMeasureSpec, int heightMeasureSpec) {
             Flip3DLayout.super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-            mCenterX = getMeasuredWidth() / 2;
-            mCenterY = getMeasuredHeight() / 2;
+            mCenterX = getMeasuredWidth() >> 1;
+            mCenterY = getMeasuredHeight() >> 1;
             mWidth = getMeasuredWidth() + mDepthConstant;
         }
 
@@ -350,8 +349,8 @@ public class Flip3DLayout extends FrameLayout {
                 mCamera.translate(0, 0, mDepth);
                 canvas.save();
                 if (mDegree >= 0 && mDegree <= 90) {
-                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateX(mDegree);
-                    else if (mTransition == MSG_VERTICAL) mCamera.rotateY(mDegree);
+                    if (mTransition == MSG_VERTICAL) mCamera.rotateX(mDegree);
+                    else if (mTransition == MSG_HORIZONTAL) mCamera.rotateY(mDegree);
                     mCamera.getMatrix(mMatrix);
                     mMatrix.preTranslate(-mCenterX, -mCenterY);
                     mMatrix.postTranslate(mCenterX, mCenterY);
@@ -362,8 +361,8 @@ public class Flip3DLayout extends FrameLayout {
                         drawChild(canvas, mFrom, drawingTime);
                     }
                 } else if (mDegree > 90 && mDegree <= 180) {
-                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateX(mDegree - 180);
-                    else if (mTransition == MSG_VERTICAL) mCamera.rotateY(mDegree - 180);
+                    if (mTransition == MSG_VERTICAL) mCamera.rotateX(mDegree - 180);
+                    else if (mTransition == MSG_HORIZONTAL) mCamera.rotateY(mDegree - 180);
                     mCamera.getMatrix(mMatrix);
                     mMatrix.postTranslate(mCenterX, mCenterY);
                     mMatrix.preTranslate(-mCenterX, -mCenterY);
@@ -374,8 +373,8 @@ public class Flip3DLayout extends FrameLayout {
                         drawChild(canvas, mTo, drawingTime);
                     }
                 } else if (mDegree >= -90 && mDegree <= 0) {
-                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateX(mDegree);
-                    else if (mTransition == MSG_VERTICAL) mCamera.rotateY(mDegree);
+                    if (mTransition == MSG_VERTICAL) mCamera.rotateX(mDegree);
+                    else if (mTransition == MSG_HORIZONTAL) mCamera.rotateY(mDegree);
                     mCamera.getMatrix(mMatrix);
                     mMatrix.preTranslate(-mCenterX, -mCenterY);
                     mMatrix.postTranslate(mCenterX, mCenterY);
@@ -386,8 +385,8 @@ public class Flip3DLayout extends FrameLayout {
                         drawChild(canvas, mTo, drawingTime);
                     }
                 } else if (mDegree >= -180 && mDegree < 90) {
-                    if (mTransition == MSG_HORIZONTAL) mCamera.rotateX(mDegree + 180);
-                    else if (mTransition == MSG_VERTICAL) mCamera.rotateY(mDegree + 180);
+                    if (mTransition == MSG_VERTICAL) mCamera.rotateX(mDegree + 180);
+                    else if (mTransition == MSG_HORIZONTAL) mCamera.rotateY(mDegree + 180);
                     mCamera.getMatrix(mMatrix);
                     mMatrix.preTranslate(-mCenterX, -mCenterY);
                     mMatrix.postTranslate(mCenterX, mCenterY);
@@ -426,17 +425,35 @@ public class Flip3DLayout extends FrameLayout {
 
         @Override
         public boolean onMove(MotionEventTracker tracker, int dx, int dy, float vx, float vy) {
-            Log.d(TAG, "moved from last dx = " + dx + " dy = " + dy);
-            Log.d(TAG, "moved totally x = " + tracker.getMovedX() + " y = " + tracker.getMovedY());
-            Log.d(TAG, "x velocity = " + vx + " y velocity = " + vy);
-            mDegree = dx;
-            invalidate();
-            return true;
+            //Log.d(TAG, "moved from last dx = " + dx + " dy = " + dy);
+            //Log.d(TAG, "moved totally x = " + tracker.getMovedX() + " y = " + tracker.getMovedY());
+            //Log.d(TAG, "x velocity = " + vx + " y velocity = " + vy);
+            if (mTransition == MSG_HORIZONTAL) {
+                if (mState == STATE_INITIAL && tracker.getMovedX() > 0
+                        || mState == STATE_FLIPPED && tracker.getMovedX() < 0) {
+                    mDegree = (int) (180f * ((float) tracker.getMovedX() / getMeasuredWidth()));
+                    invalidate();
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (mTransition == MSG_VERTICAL) {
+                if (mState == STATE_INITIAL && tracker.getMovedY() > 0
+                        || mState == STATE_FLIPPED && tracker.getMovedY() < 0) {
+                    mDegree = (int) (180f * ((float) tracker.getMovedY() / getMeasuredHeight()));
+                    invalidate();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return false;
         }
 
         @Override
         public boolean onStartTracking(MotionEventTracker tracker, int direction) {
             Log.d(TAG, "direction = " + direction);
+
             mTracking = true;
             return true;
         }
@@ -444,6 +461,19 @@ public class Flip3DLayout extends FrameLayout {
         @Override
         public boolean onStopTracking(MotionEventTracker tracker) {
             mTracking = false;
+            if (mTransition == MSG_HORIZONTAL) {
+                if (mState == STATE_INITIAL) {
+                    animateFlip();
+                } else if (mState == STATE_FLIPPED) {
+                    animateRFlip();
+                }
+            } else if (mTransition == MSG_VERTICAL) {
+                if (mState == STATE_INITIAL) {
+                    animateFlip();
+                } else if (mState == STATE_FLIPPED) {
+                    animateRFlip();
+                }
+            }
             return false;
         }
 
