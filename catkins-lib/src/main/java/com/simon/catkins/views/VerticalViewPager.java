@@ -328,7 +328,7 @@ public class VerticalViewPager extends AdapterView {
         private ScaleViewGroupInjector() {
             final float density = getResources().getDisplayMetrics().density;
 
-            mMoveThreshold = (int) (density * ViewConfig.TOUCH_EVENT_MOVE_THRESHOLD_SMALL + 0.5);
+            mMoveThreshold = (int) (density * ViewConfig.TOUCH_EVENT_MOVE_SLOP_SMALL + 0.5);
         }
 
         @Override

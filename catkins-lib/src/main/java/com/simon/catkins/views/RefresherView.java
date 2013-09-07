@@ -588,7 +588,7 @@ public class RefresherView extends ViewGroup implements IRefreshable {
 
         public SideRefreshViewGroupInjector() {
             final float density = getResources().getDisplayMetrics().density;
-            moveThreshold = (int) (ViewConfig.TOUCH_EVENT_MOVE_THRESHOLD_LARGE * density + 0.5);
+            moveThreshold = (int) (ViewConfig.TOUCH_EVENT_MOVE_SLOP_LARGE * density + 0.5);
         }
 
         @Override

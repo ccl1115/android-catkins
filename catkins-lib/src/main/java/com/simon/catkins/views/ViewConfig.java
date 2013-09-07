@@ -14,9 +14,9 @@ abstract class ViewConfig {
     public static final float PROPORTION_VELOCITY_SMALL = 1.0f;
     public static final float PROPORTION_VELOCITY_MEDIUM = 2.0f;
     public static final float PROPORTION_VELOCITY_LARGE = 4.0f;
-    public static final int TOUCH_EVENT_MOVE_THRESHOLD_SMALL = 25;
-    public static final int TOUCH_EVENT_MOVE_THRESHOLD_MEDIUM = 50;
-    public static final int TOUCH_EVENT_MOVE_THRESHOLD_LARGE = 75;
+    public static final int TOUCH_EVENT_MOVE_SLOP_SMALL = 25;
+    public static final int TOUCH_EVENT_MOVE_SLOP_MEDIUM = 50;
+    public static final int TOUCH_EVENT_MOVE_SLOP_LARGE = 75;
     public static final int VELOCITY_UNIT = 1000;
 
     private static final int MIN_VELOCITY = 100; // dips
@@ -50,15 +50,15 @@ abstract class ViewConfig {
     }
 
     public static int getTouchEventMoveThresholdSmall(Context context) {
-        return convertToPx(context, TOUCH_EVENT_MOVE_THRESHOLD_SMALL);
+        return convertToPx(context, TOUCH_EVENT_MOVE_SLOP_SMALL);
     }
 
     public static int getTouchEventMoveSlopMedium(Context context) {
-        return convertToPx(context, TOUCH_EVENT_MOVE_THRESHOLD_MEDIUM);
+        return convertToPx(context, TOUCH_EVENT_MOVE_SLOP_MEDIUM);
     }
 
     public static int getTouchEventMoveThresholdLarge(Context context) {
-        return convertToPx(context, TOUCH_EVENT_MOVE_THRESHOLD_LARGE);
+        return convertToPx(context, TOUCH_EVENT_MOVE_SLOP_LARGE);
     }
 
     public static int computeVelocityByDp(Context context, int distanceDp) {

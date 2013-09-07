@@ -20,6 +20,10 @@ dependencies {
     compile 'de.akquinet.android.androlog:androlog:1.0.5'
     compile 'com.google.guava:guava:14.0.1'
     compile project(':catkins-lib')
+
+    instrumentTestCompile 'com.jayway.android.robotium:robotium:4.2'
+    instrumentTestCompile 'com.jayway.android.robotium:robotium-solo:4.2'
+
 }
 
 android {

@@ -18,6 +18,7 @@
                 android:layout_height="match_parent">
 
             <com.simon.catkins.views.VerticalTranslateLayout
+                    android:id="@+id/vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     catkins:background="#ff932812"
@@ -108,7 +109,6 @@
                             android:checked="true"
                             android:text="@string/demo_horizontal_flip"/>
                 </RadioGroup>
-
 
 
                 <com.simon.catkins.demo.views.RoundCornerView

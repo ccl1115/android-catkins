@@ -148,6 +148,11 @@ public class Flip3DLayout extends FrameLayout {
     }
 
     @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return mInjector.dispatchTouchEvent(ev);
+    }
+
+    @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         return mInjector.interceptionTouchEvent(event);
     }
@@ -410,17 +415,26 @@ public class Flip3DLayout extends FrameLayout {
 
         @Override
         public boolean dispatchTouchEvent(MotionEvent event) {
-            return false;
+            if (!mAnimating) {
+                if (mState == STATE_FLIPPED) {
+                    mTo.dispatchTouchEvent(event);
+                } else if (mState == STATE_INITIAL) {
+                    mFrom.dispatchTouchEvent(event);
+                }
+            }
+            return true;
         }
 
         @Override
         public boolean interceptionTouchEvent(MotionEvent event) {
-            return mTracker.onInterceptTouchEvent(event);
+            //return mTracker.onInterceptTouchEvent(event);
+            return false;
         }
 
         @Override
         public boolean touchEvent(MotionEvent event) {
-            return mTracker.onTouchEvent(event);
+            //return mTracker.onTouchEvent(event);
+            return false;
         }
 
         @Override
