@@ -2,7 +2,6 @@ package com.simon.catkins.views;
 
 import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 
@@ -32,24 +31,24 @@ class MotionEventTracker {
     private final OnTrackListener mOnTrackListener;
 
     private final int mScaledMoveSlop;
+    private final int mMaxVelocity;
 
     private VelocityTracker mVelocityTracker;
 
-    private final int mMaxVelocity;
-
     private boolean mTracking;
-
+    private boolean mFromIntercept;
     private int mTrackingDirection;
 
     public MotionEventTracker(Context context, OnTrackListener listener) {
         mScaledMoveSlop = ViewConfig.getTouchEventMoveSlopMedium(context);
         mOnTrackListener = listener;
         mMaxVelocity = ViewConfig.getVelocityLarge(context);
-
     }
 
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        Log.d(TAG, "@onInterceptTouchEvent");
+        if (!mFromIntercept) {
+            mFromIntercept = true;
+        }
         final int action = MotionEventCompat.getActionMasked(event);
         final int x = (int) MotionEventCompat.getX(event, 0);
         final int y = (int) MotionEventCompat.getY(event, 0);
@@ -60,29 +59,10 @@ class MotionEventTracker {
                 initVelocityTracker();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (x - mLastDownX > mScaledMoveSlop) {
-                    mTrackingDirection = DIRECTION_RIGHT;
-                    mLastDownX = x;
-                    mLastDownY = y;
-                    mLastMoveX = x;
-                    mLastMoveY = y;
-                    return true;
-                } else if (x - mLastDownX < -mScaledMoveSlop) {
-                    mTrackingDirection = DIRECTION_LEFT;
-                    mLastDownX = x;
-                    mLastDownY = y;
-                    mLastMoveX = x;
-                    mLastMoveY = y;
-                    return true;
-                } else if (y - mLastDownY > mScaledMoveSlop) {
-                    mTrackingDirection = DIRECTION_BOTTOM;
-                    mLastDownX = x;
-                    mLastDownY = y;
-                    mLastMoveX = x;
-                    mLastMoveY = y;
-                    return true;
-                } else if (y - mLastDownY < -mScaledMoveSlop) {
-                    mTrackingDirection = DIRECTION_TOP;
+                final int dx = x - mLastDownX;
+                final int dy = y - mLastDownY;
+                mTrackingDirection = computeDirection(dx, dy);
+                if (Math.abs(dx) > mScaledMoveSlop || Math.abs(dy) > mScaledMoveSlop) {
                     mLastDownX = x;
                     mLastDownY = y;
                     mLastMoveX = x;
@@ -99,24 +79,25 @@ class MotionEventTracker {
     }
 
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d(TAG, "@onTouchEvent");
         final int action = MotionEventCompat.getActionMasked(event);
         final int x = (int) MotionEventCompat.getX(event, 0);
         final int y = (int) MotionEventCompat.getY(event, 0);
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
+                mLastDownX = x;
+                mLastDownY = y;
                 mLastMoveX = x;
                 mLastMoveY = y;
                 initVelocityTracker();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (!mTracking) {
+                final int dx = x - mLastMoveX;
+                final int dy = y - mLastMoveY;
+                if (!mTracking && !mFromIntercept) {
                     mTracking = true;
                     mOnTrackListener.onStartTracking(this, mTrackingDirection);
                 }
-                final int dx = x - mLastMoveX;
-                final int dy = y - mLastMoveY;
                 mLastMoveX = x;
                 mLastMoveY = y;
                 mMovedX = x - mLastDownX;
@@ -172,6 +153,33 @@ class MotionEventTracker {
         if (mVelocityTracker != null) {
             mVelocityTracker.recycle();
             mVelocityTracker = null;
+        }
+    }
+
+    private int computeDirection(int dx, int dy) {
+        float degree = (float) dx / (float) dy;
+        if (dx == 0) {
+            return dy > 0 ? DIRECTION_BOTTOM : DIRECTION_TOP;
+        } else if (dy == 0) {
+            return dx > 0 ? DIRECTION_RIGHT : DIRECTION_LEFT;
+        }
+
+        if (dx > 0) {
+            if (degree <= 1f) {
+                return DIRECTION_BOTTOM;
+            } else if (degree >= -1f) {
+                return DIRECTION_TOP;
+            } else {
+                return DIRECTION_RIGHT;
+            }
+        } else {
+            if (degree >= -1f) {
+                return DIRECTION_BOTTOM;
+            } else if (degree >= 1f) {
+                return DIRECTION_TOP;
+            } else {
+                return DIRECTION_RIGHT;
+            }
         }
     }
 }

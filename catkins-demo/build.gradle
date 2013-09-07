@@ -1,11 +1,11 @@
 buildscript {
-	repositories {
-		mavenCentral()
-	}
+    repositories {
+        mavenCentral()
+    }
 
-	dependencies {
-		classpath 'com.android.tools.build:gradle:0.5.5'
-	}
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.5.+'
+    }
 }
 
 apply plugin: 'android'
@@ -17,19 +17,19 @@ dependencies {
     }
 
     compile 'android.support:compatibility-v4:13'
-	compile 'de.akquinet.android.androlog:androlog:1.0.5'
-	compile 'com.google.guava:guava:14.0.1'
-	compile project(':catkins-lib')
+    compile 'de.akquinet.android.androlog:androlog:1.0.5'
+    compile 'com.google.guava:guava:14.0.1'
+    compile project(':catkins-lib')
 }
 
 android {
-	compileSdkVersion 17
+    compileSdkVersion 17
     buildToolsVersion "17.0"
 
-	defaultConfig {
-		minSdkVersion 9
-		targetSdkVersion 17
-	}
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 17
+    }
 
     sourceSets {
         main {

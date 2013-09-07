@@ -42,6 +42,7 @@ public class RoundCornerView extends View {
         super.draw(canvas);
         mDecor.draw(canvas);
         canvas.restoreToCount(sc);
+        getParent().requestDisallowInterceptTouchEvent(true);
     }
 
     //@Override

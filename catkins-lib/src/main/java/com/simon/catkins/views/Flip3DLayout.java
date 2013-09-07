@@ -116,20 +116,20 @@ public class Flip3DLayout extends FrameLayout {
     }
 
     public void startFlip() {
-        mInjector.animate(MSG_ANIMATION_FLIP | mMSGOrientation);
+        mInjector.animate(MSG_ANIMATION_FLIP | mMSGTransition);
     }
 
     public void startReverseFlip() {
-        mInjector.animate(MSG_ANIMATION_RFLIP | mMSGOrientation);
+        mInjector.animate(MSG_ANIMATION_RFLIP | mMSGTransition);
     }
 
-    private int mMSGOrientation = MSG_HORIZONTAL;
+    private int mMSGTransition = MSG_HORIZONTAL;
 
     public void setTransition(int transition) {
         if (transition == TRANSITION_VERTICAL) {
-            mMSGOrientation = MSG_HORIZONTAL;
+            mMSGTransition = MSG_HORIZONTAL;
         } else {
-            mMSGOrientation = MSG_VERTICAL;
+            mMSGTransition = MSG_VERTICAL;
         }
     }
 
@@ -428,7 +428,7 @@ public class Flip3DLayout extends FrameLayout {
             //Log.d(TAG, "moved from last dx = " + dx + " dy = " + dy);
             //Log.d(TAG, "moved totally x = " + tracker.getMovedX() + " y = " + tracker.getMovedY());
             //Log.d(TAG, "x velocity = " + vx + " y velocity = " + vy);
-            if (mTransition == MSG_HORIZONTAL) {
+            if (mMSGTransition == MSG_HORIZONTAL) {
                 if (mState == STATE_INITIAL && tracker.getMovedX() > 0
                         || mState == STATE_FLIPPED && tracker.getMovedX() < 0) {
                     mDegree = (int) (180f * ((float) tracker.getMovedX() / getMeasuredWidth()));
@@ -437,7 +437,7 @@ public class Flip3DLayout extends FrameLayout {
                 } else {
                     return false;
                 }
-            } else if (mTransition == MSG_VERTICAL) {
+            } else if (mMSGTransition == MSG_VERTICAL) {
                 if (mState == STATE_INITIAL && tracker.getMovedY() > 0
                         || mState == STATE_FLIPPED && tracker.getMovedY() < 0) {
                     mDegree = (int) (180f * ((float) tracker.getMovedY() / getMeasuredHeight()));
@@ -461,13 +461,13 @@ public class Flip3DLayout extends FrameLayout {
         @Override
         public boolean onStopTracking(MotionEventTracker tracker) {
             mTracking = false;
-            if (mTransition == MSG_HORIZONTAL) {
+            if (mMSGTransition == MSG_HORIZONTAL) {
                 if (mState == STATE_INITIAL) {
                     animateFlip();
                 } else if (mState == STATE_FLIPPED) {
                     animateRFlip();
                 }
-            } else if (mTransition == MSG_VERTICAL) {
+            } else if (mMSGTransition == MSG_VERTICAL) {
                 if (mState == STATE_INITIAL) {
                     animateFlip();
                 } else if (mState == STATE_FLIPPED) {
