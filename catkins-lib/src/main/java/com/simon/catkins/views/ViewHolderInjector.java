@@ -1,6 +1,5 @@
 package com.simon.catkins.views;
 
-import android.content.Context;
 import android.view.View;
 
 import java.lang.annotation.ElementType;
@@ -12,7 +11,7 @@ import java.lang.reflect.Field;
 /**
  * @author Simon Yu
  */
-public abstract class ViewHolderInjector {
+public final class ViewHolderInjector {
 
     @Target({ElementType.TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)

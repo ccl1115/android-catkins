@@ -1,6 +1,7 @@
 package com.simon.catkins.demo.app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,6 +58,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 mHolder.mFlipper.startReverseFlip();
             }
             return true;
+        } else if (item.getItemId() == R.id.demos) {
+            startActivity(new Intent(this, DemoListActivity.class));
         }
         return super.onMenuItemSelected(featureId, item);
     }

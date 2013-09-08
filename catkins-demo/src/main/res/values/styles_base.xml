@@ -35,7 +35,21 @@
         <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_base</item>
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Base</item>
 
+        <item name="android:absListViewStyle">@style/AbsListView.Base</item>
+        <item name="android:listViewStyle">@style/ListView.Base</item>
 
+        <item name="android:colorPressedHighlight">@color/press_highlight_base</item>
+        <item name="android:colorLongPressedHighlight">@color/press_highlight_base</item>
+    </style>
+
+    <style name="ListView.Base" parent="@android:style/Widget.Holo.Light.ListView">
+        <item name="android:divider">@null</item>
+        <item name="android:dividerHeight">0dp</item>
+    </style>
+
+    <style name="AbsListView.Base" parent="@android:style/Widget.AbsListView">
+        <item name="android:scrollbars">none</item>
+        <item name="android:fadingEdge">none</item>
     </style>
 
     <style name="ActionBar.Solid.Base" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
@@ -94,4 +108,5 @@
     <style name="Widget.Base.TextView" parent="@android:style/Widget.Holo.Light.TextView">
         <item name="android:textAppearance">@style/TextAppearance.Base</item>
     </style>
+
 </resources>

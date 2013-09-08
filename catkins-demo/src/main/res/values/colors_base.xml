@@ -18,7 +18,9 @@
 -->
 
 <resources>
-    <color name="pressed_base">#CCD6D6D6</color>
+    <color name="pressed_base">#ff476432</color>
+
+    <color name="press_highlight_base">@color/pressed_base</color>
 
     <color name="text_color_base">#E0E1E2</color>
 

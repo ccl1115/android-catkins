@@ -6,4 +6,9 @@
             android:id="@+id/flip"
             android:title="Flip"
             android:showAsAction="always"/>
+
+    <item
+            android:id="@+id/demos"
+            android:title="Demos"
+            android:showAsAction="ifRoom"/>
 </menu>

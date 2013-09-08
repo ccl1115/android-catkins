@@ -12,13 +12,9 @@
             android:theme="@style/Theme.Base"
             android:icon="@drawable/icon"
             android:label="@string/app_name">
-        <activity android:name=".app.FlipperLayoutDemoActivity"/>
-
         <activity android:name=".app.StackLayoutDemoActivity"/>
 
         <activity android:name=".app.StackLayoutWithFragmentDemoActivity"/>
-
-        <activity android:name=".app.HorizontalTranslateLayoutActivity"/>
 
         <activity android:name=".app.refresher.RefresherViewFromXmlActivity"/>
 
@@ -33,6 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".app.DemoDetailActivity"/>
+        <activity
+                android:name=".app.DemoListActivity"
+                android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

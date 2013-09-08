@@ -9,6 +9,7 @@
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            catkins:background="#FF333333"
             catkins:leftOffset="30dp"
             catkins:rightOffset="30dp"
             catkins:tapBack="left|right"
@@ -18,7 +19,8 @@
                 android:id="@android:id/button1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:clickable="true"/>
     </com.simon.catkins.views.HorizontalTranslateLayout>
 
 </FrameLayout>
