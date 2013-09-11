@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Layout {
     int value();
+
+    boolean useMerge() default false;
 }

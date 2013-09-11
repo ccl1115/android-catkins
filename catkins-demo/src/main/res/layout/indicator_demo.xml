@@ -11,9 +11,8 @@
             android:id="@+id/indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FF8439FA"
             catkins:spacing="10dp"
-            catkins:count="2"
+            catkins:count="5"
             catkins:selector="@drawable/indicator_selector"
             catkins:drawable="@drawable/indicator_drawable"/>
 

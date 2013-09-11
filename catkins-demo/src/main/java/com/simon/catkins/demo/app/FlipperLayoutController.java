@@ -11,17 +11,18 @@ import android.widget.LinearLayout;
 import com.simon.catkins.demo.R;
 import com.simon.catkins.demo.app.mvc.BaseController;
 import com.simon.catkins.demo.app.mvc.Layout;
-import com.simon.catkins.demo.app.mvc.ViewHolderType;
 import com.simon.catkins.demo.app.mvc.ViewId;
-
-import static com.simon.catkins.demo.app.FlipperLayoutController.ViewHolder;
 
 /**
  * @author bb.simon.yu@gmail.com
  */
 @Layout(R.layout.flipper_layout)
-@ViewHolderType(ViewHolder.class)
-public class FlipperLayoutController extends BaseController {
+public class FlipperLayoutController extends BaseController<FlipperLayoutController.ViewHolder> {
+
+    @Override
+    protected Class<ViewHolder> getViewHolderType() {
+        return ViewHolder.class;
+    }
 
     public static class ViewHolder {
         @ViewId(R.id.content)

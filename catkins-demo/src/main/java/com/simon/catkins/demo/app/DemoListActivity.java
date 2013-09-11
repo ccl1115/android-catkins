@@ -50,7 +50,7 @@ public class DemoListActivity extends FragmentActivity implements AdapterView.On
                     .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right,
                             android.R.anim.fade_in, android.R.anim.fade_out)
                     .replace(R.id.wrapper, controller)
-                    .commit();
+                    .commitAllowingStateLoss();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

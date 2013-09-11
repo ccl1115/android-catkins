@@ -21,8 +21,7 @@
         <activity android:name=".app.image.ImageSurfaceViewActivity"/>
         <activity android:name=".app.VerticalViewPagerActivity"/>
         <activity android:name=".app.RevertAddingLinearLayoutActivity"/>
-        <activity android:name=".app.PinnedHeaderListViewDemoActivity"/>
-        <activity android:name=".app.IndicatorDemoActivity"/>
+        <activity android:name=".app.PinnedHeaderListViewController"/>
         <activity android:name=".app.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

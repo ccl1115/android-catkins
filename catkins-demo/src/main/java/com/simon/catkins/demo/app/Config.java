@@ -36,5 +36,7 @@ public class Config {
     static {
         addEntry(new ControllerEntry("1", "FlipperLayout", FlipperLayoutController.class));
         addEntry(new ControllerEntry("2", "Horizontal translate", HorizontalTranslateLayoutController.class));
+        addEntry(new ControllerEntry("3", "IndicatorView", IndicatorController.class));
+        addEntry(new ControllerEntry("4", "PinnedHeaderListView", PinnedHeaderListViewController.class));
     }
 }

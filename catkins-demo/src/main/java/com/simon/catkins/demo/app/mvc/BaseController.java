@@ -9,23 +9,23 @@ import android.view.ViewGroup;
 /**
  * @author Simon Yu
  */
-public abstract class BaseController extends Fragment {
+public abstract class BaseController<ViewHolder> extends Fragment {
 
-    private Object mHolder;
+    private ViewHolder mHolder;
+
+    private boolean mUseMerge;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(getLayoutId(), container, false);
+        return inflater.inflate(getLayoutId(), container, mUseMerge);
     }
+
+    protected abstract Class<ViewHolder> getViewHolderType();
 
     @Override
     @SuppressWarnings("unchecked")
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ViewHolderType viewHolderType = getClass().getAnnotation(ViewHolderType.class);
-        if (viewHolderType == null) {
-            throw new RuntimeException("no id to bind");
-        }
-        mHolder = ViewBinder.bind(viewHolderType.value(), view);
+        mHolder = ViewBinder.bind(getViewHolderType(), view);
     }
 
     private int getLayoutId() {
@@ -34,10 +34,12 @@ public abstract class BaseController extends Fragment {
             throw new RuntimeException("no layout to inflate");
         }
 
+        mUseMerge = layout.useMerge();
+
         return layout.value();
     }
 
-    protected Object getViewHolder() {
+    protected ViewHolder getViewHolder() {
         return mHolder;
     }
 
