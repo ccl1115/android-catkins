@@ -3,10 +3,7 @@ Catkins
 * master [![Build Status](https://travis-ci.org/ccl1115/android-catkins.png?branch=master)](https://travis-ci.org/ccl1115/android-catkins)
 * develop [![Build Status](https://travis-ci.org/ccl1115/android-catkins.png?branch=develop)](https://travis-ci.org/ccl1115/android-catkins)
 
-This is an android library project to enhance the UI development experience. With Catkins you can easily structure an
-app with a slide view or obtain some customizable widgets.
-
-But now it's under heavy development and has many features to accomplish.
+This is an android library project to enhance the UI development experience. With Catkins you can easily structure an app. Now it's under heavy development and has many features to accomplish. Pull request is welcome.
 
 
 Sub projects
@@ -17,22 +14,15 @@ catkins-lib
 
 The library project you need to include to your android project if you want use catkins.
 
-catkins-it
-=====
-The instrumentation test project. It actually tests catkins-demo project, because Android test framework cannot test a
-library project.
-
 catkins-demo
 =====
 
-A standard android project to demonstrate catkins usages.
+A standard android project to demonstrate catkins usages and some test codes.
 
-Maven
+Gradle
 =====
 
-We use Maven to for project management. For how to build and test android project using Maven, you can check out the [maven-android-plugin](http://github.com/jayway/maven-android-plugin) and the [maven-android-sdk-deployer](http://github.com/jayway/mosahua/maven-android-sdk-deployer).
-
-If you don't get familiar with Maven or even don't know what Maven is, here it's [documentation](http://maven.apache.org).
+This project is build using the new android build system based on Gradle. The library project now can be build into a bundle file called aar which contains all resources and the manifest file.
 
 Custom views
 ======
