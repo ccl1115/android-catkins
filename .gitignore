@@ -12,3 +12,4 @@ test-key.keystore
 .gradle
 *.swp
 gradle-app.setting
+local.properties

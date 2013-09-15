@@ -23,7 +23,6 @@ public abstract class BaseController<ViewHolder> extends Fragment {
     protected abstract Class<ViewHolder> getViewHolderType();
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mHolder = ViewBinder.bind(getViewHolderType(), view);
     }
