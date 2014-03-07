@@ -1,7 +1,5 @@
 Catkins
 =======
-* master [![Build Status](https://travis-ci.org/ccl1115/android-catkins.png?branch=master)](https://travis-ci.org/ccl1115/android-catkins)
-* develop [![Build Status](https://travis-ci.org/ccl1115/android-catkins.png?branch=develop)](https://travis-ci.org/ccl1115/android-catkins)
 
 This is an android library project to enhance the UI development experience. With Catkins you can easily structure an app. Now it's under heavy development and has many features to accomplish. Pull request is welcome.
 
